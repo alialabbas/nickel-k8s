@@ -1,0 +1,929 @@
+buildinfo:
+    command: otelcontribcol
+    description: Local OpenTelemetry Collector Contrib binary, testing only.
+    version: 0.87.0-dev
+receivers:
+    - name: googlecloudpubsub
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: kubeletstats
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: podman_stats
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: sqlquery
+      stability:
+        logs: Development
+        metrics: Alpha
+        traces: Undefined
+    - name: syslog
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: snmp
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: awscloudwatch
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: carbon
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: filelog
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Undefined
+    - name: nginx
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: wavefront
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: zipkin
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: azureblob
+      stability:
+        logs: Development
+        metrics: Undefined
+        traces: Development
+    - name: chrony
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: jmx
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: mongodb
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: prometheus
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: purefb
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: prometheus_simple
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: apachespark
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: awscontainerinsightreceiver
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: azuremonitor
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: bigip
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: fluentforward
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Undefined
+    - name: httpcheck
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: zookeeper
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: haproxy
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: k8sobjects
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: purefa
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: apache
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: collectd
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: datadog
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Alpha
+    - name: docker_stats
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: file
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: iis
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: journald
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: riak
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: solace
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: sshcheck
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: azureeventhub
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Undefined
+    - name: k8s_events
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: mongodbatlas
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Undefined
+    - name: oracledb
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: snowflake
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: splunk_hec
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Undefined
+    - name: active_directory_ds
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: aerospike
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: expvar
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: rabbitmq
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: sqlserver
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: awsfirehose
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: couchdb
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: hostmetrics
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: statsd
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: udplog
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: windowseventlog
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: awsecscontainermetrics
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: kafka
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: memcached
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: postgresql
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: pulsar
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: tcplog
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: windowsperfcounters
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: filestats
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: googlecloudspanner
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: redis
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: nsxt
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: skywalking
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Beta
+    - name: otlp
+      stability:
+        logs: Beta
+        metrics: Stable
+        traces: Stable
+    - name: kafkametrics
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: loki
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: awsxray
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: flinkmetrics
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: jaeger
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: mysql
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: opencensus
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Beta
+    - name: otlpjsonfile
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: receiver_creator
+      stability:
+        logs: Alpha
+        metrics: Beta
+        traces: Alpha
+    - name: cloudfoundry
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: influxdb
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: vcenter
+      stability:
+        logs: Undefined
+        metrics: Alpha
+        traces: Undefined
+    - name: cloudflare
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+    - name: elasticsearch
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: k8s_cluster
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Undefined
+    - name: sapm
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: signalfx
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Undefined
+    - name: webhookevent
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Undefined
+processors:
+    - name: k8sattributes
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: routing
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: spanmetrics
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Deprecated
+    - name: memory_limiter
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: datadog
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Deprecated
+    - name: deltatorate
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: filter
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: groupbyattrs
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: span
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Alpha
+    - name: attributes
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: redaction
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: resource
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: resourcedetection
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: tail_sampling
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: transform
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: batch
+      stability:
+        logs: Stable
+        metrics: Stable
+        traces: Stable
+    - name: cumulativetodelta
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: groupbytrace
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: metricstransform
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: probabilistic_sampler
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Beta
+    - name: experimental_metricsgeneration
+      stability:
+        logs: Undefined
+        metrics: Development
+        traces: Undefined
+    - name: servicegraph
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Development
+    - name: remoteobserver
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+exporters:
+    - name: googlecloudpubsub
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: mezmo
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Undefined
+    - name: prometheusremotewrite
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: skywalking
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Undefined
+    - name: zipkin
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: azuremonitor
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: f5cloud
+      stability:
+        logs: Beta
+        metrics: Stable
+        traces: Stable
+    - name: kafka
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: splunk_hec
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: dataset
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Alpha
+    - name: file
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: googlemanagedprometheus
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: sapm
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: signalfx
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: otlphttp
+      stability:
+        logs: Beta
+        metrics: Stable
+        traces: Stable
+    - name: coralogix
+      stability:
+        logs: Alpha
+        metrics: Beta
+        traces: Beta
+    - name: clickhouse
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: influxdb
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: instana
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Alpha
+    - name: loadbalancing
+      stability:
+        logs: Beta
+        metrics: Development
+        traces: Beta
+    - name: logicmonitor
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Alpha
+    - name: loki
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Undefined
+    - name: awsemf
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: carbon
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: elasticsearch
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Beta
+    - name: opencensus
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Beta
+    - name: pulsar
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: sentry
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+    - name: tencentcloud_logservice
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Undefined
+    - name: otlp
+      stability:
+        logs: Beta
+        metrics: Stable
+        traces: Stable
+    - name: azuredataexplorer
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: dynatrace
+      stability:
+        logs: Undefined
+        metrics: Deprecated
+        traces: Undefined
+    - name: prometheus
+      stability:
+        logs: Undefined
+        metrics: Beta
+        traces: Undefined
+    - name: awscloudwatchlogs
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Undefined
+    - name: awss3
+      stability:
+        logs: Alpha
+        metrics: Alpha
+        traces: Alpha
+    - name: awskinesis
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: cassandra
+      stability:
+        logs: Alpha
+        metrics: Undefined
+        traces: Alpha
+    - name: datadog
+      stability:
+        logs: Alpha
+        metrics: Beta
+        traces: Beta
+    - name: googlecloud
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: sumologic
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Undefined
+    - name: logging
+      stability:
+        logs: Deprecated
+        metrics: Deprecated
+        traces: Deprecated
+    - name: alibabacloud_logservice
+      stability:
+        logs: Beta
+        metrics: Beta
+        traces: Beta
+    - name: logzio
+      stability:
+        logs: Beta
+        metrics: Undefined
+        traces: Beta
+    - name: tanzuobservability
+      stability:
+        logs: Undefined
+        metrics: Deprecated
+        traces: Deprecated
+    - name: debug
+      stability:
+        logs: Development
+        metrics: Development
+        traces: Development
+    - name: awsxray
+      stability:
+        logs: Undefined
+        metrics: Undefined
+        traces: Beta
+connectors:
+    - name: count
+      stability:
+        logs-to-logs: Undefined
+        logs-to-metrics: Development
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Development
+        metrics-to-traces: Undefined
+        traces-to-logs: Undefined
+        traces-to-metrics: Development
+        traces-to-traces: Undefined
+    - name: datadog
+      stability:
+        logs-to-logs: Undefined
+        logs-to-metrics: Undefined
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Undefined
+        metrics-to-traces: Undefined
+        traces-to-logs: Undefined
+        traces-to-metrics: Beta
+        traces-to-traces: Undefined
+    - name: exceptions
+      stability:
+        logs-to-logs: Undefined
+        logs-to-metrics: Undefined
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Undefined
+        metrics-to-traces: Undefined
+        traces-to-logs: Development
+        traces-to-metrics: Development
+        traces-to-traces: Undefined
+    - name: routing
+      stability:
+        logs-to-logs: Alpha
+        logs-to-metrics: Undefined
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Alpha
+        metrics-to-traces: Undefined
+        traces-to-logs: Undefined
+        traces-to-metrics: Undefined
+        traces-to-traces: Alpha
+    - name: servicegraph
+      stability:
+        logs-to-logs: Undefined
+        logs-to-metrics: Undefined
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Undefined
+        metrics-to-traces: Undefined
+        traces-to-logs: Undefined
+        traces-to-metrics: Alpha
+        traces-to-traces: Undefined
+    - name: spanmetrics
+      stability:
+        logs-to-logs: Undefined
+        logs-to-metrics: Undefined
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Undefined
+        metrics-to-traces: Undefined
+        traces-to-logs: Undefined
+        traces-to-metrics: Alpha
+        traces-to-traces: Undefined
+    - name: forward
+      stability:
+        logs-to-logs: Beta
+        logs-to-metrics: Undefined
+        logs-to-traces: Undefined
+        metrics-to-logs: Undefined
+        metrics-to-metrics: Beta
+        metrics-to-traces: Undefined
+        traces-to-logs: Undefined
+        traces-to-metrics: Undefined
+        traces-to-traces: Beta
+extensions:
+    - name: ecs_observer
+      stability:
+        extension: Beta
+    - name: host_observer
+      stability:
+        extension: Beta
+    - name: db_storage
+      stability:
+        extension: Alpha
+    - name: memory_ballast
+      stability:
+        extension: Beta
+    - name: health_check
+      stability:
+        extension: Beta
+    - name: ecs_task_observer
+      stability:
+        extension: Beta
+    - name: pprof
+      stability:
+        extension: Beta
+    - name: bearertokenauth
+      stability:
+        extension: Beta
+    - name: jaegerremotesampling
+      stability:
+        extension: Alpha
+    - name: docker_observer
+      stability:
+        extension: Beta
+    - name: zpages
+      stability:
+        extension: Beta
+    - name: k8s_observer
+      stability:
+        extension: Alpha
+    - name: basicauth
+      stability:
+        extension: Beta
+    - name: headers_setter
+      stability:
+        extension: Alpha
+    - name: http_forwarder
+      stability:
+        extension: Beta
+    - name: oauth2client
+      stability:
+        extension: Beta
+    - name: oidc
+      stability:
+        extension: Beta
+    - name: sigv4auth
+      stability:
+        extension: Beta
+    - name: asapclient
+      stability:
+        extension: Beta
+    - name: awsproxy
+      stability:
+        extension: Beta
+    - name: file_storage
+      stability:
+        extension: Beta
