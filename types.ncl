@@ -110,8 +110,7 @@
 
       Nullable
         | doc "A record contract that can be null"
-        = fun contract =>
-          fun label record =>
+        = fun contract label record =>
             if record == null then
               record
             else

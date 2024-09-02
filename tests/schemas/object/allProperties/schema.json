@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "additionalProperties": {
+    "type": "string"
+  },
+  "properties": {
+    "rank": {
+      "type": "number"
+    }
+  },
+  "patternProperties": {
+    "^[.]": {
+      "type": "string"
+    }
+  }
+}

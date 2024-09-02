@@ -1,16 +1,3 @@
-# Similar idea here for tomorrow, something that gives you the basic test against the known schema when we load things into OpenTelemetry Collector
-# This focuse on the known component name the validation of PipelineConfigs
-# Component checked would need to be handled differently if we want to be able to do such a thing along with potentially exposing configs for something like Loki Labeling and so on
-# This contract is agnostic to the OpenTel distribution, the schema that drives the evaluation is managed independently from the code but loaded
-# `otelcol components` should yield the componetns in your own distribution and you could use that instead
-# The interesting challenge is converting these contracts into a json schema for CRDs that extends beyond the basic type to allow correct linting and not relying on server side validation
-# The idea is give something that is openended like ConfigMap a real schema inside kubernetes with little to no effort and bashing your head against the wall
-# complex validation will be hard to check but I guess something needs to give or take sometimes
-# Converting to JsonSchema will be impossible when there is no hint to indicate what is the contract is trying to do like allOf, anyOf and so on
-# One would say why do all of this when I can just write a schema then use that schema... Schemas are not really expressive enough to what you want to do honestly
-# and also breaks what I would expect from the world aka use one system for all things configs
-# TODO: this should be a proper contract so that it is more obvious where errors are coming from the generated data or from our code
-# TODO: This is a good candidate for a contract.from extension to apply a contract on a field and ensure enumration on a dictionary keys
 let component = { name | String, stability | { logs | String, metrics | String, traces | String }, } in
 let cfg
   | {
@@ -19,10 +6,6 @@ let cfg
     exporters | Array component,
     processors | Array component,
     extensions | Array { name | String, stability | { extension | String } }, # TODO: this could be folded fup if the record fields are enumerated
-    # A connector is a receiver and exporter
-    # the original receiver + exporters map should be kept clean
-    # instead we want another conditional check for the pipeline to go over the connector and see if it allows the pipeline graph to go from signal to signal
-    # i.e. connector.receivers = someName === For the signal basically
     connectors
       | Array {
         name | String,
@@ -196,20 +179,7 @@ let PipelineContract = fun configuredReceivers configuredExporters configuredPro
     |> std.record.from_array
   )
 in
-# Components is always computable, the config of how it looks like under certain subsection is not. telemetry went through some iteration in the past
-# If we have an ever changing schema that constantly change, how do you make something work side by side to compute the deltas of what is to be applied for a specific version only
-# i.e. rather than rewriting the whole thing, we write incremental patches that would add to it. This work only if the schema is addiditive.
-# Which I guess from a design PoV, a break change should be a major increment on the schema, patch is truly a patch were we add to it.
 {
-  # TODO: this contract can be exported to allow you to do about anything you want, show an example of how one could address a complex schema like OpenTel without relying on arbitrary schema generation but rather isolated contracts similar to the kind test.....PipelineNames
-  # The components name is always generated correctly from the output of otelcol components
-  # Then the fine grained contract for the component is there to be applied for each component, same thing those could be looked up
-  # Then the final stage of validation is the correctness of the outcome of the component.
-  # - Think for example label loki data
-  # - Or maybe remove attribute and you want to make the intention clear
-  # - maybe you wanted to drop/aggregate
-  # TODO: this name of sounds good in theory but will fail because it will cause an infinite recursion
-  # Could be a good feature to have since a lot of times you want to do something like OneOf in isolation but reference the original name
   receivers | ComponentValidation "receivers",
   extensions | ComponentValidation "extensions" | optional,
   exporters | ComponentValidation "exporters",

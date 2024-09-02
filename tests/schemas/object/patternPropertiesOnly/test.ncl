@@ -1,0 +1,10 @@
+let contract = import "contract.ncl" in
+std.test.assert_all
+  [
+    (
+      let val = {
+        ".hidden" = "hidden",
+      }
+      in (val | contract) == val
+    ),
+  ]

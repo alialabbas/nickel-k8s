@@ -11,13 +11,17 @@ let { Env, .. } = import "../kube.ncl" in
     },
   },
   # Ensures all deployment define in this env have at least a replica of 10
+  # TODO: this is not working now for whatever reason
   Constraints = {
     Deployment = {
+      apiVersion = "apps/v1",
+      kind = "Deployment",
       spec
         | {
           replicas | Number | std.contract.from_predicate (fun val => val >= 10),
           ..
-        },
+        }
+        | optional,
       ..
     }
   },
