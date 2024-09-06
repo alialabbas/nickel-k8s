@@ -1,5 +1,5 @@
 let { ResourceMetadata, Labels, .. } = import "metadata.ncl" in
-let { Networking , .. } = import "types.ncl" in
+let { Networking, .. } = import "types.ncl" in
 let { Kube, ApiGroups, .. } = import "kube.ncl" in
 let portOrProtocol = fun label value =>
   std.typeof value
@@ -36,7 +36,7 @@ in
           internalTrafficPolicy | std.enum.TagOrString | [| 'Local, 'Cluster |] | optional,
           ipFamilies | Array String | optional,
           ipFamilyPolicy | String | optional,
-          loadBalanacerClass | String | optional,
+          loadBalancerClass| String | optional,
           loadBalancerIP | String | optional,
           loadBalancerSourceRanges | String | optional,
           ports | Array svcPort,
@@ -45,6 +45,8 @@ in
           sessionAffinity | std.enum.TagOrString | [| 'ClientIP, 'None |] | optional,
           sessionAffinityConfig | { .. } | optional, # TODO: close this contract
           type | std.enum.TagOrString | [| 'ClusterIP, 'ExternalName, 'NodePort, 'LoadBalancer |] | optional,
+          loadBalancerClass | String | optional,
+          healthCheckNodePort | std.number.Integer | optional,
         },
     }
 } | ApiGroups

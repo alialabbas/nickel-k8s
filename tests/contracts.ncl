@@ -49,6 +49,43 @@ let formatsTests = [
   !("639addf5-9297-4749-ae1e-ac1f9de1c3" | lib.IsContract lib.UUID),
 ]
 in
+let recordTests = [
+  let val = { a = "test" } in
+  (
+    val
+      | lib.Records.JsonObject
+        {
+          a = { optional = false, contract = String },
+          b = { optional = true, contract = Number }
+        }
+        {}
+        false
+  ) == val,
+  (
+    { a = { b = 1, c = "3" } }
+      | lib.Records.JsonObject
+        {
+          a = {
+            optional = false,
+            contract = (
+              lib.Records.JsonObject
+                {
+                  b = { optional = false, contract = Number, },
+                  c = {
+                    optional = false,
+                    contract = String
+                  }
+                }
+                {}
+                false
+            )
+          },
+        }
+        {}
+        false
+  ) == { a = { b = 1, c = "3" } },
+]
+in
 std.test.assert_all
   (
     oneOfTests
@@ -56,4 +93,5 @@ std.test.assert_all
     @ numberTests
     @ arraysTests
     @ formatsTests
+    @ recordTests
   )

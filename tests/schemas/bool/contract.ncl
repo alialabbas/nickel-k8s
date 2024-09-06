@@ -1,3 +1,3 @@
 let lib = import "Contracts.ncl"
 in
-{ _ | String }
+Bool

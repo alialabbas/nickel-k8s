@@ -45,6 +45,7 @@ let OnlyWhenInOrNotIn
       annotations | annotationsContract | optional,
       name | Kube.Name | optional,
       namespace | Kube.Name | optional,
+      ..
     },
   ResourceMetadata | doc "Extension of Metadata, includes metadata.name, the other one is used in embedded resources" = { name | Kube.Name } & Metadata,
   ValidLabel = std.contract.from_predicate (fun val => validLabel val),

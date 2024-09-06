@@ -1,0 +1,12 @@
+{
+  "enum": [
+    {
+      "first": 1
+    },
+    {
+      "string": "str"
+    },
+    1,
+    true
+  ]
+}

@@ -22,7 +22,7 @@
                 (
                   fun c acc =>
                     # std.contract.check (std.contract.from_predicate (fun value => (value | c) == value)) label value
-                    std.contracts.check c label value
+                    std.contract.check c label value
                     |> match {
                       'Ok val => acc @ ['Ok val],
                       'Error _ => acc,
@@ -156,7 +156,7 @@
           Represent a json record using standard json schema model for objects.
           Only use this when you want to code generation json schemas since most likely the code would look cleaner if you write your contract by hand.
         "%
-      : { _ : Dyn } -> { _ : Dyn } -> Dyn -> Dyn
+      : { _ : { optional : Bool, contract : Dyn } } -> { _ : Dyn } -> Dyn -> Dyn
       = fun properties patternProperties additionalProperties =>
         let contract = fun label value =>
           # we first check pattern properties
@@ -210,18 +210,40 @@
               result
             in
 
-          # we then get the properties that are part of the properties contract but assume they are correct
-          # the returned result would be apply the properties contract checking their correctness
+          # here we want to go over the defined properties and apply their IsContract
+          # NOTE: while this look like a root level check only, each field contract could be yet another invocation to JsonObject
           let result =
-            let record_contract_fields = std.record.fields_with_opts properties in
-            std.record.fields_with_opts value
+            std.record.to_array properties
             |> std.array.fold_right
               (
                 fun e acc =>
-                  if std.array.any (fun p => p == e) record_contract_fields then { checked = acc.checked @ [e], failed = acc.failed } else acc
+                  if !std.record.has_field e.field value && !e.value.optional then
+                    { checked = acc.checked, failed = acc.failed @ ["Missing required field `%{e.field}`"] }
+                  else if !std.record.has_field e.field value && e.value.optional then
+                    acc # missing an optional propertie, nothing to do here
+                  else
+                    std.contract.check e.value.contract label value."%{e.field}"
+                    |> match {
+                      'Ok _ => { checked = acc.checked @ [e.field], failed = acc.failed },
+                      # TODO: better error messaging
+                      'Error val => { checked = acc.checked, failed = acc.failed @ ["%{e.field} doesn't match its specified contract"] },
+                    }
               )
               result
           in
+
+          # we then get the properties that are part of the properties contract but assume they are correct
+          # the returned result would be apply the properties contract checking their correctness
+          # let result =
+          #   let record_contract_fields = std.record.fields_with_opts properties in
+          #   std.record.fields_with_opts value
+          #   |> std.array.fold_right
+          #     (
+          #       fun e acc =>
+          #         if std.array.any (fun p => p == e) record_contract_fields then { checked = acc.checked @ [e], failed = acc.failed } else acc
+          #     )
+          #     result
+          # in
 
           # get the remaining properties and inject them
           let result =
@@ -266,7 +288,7 @@
             'Error { message = "record doesn't allow unchecked fields", notes = remainingProperties }
           else
             # NOTE: this approach is not great and doesn't work well with merging contracts
-            'Ok (value | properties)
+            'Ok value
         in
         std.contract.custom contract | Dyn,
   },
@@ -328,7 +350,20 @@
     Regex
       | doc "Contract matching a string value against a regex"
       # | String -> Bool -> Dyn
-      = fun regex => std.contract.from_predicate (fun val => std.string.is_match regex val)
+      = fun regex => std.contract.from_predicate (fun val => std.string.is_match regex val),
+    join
+      | doc "join array of string on character ignore empty strings"
+      : String -> Array String -> String
+      = fun joinChar values =>
+        std.array.fold_right
+          (
+            fun e acc =>
+              if acc == "" then
+                e
+              else if e != "" then e ++ joinChar ++ acc else acc
+          )
+          ""
+          values
   },
 
   UUID =
@@ -372,6 +407,18 @@
   },
 
   Enum = {
+    ArrayEnum
+      | doc "Ensure a given value is part of a set"
+      = fun elements =>
+        std.contract.custom
+          (
+            fun label value =>
+              std.array.elem value elements
+              |> match {
+                true => 'Ok value,
+                false => 'Error { message = "Enum doesn't match expected enum values" ++ (std.serialize 'Json elements) }
+              }
+          ),
     StringOrEnum
       | doc "Similar to `std.enum.TagOrString | [| enums |]` expect that it can be applied inside other contracts safely"
       = fun enums =>

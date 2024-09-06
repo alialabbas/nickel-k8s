@@ -2,10 +2,10 @@ let lib = import "Contracts.ncl"
 in
 lib.Records.JsonObject
   {
-    rank
-      | Number
-      | optional,
-    ..
+    rank = {
+      contract = Number,
+      optional = false
+    },
   }
   {
     "^[.]" = String,
