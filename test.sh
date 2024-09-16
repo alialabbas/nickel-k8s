@@ -1,29 +1,49 @@
 #!/usr/bin/env bash
 
-set -e
+: '
+    This is the tester for for the schema generation.
+    All tests lives in ./tests/schemas/* and each directory can contain many tests
+    Each test repo should have the following;
+    - test.ncl: test cases against the generated contract
+    - schema.json: the schema used when generating the test contract
+    - contract.ncl: the generated contract which should be used in test.ncl
+'
 
-nickel_test() {
-	dir=$(dirname "$1")
-	GENERATED_FILE_NAME="${dir}/contract.ncl"
-	echo "Generating contract at $GENERATED_FILE_NAME"
-	nickel eval tester.ncl -I "${dir}" | awk '{print substr($0, 2, length($0) - 2)}' >"${GENERATED_FILE_NAME}"
+set -e -o pipefail
 
-	# Fix string formatting since nickel will always escape " and no other way to print this for now
-	# TODO: use this instead of echo -e to make the file print new liens correctly
-	# This will alllow us to keep the escaped data as is and only unescape what we want to truly unescape
-	# This will become an issue when a doc string has \" in their doc string
-	sed 's/\\n/\n/g' "$GENERATED_FILE_NAME" -i
-	sed 's/m%\\"/m%"/g' "$GENERATED_FILE_NAME" -i
-	sed 's/\\"\\%/"%/g' "$GENERATED_FILE_NAME" -i
-	sed 's/\\"/"/g' "$GENERATED_FILE_NAME" -i
+generate_and_run_tests() {
 
-	TESTFILE="$dir/test.ncl"
-	echo "Running test $TESTFILE"
-	nickel format "$GENERATED_FILE_NAME"
-	nickel eval "$TESTFILE" -I "${PWD}"
+	# base case when we are passing a file
+	if [ ! -d "$1" ]; then
+		return 0
+	fi
+
+	# shellcheck disable=SC2231
+	for dir in $1/*; do
+
+		if [ -f "$dir/schema.json" ]; then
+			# generate the contract used in test
+			GENERATED_FILE_NAME="${dir}/contract.ncl"
+			echo "Generating contract at $GENERATED_FILE_NAME"
+			result=$(nickel eval tester.ncl -I "${dir}" 2>/dev/null)
+			echo "${result:1:-1}" >"$GENERATED_FILE_NAME"
+
+			# Fix some escaped special characters
+			sed 's/\\n/\n/g' "$GENERATED_FILE_NAME" -i
+			sed 's/m%\\"/m%"/g' "$GENERATED_FILE_NAME" -i
+			sed 's/\\"\\%/"%/g' "$GENERATED_FILE_NAME" -i
+			sed 's/\\"/"/g' "$GENERATED_FILE_NAME" -i
+
+			# format and run the test
+			TESTFILE="$dir/test.ncl"
+			echo "Running test $TESTFILE"
+			nickel format "$GENERATED_FILE_NAME"
+			nickel eval "$TESTFILE" -I "${PWD}" >/dev/null
+		fi
+
+		# recurse into each sub-directory
+		generate_and_run_tests "$dir"
+	done
 }
 
-# TODO: need to exit on first failure or just aggregate all results somehow and return that
-# TODO: need to figure out escape string hell here
-export -f nickel_test
-find ./tests -name schema.json -exec bash -c 'nickel_test $0' {} \;
+generate_and_run_tests "./tests/schemas"

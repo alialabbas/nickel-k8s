@@ -53,6 +53,7 @@ let Schemas = {
     minLength | std.number.Integer | optional,
     maxLength | std.number.Integer | optional,
     pattern | String | optional,
+    # TODO: format is abused by json schemas, convert this to just a a simple array check
     format
       | std.enum.TagOrString
       | [|
@@ -80,6 +81,7 @@ let Schemas = {
         'binary,
         'string,
         'url,
+        'int-or-string
       |]
       | optional,
     description | String | optional,
@@ -261,18 +263,6 @@ let Converters = {
           std.to_string isOpen
       in
 
-      # TODO: this should be outside with std.contract.all_of
-      # let noLazy =
-      #   !(
-      #     std.record.has_field "oneOf" schema
-      #     || std.record.has_field "allOf"
-      #     || std.record.has_field
-      #     || "anyOf"
-      #   )
-      #   && noLazy
-      # in
-      # let oneOf = if std.record.has_field "oneOf" schema then OneOf schema.oneOf else "" in
-      # let isComplex = schema.isEmptyObject in
       let patternPropertiesSchema =
         (
           schema.patternProperties

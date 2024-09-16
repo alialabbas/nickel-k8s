@@ -1,4 +1,67 @@
 {
+
+  # TODO: need a kube space for contracts and types
+  # TODO: can this be just a function, we will need the full types though and what is there to be transformed
+  FromMapToList
+    | doc "emulate kubenretes list-map type where a key in a list acts as the anchor for the object to allow list to be easily merged"
+    = fun mergeKey =>
+      std.contract.custom
+        (
+          fun label value =>
+            let r = (
+              std.record.to_array value
+              |> std.array.map
+                (
+                  fun e =>
+                    let originalFieldValue =
+                      # if the string is a number, convert it back to a number since that what it was originally
+                      # TODO: is there a case where the value is always going to be a string and someone present it as a number only?
+                      if e.field | IsContract std.string.NumberLiteral then
+                        std.string.to_number e.field
+                      else
+                        e.field
+                    in { "%{mergeKey}" = originalFieldValue } & e.value
+                )
+            )
+            in
+            std.typeof value
+            |> match {
+              'Record => 'Ok r,
+              _ => 'Error { message = "exected a record" }
+            }
+        ),
+
+  FromListToMap
+    | doc m%"
+      Transpose Contract that allows to take define a structure is an array of records and convert it to a record based on a key
+      This is useufl when you want to merge data but the underlying structure is a list
+    "%
+    = fun key =>
+      std.contract.custom
+        (
+          fun label value =>
+            std.typeof value
+            |> match {
+              'Array =>
+                let acc = {} in
+                std.array.try_fold_left
+                  (
+                    fun acc e =>
+                      let field = std.to_string e."%{key}" in
+                      if std.record.has_field field acc then
+                        'Error { message = "Found duplicated key `%{e."%{key}"}`" }
+                      else
+                        'Ok ({ "%{field}" = std.record.remove key e } & acc)
+                  )
+                  acc
+                  value,
+              # we assume the record value is correct and we just leave it as is.
+              # the core contract in the validation will check the concrete data once we transform it back
+              'Record => 'Ok value,
+              _ => 'Error { message = "Expected the data to be either formatted as a map or a list that can be converted, got instead %{std.to_string (std.typeof value)}" }
+            }
+        ),
+
   IsContract = fun contract =>
     std.contract.custom
       (
@@ -366,32 +429,129 @@
           values
   },
 
+  # TODO: this could be cleaned up a bit more
+  # Maybe using validator is not the best here
+  # also need a sensible way to not overuse regex
+  # braces format need hypens,
+  # hypers can be checked separate
+  # without hypers
+  # parantheses is the same as braces. Slice without first and last, check first and last are opening and closing then run the other check
   UUID =
-    std.contract.from_predicate
+    let IsNGuid = fun v =>
+      std.string.is_match
+        "^[0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}$"
+        v
+    in
+    let IsDGuid = fun v =>
+      std.string.is_match
+        "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        v
+    in
+    let IsBGuid = fun v =>
+      std.string.is_match
+        "^\\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$"
+        v
+    in
+    let IsPGuid = fun v =>
+      std.string.is_match
+        "^\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\)$"
+        v
+    in
+    std.contract.from_validator
       (
-        fun v =>
-          std.string.is_match
-            "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-            v
+        match {
+          t if std.typeof t != 'String =>
+            'Error {
+              message = "Expected a String, got %{std.to_string (std.typeof t)}"
+            },
+          s if std.string.length s < 32 =>
+            'Error {
+              message = "Got an invalid UUID length, need least 32 characters"
+            },
+          v if IsNGuid v
+            || IsDGuid v
+            || IsPGuid v
+            || IsBGuid v => 'Ok,
+          _ =>
+            'Error {
+              message = "Invalid Guid",
+              notes = [
+                "Guid have one of the following representations",
+                "00000000000000000000000000000000",
+                "00000000-0000-0000-0000-000000000000",
+                "{00000000-0000-0000-0000-000000000000}",
+                "(00000000-0000-0000-0000-000000000000)",
+              ]
+            },
+        }
       ),
 
   DateTime = {
     Date =
-      std.contract.from_predicate
+      std.contract.from_validator
         (
-          fun v =>
-            std.string.is_match
-              "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))"
-              v
+          let isDateTime = fun v =>
+            let segments = std.string.split "-" v in
+            let year = std.array.at 0 segments in
+            let month = std.array.at 1 segments in
+            let day = std.array.at 2 segments in
+
+            let isValidMonth = fun v =>
+              std.string.length v == 2
+              && (std.string.to_number v > 0 && std.string.to_number v <= 12)
+            in
+
+            let isValidDay = fun year month day =>
+              let isDayValid = std.string.length day == 2 in
+              let year = std.string.to_number year in
+              let month = std.string.to_number month in
+              let day = std.string.to_number day in
+              month
+              |> match {
+                n if !isDayValid => false,
+                1 => day > 0 && day <= 31,
+                2 if year % 4 == 0 => day > 0 && day <= 29,
+                2 => day > 0 && day <= 28,
+                3 => day > 0 && day <= 31,
+                4 => day > 0 && day <= 30,
+                5 => day > 0 && day <= 31,
+                6 => day > 0 && day <= 30,
+                7 => day > 0 && day <= 31,
+                8 => day > 0 && day <= 31,
+                9 => day > 0 && day <= 30,
+                10 => day > 0 && day <= 31,
+                11 => day > 0 && day <= 30,
+                12 => day > 0 && day <= 31,
+              }
+            in
+
+            std.array.length segments == 3
+            && std.string.is_match "^[0-9]{4}$" year
+            && isValidMonth month
+            && isValidDay year month day
+          in
+          match {
+            v if !isDateTime v =>
+              'Error {
+                message = "%{v} is not a valid date time format",
+                notes = ["e.g 2024-09-01 is valid but not 2024-9-1"],
+              },
+            _ => 'Ok,
+          }
         ),
-    Time =
-      std.contract.from_predicate
-        (
-          fun v =>
-            std.string.is_match
-              "^(?:[01]\\d|2[0-3]):(?:[0-5]\\d):(?:[0-5]\\d(\\+[0-9]{2}?(:[0-9]{2})?)?)$"
-              v
-        ),
+    Time
+      | doc m%"
+          Contract based on RFC3339
+          https://datatracker.ietf.org/doc/html/rfc3339
+        "%
+      =
+        std.contract.from_predicate
+          (
+            fun v =>
+              std.string.is_match
+                "^(?:[01]\\d|2[0-3]):(?:[0-5]\\d):(?:[0-5]\\d(\\+[0-9]{2}?(:[0-9]{2})?)?)$"
+                v
+          ),
 
     DateTime | doc "Simple ISO-8601 DateTime regex, doesn't check for leap years"
       =
@@ -561,7 +721,39 @@
         | doc "Valid port number between 0 to 65535"
         = Numbers.InRange 0 65535,
 
-      IPAddr
+      # Works but lacks any check around max number of bits calculated
+      # how do we go about that
+      # each fragment should be considered for the total count
+      # another option is to tranform the value before the validation
+      # add the missing zeros this is might not be simple
+      # we have to add for the total missing segments basically
+      # once we have filled the missing pieces, we can do that
+      IPv6
+        | doc "Contract ensuring the string is a valid ipv6 representation"
+        =
+          std.contract.custom
+            (
+              fun label value =>
+                if std.string.find_all "::" value |> std.array.length > 1 || std.string.find_all ":::" value |> std.array.length > 0 then
+                  'Error {
+                    message = "%{value} is a not a valid ipv6"
+                  }
+                else
+                  'Ok (
+                    std.string.split ":" value
+                    |> std.array.filter (fun e => e != "")
+                    |> std.array.fold_right
+                      (
+                        fun e acc =>
+                          if std.string.is_match "[0-9a-f]" e then
+                            true
+                          else
+                            std.contract.blame_with_message "%{value} is not a valid ipv6" label
+                      )
+                      false
+                  )
+            ),
+      IPv4
         | doc "IPv4 address"
         =
           std.contract.from_predicate

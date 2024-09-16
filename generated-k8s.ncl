@@ -1,6 +1,6 @@
 # TODO: most likely it makes more sense to fold this in, create a wrapper method around SchemaToNickel so that it defines the prelim there for all generated text
 # Also this wrapper should handle the complex shenanigen
-let k8sSchema = import "k8s.json" in
+let k8sSchema = import "swagger.json" in
 let rec jsonSchema =
   (import "schema.ncl")
   & {

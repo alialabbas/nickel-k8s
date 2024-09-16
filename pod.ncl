@@ -1,33 +1,47 @@
-let { Pod, .. } = import "podspec.ncl" in
-{
-  metadata = {
-    name = "valid-name",
-    # labels = {
-    #   "kubernetse.io/test" = "test",
-    # },
-    # annotations = {
-    #   testnotvali_d = "willfail",
-    # },
-  },
+let { v1, .. } = import "./k8s/v1.31.0/mergeable.ncl" in
+let all = import "./k8s/v1.31.0/mapToList.ncl" in
+let outter = {
+  spec
+    | {
+      ThisExtraFieldMakeItWork | optional,
+      hostAliases | Number | optional,
+      containers | Number | optional,
+      ..
+    }
+    | optional,
+  ..
+}
+in
+let inner = {
+
+  spec
+    | {
+      failure | Bool | optional,
+      hostAliases
+        | optional,
+      containers
+        | Array {
+          ..
+        },
+      ..
+    }
+    | optional,
+  ..
+}
+in
+let p = {
   spec = {
     containers = [
       {
-        name = "custom-name",
-        image = "custom-name",
-        ports = [{ containerPort = 90 }],
-        env = [
+        name = "test",
+        image = "nginx",
+        ports = [
           {
-            name = "test",
-            value = "test",
-            # valueFrom = { fieldRef = { fieldPath = '"metadata.name", } },
-          },
-        ],
-        envFrom = [
-          {
-            configMapRef = { name = "configmap-valid", "optional" = true, },
+            containerPort = 80,
+            name = "http"
           }
-        ]
+        ],
       }
-    ],
-  },
-} | Pod
+    ]
+  }
+} in (p | v1.Pod | all.v1.Pod) == p

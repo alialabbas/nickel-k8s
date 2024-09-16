@@ -44,9 +44,32 @@ let arraysTests = [
 ]
 in
 let formatsTests = [
+
+  # Valid Guids
   "639addf5-9297-4749-ae1e-ac1f9de1cbf3" | lib.IsContract lib.UUID,
-  !("639addf592974749ae1eac1f9de1cbf3" | lib.IsContract lib.UUID),
+  "{639addf5-9297-4749-ae1e-ac1f9de1cbf3}" | lib.IsContract lib.UUID,
+  "(639addf5-9297-4749-ae1e-ac1f9de1cbf3)" | lib.IsContract lib.UUID,
+  "639addf592974749ae1eac1f9de1cbf3" | lib.IsContract lib.UUID,
+
+  #Invalid Guids
+  !("639addf5-9297-4749-ae1e-ac1f9de1cbzz" | lib.IsContract lib.UUID),
   !("639addf5-9297-4749-ae1e-ac1f9de1c3" | lib.IsContract lib.UUID),
+  !("{639addf592974749ae1eac1f9de1c3}" | lib.IsContract lib.UUID),
+  !("(639addf592974749ae1eac1f9de1c3)" | lib.IsContract lib.UUID),
+  !("{639addf592974749ae1eac1f9de1c3)" | lib.IsContract lib.UUID),
+  !("639addf592974749ae1eac1f9de1c3)" | lib.IsContract lib.UUID),
+  !("0000000" | lib.IsContract lib.UUID),
+
+  # IPv4
+  "0.0.0.0" | lib.IsContract lib.Networking.IPv4,
+  "255.255.255.255" | lib.IsContract lib.Networking.IPv4,
+  !("123.555.123.123" | lib.IsContract lib.Networking.IPv4),
+
+  # IPv6
+  "::1" | lib.IsContract lib.Networking.IPv6,
+  "0000:0000::1" | lib.IsContract lib.Networking.IPv6,
+  "0000::1" | lib.IsContract lib.Networking.IPv6,
+  "2001:db8::ff00:42:8329" | lib.IsContract lib.Networking.IPv6,
 ]
 in
 let recordTests = [
