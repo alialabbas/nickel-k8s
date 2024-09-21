@@ -1,7 +1,7 @@
 let { Numbers, Arrays, Strings, Records, .. } = import "types.ncl" in
 let { Kube, .. } = import "kube.ncl" in
 let { ContainerSpec, .. } = import "containerSpec.ncl" in
-let { Metadata, LabelSelector, ValidLabel, Labels, .. } = import "metadata.ncl" in
+let { Metadata, ResourceMetadata, LabelSelector, ValidLabel, Labels, .. } = import "metadata.ncl" in
 
 let _podAffinityTerm = {
   labelSelector | LabelSelector | optional,
@@ -14,17 +14,17 @@ in
 let nodeSelectorRequirments =
   # TODO: match me
   let nodeSelectorValidation = fun values label operator =>
-      if ((operator == 'In || operator == 'NotIn) && std.array.length values == 0)
-      || ((operator == 'Exists || operator == 'DoesNotExist) && std.array.length values != 0)
-      || ((operator == 'Gt || operator == 'Lt) && std.array.length values != 1) then
-        std.contract.blame_with_message
-          m%"operator + values are invalid
+    if ((operator == 'In || operator == 'NotIn) && std.array.length values == 0)
+    || ((operator == 'Exists || operator == 'DoesNotExist) && std.array.length values != 0)
+    || ((operator == 'Gt || operator == 'Lt) && std.array.length values != 1) then
+      std.contract.blame_with_message
+        m%"operator + values are invalid
           In and NotIn need at least one value
           Exists and DoesNotExist need an empty array
           Gt and Lt need exactly one value"%
-          label
-      else
-        operator
+        label
+    else
+      operator
   in
   {
     key | ValidLabel,
@@ -111,13 +111,17 @@ let _affinity = {
     | optional,
   podAffinity
     | {
-      preferredDuringSchedulingIgnoredDuringExecution | Array { podAffinityTerm | _podAffinityTerm, weight | Numbers.InRange 0 100 } | optional,
+      preferredDuringSchedulingIgnoredDuringExecution
+        | Array { podAffinityTerm | _podAffinityTerm, weight | Numbers.InRange 0 100 }
+        | optional,
       requiredDuringSchedulingIgnoredDuringExecution | Array _podAffinityTerm | optional,
     }
     | optional,
   podAntiAffinity
     | {
-      preferredDuringSchedulingIgnoredDuringExecution | Array { podAffinityTerm | _podAffinityTerm, weight | Numbers.InRange 0 100 } | optional,
+      preferredDuringSchedulingIgnoredDuringExecution
+        | Array { podAffinityTerm | _podAffinityTerm, weight | Numbers.InRange 0 100 }
+        | optional,
       requiredDuringSchedulingIgnoredDuringExecution | Array _podAffinityTerm | optional,
     }
     | optional,
@@ -134,15 +138,13 @@ let podSpec = {
   tolerations
     | Array {
       effect | std.enum.TagOrString | [| 'NoSchedule, 'PreferNoSchedule, 'NoExecute |],
-      key | String | optional,
       operator | std.enum.TagOrString | [| 'Exists, 'Equal |] | optional,
-      tolerationSeconds | Number | optional,
-      value | String | optional,
+      ..
     }
     | optional,
 
-  automountServiceAccountToken | Bool | optional,
   serviceAccountName | Kube.Name | optional,
+  # TODO: would this be necessary if we are always converting to a map then back to a list 🤔
   containers | Array ContainerSpec | Arrays.MinItems 1 | Arrays.UniqueRecords "name",
 
   dnsConfig # TODO: figure out what server is validating here
@@ -158,26 +160,13 @@ let podSpec = {
     | [| 'ClusterFirstWithHostNet, 'ClusterFirst, 'Default, 'None |]
     | optional,
 
-  enableServiceLinks | Bool | optional,
   hostAliases | Array { hostnames | Array String, ip | String } | optional,
-  hostIPC | Bool | optional,
-  hostNetwork | Bool | optional,
-  hostPID | Bool | optional,
-  hostUsers | Bool | optional,
-  hostname | String | optional,
-  imagePullSecrets | Array { name | String } | optional,
   initContainers | Array ContainerSpec | optional,
-  nodeName | String | optional,
   nodeSelector | Labels | optional, # TODO: basic selector thingy
   restartPolicy | std.enum.TagOrString | [| 'Always, 'OnFailure, 'Never |] | optional,
   os
-    | doc m%%"Due to technical reason, this contract is forcing all specs to have a null value when evaluated.
-This emulate what typically done by the server and the security checks will only happen when spec.os.name is specified.
-  "%%
     | Records.Nullable { name | std.enum.TagOrString | [| 'linux, 'windows |], }
-    | optional
-    | default
-    = null,
+    | optional,
   preemptionPolicy | std.enum.TagOrString | [| 'Never, 'PreemptLowerPriority |] | optional,
 
   securityContext
@@ -192,10 +181,6 @@ This emulate what typically done by the server and the security checks will only
       runAsGroup
         | onlyLinux os
         | Number
-        | optional,
-
-      runAsNonRoot
-        | Bool
         | optional,
 
       runAsUser
@@ -230,38 +215,34 @@ This emulate what typically done by the server and the security checks will only
           runAsUserName | String
         }
         | optional,
+      ..
     }
     | optional,
 
-  readinessGates | Array { conditionType | String } | optional,
-  runtimeClassName | String | optional,
-  schedulerName | String | optional,
-  schedulingGates | Array { name | String } | optional,
-  setHostnameAsFQDN | Bool | optional,
-  shareProcessNamespace | Bool | optional,
   subdomain | Kube.Name | optional,
   terminationGracePeriodSeconds | std.number.PosNat | optional,
   topologySpreadConstraints
     | Array {
       maxSkew | std.number.PosNat,
       topologyKey | ValidLabel,
-      whenUnsatisfiable | String,
       labelSelector | LabelSelector | optional,
       matchLabelKeys | Array Kube.Name | optional,
-      minDomains | Number | optional,
       nodeAffinityPolicy | std.enum.TagOrString | [| 'Honor, 'Ignore, |] | optional,
       nodeTaintsPolicy | std.enum.TagOrString | [| 'Honor, 'Ignore, |] | optional,
+      ..
     }
     | optional,
-  volumes | Array _volumeSource | optional,
+  volumes | Array { .. } | optional, #_volumeSource | optional, # TODO: what is the best way to model arbitrary sections of volume... Could potentially be generated from schema
+  ..
 }
 in
 {
   Pod = {
-    metadata | Metadata,
+    metadata | ResourceMetadata,
     apiVersion = "v1",
-    kind = "pod",
-    spec | PodSpec
+    kind = "Pod",
+    spec | PodSpec,
+    ..
   },
   PodSpec = podSpec,
 }

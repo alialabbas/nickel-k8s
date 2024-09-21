@@ -26,7 +26,8 @@ in
         selector | LabelSelector,
         maxUnavailable | Numbers.NumberOrPercentage | optional,
         minAvailable | Numbers.NumberOrPercentage | optional,
-      }
+      },
+    ..
   },
 
   HorizontalPodAutoscaler = {
@@ -50,5 +51,6 @@ in
           }
           | optional,
       },
+      ..
   },
 } | ApiGroups

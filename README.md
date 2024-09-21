@@ -173,3 +173,17 @@ It should be possible generate the flat out contract as a basic contract for eac
 This project initially started as a policy agent, some of these are implemented right now through the `Constraints` in both `Release` and `Env`. This works fine right now as a client side approach for validating before pushing the resources to an API server.
 
 It should be possible to create a Policy Agent that utilize the same bits `Contraints` model and apply those in a remote context such as `Validation Webhook` inside a cluster. This in theory would allow cluster operator to craft the policies and applying them inside the cluster while allow their users to apply the same policies.
+
+### Merging System
+
+Few design goals that would influence this.
+
+1. Resource Names, names need to be unique per release, this requires some way to force all names to have a prefix or a suffix.
+2. Additional Labels, static labels injected to all releases in a single context
+3. Target a kind to be modified globally
+4. Target a resource to be modified, i.e. by kind and name. Does this make sense when the user know what they want to override and can just do it themselves. Does this help in anyway? Probably when it comes to merge operation not supporting arrays at the moment. So providing that could be useful.
+5. Removal of resources based on their kinds and kind + name combo. This is useful when a user has a specific dialact of handling things with custom CRDs like prometheus operator or something but the other user doesn't need that. Could technically done by hand but this is just easier to consume rather than keeping this to the end user. Maybe a Util they consume to do the filter for them at the user level rathar than at the manifest level
+
+The user should not be concerned with the details around how a patch is achieved, the should define a patch based on its purist form, as if it was a fragment of a resource.
+
+Would there be a need to remove a specific item from a resource. Yes potentially, this is where the user can get their hands dirty with Nickel and start using its dialatct to remove something

@@ -14,10 +14,11 @@ in
     apiVersion | String | force = "v1",
     kind | String | force = "Secret",
     metadata | ResourceMetadata,
-    type | String | optional,
+    type | String | optional, # TODO: this could be done client side
     immutable | Bool | optional,
     data | ConfigData | { _ : String } | optional,
     stringData | ConfigData | { _ : String } | optional,
+    ..
   },
 
   ConfigMap = {
@@ -27,6 +28,7 @@ in
     immutable | Bool | optional,
     data | ConfigData | { _ : String } | optional,
     binaryData | ConfigData | { _ : String } | optional,
+    ..
   },
 
   PersistentVolumeClaim = {
@@ -49,5 +51,6 @@ in
         storageClassName | String | optional,
         volumeName | String | optional,
       },
+      ..
   },
 } | ApiGroups

@@ -3974,8 +3974,7 @@ let lib = import "Contracts.ncl" in
   },
   io.k8s.api.core.v1.PodIP = {
     ip
-      | String
-      | optional,
+      | String,
   },
   io.k8s.api.core.v1.PodDNSConfigOption = {
     value
@@ -4799,13 +4798,11 @@ let lib = import "Contracts.ncl" in
   },
   io.k8s.api.core.v1.HostIP = {
     ip
-      | String
-      | optional,
+      | String,
   },
   io.k8s.api.core.v1.HostAlias = {
     ip
-      | String
-      | optional,
+      | String,
     hostnames
       | (Array String)
       | optional,
@@ -7375,8 +7372,7 @@ let lib = import "Contracts.ncl" in
     kind
       | std.contract.Equal "ValidatingAdmissionPolicyList",
     items
-      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicy)
-      | optional,
+      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicy),
     apiVersion
       | std.contract.Equal "admissionregistration.k8s.io/v1beta1",
   },
@@ -7401,8 +7397,7 @@ let lib = import "Contracts.ncl" in
     kind
       | std.contract.Equal "ValidatingAdmissionPolicyBindingList",
     items
-      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBinding)
-      | optional,
+      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBinding),
     apiVersion
       | std.contract.Equal "admissionregistration.k8s.io/v1beta1",
   },
@@ -7575,8 +7570,7 @@ let lib = import "Contracts.ncl" in
     kind
       | std.contract.Equal "ValidatingAdmissionPolicyList",
     items
-      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy)
-      | optional,
+      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy),
     apiVersion
       | std.contract.Equal "admissionregistration.k8s.io/v1alpha1",
   },
@@ -7601,8 +7595,7 @@ let lib = import "Contracts.ncl" in
     kind
       | std.contract.Equal "ValidatingAdmissionPolicyBindingList",
     items
-      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBinding)
-      | optional,
+      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBinding),
     apiVersion
       | std.contract.Equal "admissionregistration.k8s.io/v1alpha1",
   },
@@ -7840,8 +7833,7 @@ let lib = import "Contracts.ncl" in
     kind
       | std.contract.Equal "ValidatingAdmissionPolicyList",
     items
-      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicy)
-      | optional,
+      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicy),
     apiVersion
       | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
@@ -7866,8 +7858,7 @@ let lib = import "Contracts.ncl" in
     kind
       | std.contract.Equal "ValidatingAdmissionPolicyBindingList",
     items
-      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding)
-      | optional,
+      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding),
     apiVersion
       | std.contract.Equal "admissionregistration.k8s.io/v1",
   },

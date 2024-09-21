@@ -1,12 +1,13 @@
+let lib = import "Contracts.ncl" in
 let { Networking, Records, Arrays, .. } = import "types.ncl" in
 let { Kube, .. } = import "kube.ncl" in
-let ContainePort = {
+let ContainerPort = {
   containerPort | Networking.Port,
   name | Kube.Name | optional,
-  protocol | std.enum.TagOrString | [| 'TCP, 'STCP', 'UDP |] | optional
+  protocol | lib.Enum.StringOrEnum [| 'TCP, 'STCP', 'UDP |] | optional,
+  ..
 }
 in
-let ImagePullPolicy = [| 'Always, 'Never, 'IfNotPresent |] in
 let fieldRefContract =
   let validFieldRefs = [
     "metadata.name",
@@ -70,7 +71,7 @@ let OnlyOneOf # this will be higher order func called on the reocrd
 let Env = fun label env =>
   env
   |> match {
-    { name, value } => env | {name | String, value | String },
+    { name, value } => env | { name | String, value | String },
     { name, valueFrom } =>
       env.valueFrom
       |> match {
@@ -131,36 +132,26 @@ let Env = fun label env =>
   }
 in
 let EnvFrom = {
-  prefix | String | optional,
-  configMapRef | { name | Kube.Name, "optional" | Bool | optional } | optional,
-  secretRef | { name | Kube.Name, "optional" | Bool | optional } | optional,
+  configMapRef | { name | Kube.Name, .. } | optional,
+  secretRef | { name | Kube.Name, .. } | optional,
+  ..
 }
 in
 let HttpProbeAction = {
-  host | String | optional,
-  httpHeaders | Array { name | String, value | String, } | optional,
   port | Kube.PortOrName, # This technically work but if we write these contracts like this we lose on the big benifit, actually checking if http port is defined? TODO:
   path | String,
-  scheme | String | optional
+  ..
 }
 in
 let ExecAction | doc "Array of commands to execute" = Array String in
 let TcpSocketAction = { host | String | optional, port | Networking.Port } in
-let Probe
-  | doc "Health checks to check if the container is alive and ready"
-  = {
-    failureThreshold | Number | optional,
-    initialDelaySeconds | Number | optional,
-    periodSeconds | Number | optional,
-    successThreshold | Number | optional,
-    timeoutSeconds | Number | optional,
-    terminationGracePeriodSeconds | Number | optional,
-
-    httpGet | HttpProbeAction | optional,
-    exec | Array String | optional,
-    tcpSocket | TcpSocketAction | optional,
-  }
-  in
+let Probe = {
+  httpGet | HttpProbeAction | optional,
+  exec | Array String | optional,
+  tcpSocket | TcpSocketAction | optional,
+  ..
+}
+in
 let KubeResource =
   std.contract.from_predicate
     (fun val => std.is_number val || std.string.is_match "^[0-9]+(\\.[0-9]+)?(mi?|k|Ki|Mi?|Gi?|Ti?|Pi?|Ei?)?$" val)
@@ -175,14 +166,6 @@ let Resources = {
   limits | AResource | optional,
 }
 in
-let VolumeMount | doc "settings for mounting a volume to the container"
-  = {
-    mountPath | String,
-    name | String,
-    readOnly | Bool | optional,
-    subPath | String | optional,
-  }
-  in
 # TODO: a lot of these are dependent on pod.spec.os, is this just unset or actually validated and erred --- Need checking
 let SecurityContext = {
   allowPrivilegeEscalation | Bool | optional, # not spec.os.name is windows
@@ -196,34 +179,32 @@ let SecurityContext = {
   seLinuxOptions | { level | String, role | String, type | String, user | String, } | optional, # SELinuxOptions,
   seccompProfile | { localhostProfile | String | optional, type | String } | optional, # SeccompProfile
   windowsOptions | { gmsaCredentialSpec | String, gmsaCredentialSpecName | String, hostProcess | Bool, runAsUserName | String } | optional, # WindowsSecurityContextOptions, # not spec.os.name is linux
+  ..
 }
 in
 {
   ContainerSpec = {
     name | String | std.string.NonEmpty,
-    image | doc "Container Name" | String,
-    imagePullPolicy | doc "Image pull behavior when container started in a node" | std.enum.TagOrString | ImagePullPolicy | optional,
-    ports | doc "List of ports to expose from the pod" | Array ContainePort | optional,
-    command | doc "Override Docker Entrypoint" | Array String | optional,
-    args | doc "Args passed to Docker Entrypoint/command override" | Array String | optional,
-    env | doc "Environment variables to add to the container" | Arrays.Nullable Env | optional,
-    envFrom | doc "Load Environments variables from a secret or configMap" | Arrays.Nullable EnvFrom | optional,
+    image | String,
+    imagePullPolicy
+      | lib.Enum.StringOrEnum [| 'Always, 'Never, 'IfNotPresent |]
+      | optional,
+    ports | Array ContainerPort | optional,
+    env | Arrays.Nullable Env | optional,
+    envFrom | Arrays.Nullable EnvFrom | optional,
     livenessProbe
-      | doc "Container Liveness probe"
       | AllPreds [(OnlyOneOf ["httpGet", "exec", "tcpSocket"])]
       | Records.Nullable Probe
       | optional,
     readinessProbe
-      | doc "Container readiness probe"
       | AllPreds [(OnlyOneOf ["httpGet", "exec", "tcpSocket"])]
       | Records.Nullable Probe
       | optional,
     startupProbe
-      | doc "Container Startup Probe"
       | AllPreds [(OnlyOneOf ["httpGet", "exec", "tcpSocket"])]
       | Records.Nullable Probe
       | optional,
-    lifecycle
+    lifecycle # TODO: check these, can lifecycle be something else
       | {
         postStart
           | AllPreds [(OnlyOneOf ["httpGet", "exec"])]
@@ -240,14 +221,7 @@ in
       }
       | optional,
     resources | Resources | optional,
-    tty | Bool | optional,
-    stdin | Bool | optional,
-    stdinOnce | Bool | optional,
-    workingDir | String | optional,
-    terminationMessagePath | String | optional,
-    terminationMessagePolicy | String | optional,
-    volumeMounts | Array VolumeMount | optional,
-    volumeDevices | Array { devicePath | String, name | String, } | optional,
     securityContext | SecurityContext | optional,
+    ..
   },
 }

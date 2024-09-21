@@ -44,13 +44,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "APIServiceList",
     items
       | (Array io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIService),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apiregistration.k8s.io/v1",
   },
   io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceCondition = {
     type
@@ -78,11 +76,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "APIService",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apiregistration.k8s.io/v1",
   },
   io.k8s.apimachinery.pkg.version.Info = {
     platform
@@ -104,7 +100,13 @@ let lib = import "Contracts.ncl" in
     buildDate
       | String,
   },
-  io.k8s.apimachinery.pkg.util.intstr.IntOrString = String,
+  io.k8s.apimachinery.pkg.util.intstr.IntOrString = (
+    lib.OneOf
+      [
+        String,
+        Number,
+      ]
+  ),
   io.k8s.apimachinery.pkg.runtime.RawExtension = { .. },
   io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent = {
     type
@@ -158,8 +160,7 @@ let lib = import "Contracts.ncl" in
       | String
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Status",
     details
       | io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails
       | optional,
@@ -167,8 +168,7 @@ let lib = import "Contracts.ncl" in
       | std.number.Integer
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR = {
     serverAddress
@@ -363,23 +363,19 @@ let lib = import "Contracts.ncl" in
     serverAddressByClientCIDRs
       | (Array io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR),
     kind
-      | String
-      | optional,
+      | std.contract.Equal "APIVersions",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.APIResourceList = {
     resources
       | (Array io.k8s.apimachinery.pkg.apis.meta.v1.APIResource),
     kind
-      | String
-      | optional,
+      | std.contract.Equal "APIResourceList",
     groupVersion
       | String,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.apimachinery.pkg.apis.meta.v1.APIResource = {
     version
@@ -410,13 +406,11 @@ let lib = import "Contracts.ncl" in
   },
   v1.APIGroupList = {
     kind
-      | String
-      | optional,
+      | std.contract.Equal "APIGroupList",
     groups
       | (Array io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.APIGroup = {
     versions
@@ -430,11 +424,9 @@ let lib = import "Contracts.ncl" in
     name
       | String,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "APIGroup",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.apimachinery.pkg.api.resource.Quantity = String,
   io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.WebhookConversion = {
@@ -743,13 +735,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CustomResourceDefinitionList",
     items
       | (Array io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinition),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apiextensions.k8s.io/v1",
   },
   io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionCondition = {
     type
@@ -776,11 +766,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CustomResourceDefinition",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apiextensions.k8s.io/v1",
   },
   io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceConversion = {
     webhook
@@ -826,13 +814,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StorageVersionMigrationList",
     items
       | (Array io.k8s.api.storagemigration.v1alpha1.StorageVersionMigration),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storagemigration.k8s.io/v1alpha1",
   },
   storagemigration.k8s.io.v1alpha1.StorageVersionMigration = {
     status
@@ -845,11 +831,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StorageVersionMigration",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storagemigration.k8s.io/v1alpha1",
   },
   io.k8s.api.storagemigration.v1alpha1.MigrationCondition = {
     type
@@ -882,13 +866,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "VolumeAttributesClassList",
     items
       | (Array io.k8s.api.storage.v1beta1.VolumeAttributesClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1beta1",
   },
   storage.k8s.io.v1beta1.VolumeAttributesClass = {
     parameters
@@ -898,26 +880,22 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "VolumeAttributesClass",
     driverName
       | String,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1beta1",
   },
   storage.k8s.io.v1alpha1.VolumeAttributesClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "VolumeAttributesClassList",
     items
       | (Array io.k8s.api.storage.v1alpha1.VolumeAttributesClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1alpha1",
   },
   storage.k8s.io.v1alpha1.VolumeAttributesClass = {
     parameters
@@ -927,13 +905,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "VolumeAttributesClass",
     driverName
       | String,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1alpha1",
   },
   io.k8s.api.storage.v1.VolumeNodeResources = {
     count
@@ -982,13 +958,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "VolumeAttachmentList",
     items
       | (Array io.k8s.api.storage.v1.VolumeAttachment),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   storage.k8s.io.v1.VolumeAttachment = {
     status
@@ -1000,11 +974,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "VolumeAttachment",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   io.k8s.api.storage.v1.TokenRequest = {
     expirationSeconds
@@ -1018,13 +990,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StorageClassList",
     items
       | (Array io.k8s.api.storage.v1.StorageClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   storage.k8s.io.v1.StorageClass = {
     volumeBindingMode
@@ -1045,11 +1015,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StorageClass",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
     allowedTopologies
       | (Array io.k8s.api.core.v1.TopologySelectorTerm)
       | optional,
@@ -1062,13 +1030,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CSIStorageCapacityList",
     items
       | (Array io.k8s.api.storage.v1.CSIStorageCapacity),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   storage.k8s.io.v1.CSIStorageCapacity = {
     storageClassName
@@ -1083,14 +1049,12 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.api.resource.Quantity
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CSIStorageCapacity",
     capacity
       | io.k8s.apimachinery.pkg.api.resource.Quantity
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   io.k8s.api.storage.v1.CSINodeSpec = {
     drivers
@@ -1101,13 +1065,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CSINodeList",
     items
       | (Array io.k8s.api.storage.v1.CSINode),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   io.k8s.api.storage.v1.CSINodeDriver = {
     topologyKeys
@@ -1128,11 +1090,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CSINode",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   io.k8s.api.storage.v1.CSIDriverSpec = {
     volumeLifecycleModes
@@ -1165,13 +1125,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CSIDriverList",
     items
       | (Array io.k8s.api.storage.v1.CSIDriver),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   storage.k8s.io.v1.CSIDriver = {
     spec
@@ -1180,24 +1138,20 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CSIDriver",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "storage.k8s.io/v1",
   },
   scheduling.k8s.io.v1.PriorityClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PriorityClassList",
     items
       | (Array io.k8s.api.scheduling.v1.PriorityClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "scheduling.k8s.io/v1",
   },
   scheduling.k8s.io.v1.PriorityClass = {
     value
@@ -1209,8 +1163,7 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PriorityClass",
     globalDefault
       | Bool
       | optional,
@@ -1218,8 +1171,7 @@ let lib = import "Contracts.ncl" in
       | String
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "scheduling.k8s.io/v1",
   },
   io.k8s.api.resource.v1alpha3.ResourceSliceSpec = {
     pool
@@ -1244,13 +1196,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceSliceList",
     items
       | (Array io.k8s.api.resource.v1alpha3.ResourceSlice),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   resource.k8s.io.v1alpha3.ResourceSlice = {
     spec
@@ -1259,11 +1209,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceSlice",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.ResourcePool = {
     resourceSliceCount
@@ -1285,13 +1233,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceClaimTemplateList",
     items
       | (Array io.k8s.api.resource.v1alpha3.ResourceClaimTemplate),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   resource.k8s.io.v1alpha3.ResourceClaimTemplate = {
     spec
@@ -1300,11 +1246,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceClaimTemplate",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.ResourceClaimStatus = {
     reservedFor
@@ -1337,13 +1281,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceClaimList",
     items
       | (Array io.k8s.api.resource.v1alpha3.ResourceClaim),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.ResourceClaimConsumerReference = {
     uid
@@ -1366,11 +1308,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceClaim",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.PodSchedulingContextStatus = {
     resourceClaims
@@ -1390,13 +1330,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodSchedulingContextList",
     items
       | (Array io.k8s.api.resource.v1alpha3.PodSchedulingContext),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   resource.k8s.io.v1alpha3.PodSchedulingContext = {
     status
@@ -1408,11 +1346,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodSchedulingContext",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.OpaqueDeviceConfiguration = {
     parameters
@@ -1477,13 +1413,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "DeviceClassList",
     items
       | (Array io.k8s.api.resource.v1alpha3.DeviceClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.DeviceClassConfiguration = {
     opaque
@@ -1497,11 +1431,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "DeviceClass",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "resource.k8s.io/v1alpha3",
   },
   io.k8s.api.resource.v1alpha3.DeviceClaimConfiguration = {
     requests
@@ -1609,26 +1541,22 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "RoleList",
     items
       | (Array io.k8s.api.rbac.v1.Role),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   rbac.authorization.k8s.io.v1.RoleBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "RoleBindingList",
     items
       | (Array io.k8s.api.rbac.v1.RoleBinding),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   rbac.authorization.k8s.io.v1.RoleBinding = {
     subjects
@@ -1640,11 +1568,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "RoleBinding",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   rbac.authorization.k8s.io.v1.Role = {
     rules
@@ -1654,11 +1580,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Role",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   io.k8s.api.rbac.v1.PolicyRule = {
     verbs
@@ -1681,26 +1605,22 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ClusterRoleList",
     items
       | (Array io.k8s.api.rbac.v1.ClusterRole),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   rbac.authorization.k8s.io.v1.ClusterRoleBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ClusterRoleBindingList",
     items
       | (Array io.k8s.api.rbac.v1.ClusterRoleBinding),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   rbac.authorization.k8s.io.v1.ClusterRoleBinding = {
     subjects
@@ -1712,11 +1632,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ClusterRoleBinding",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
   },
   rbac.authorization.k8s.io.v1.ClusterRole = {
     rules
@@ -1726,11 +1644,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ClusterRole",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "rbac.authorization.k8s.io/v1",
     aggregationRule
       | io.k8s.api.rbac.v1.AggregationRule
       | optional,
@@ -1778,13 +1694,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodDisruptionBudgetList",
     items
       | (Array io.k8s.api.policy.v1.PodDisruptionBudget),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "policy/v1",
   },
   policy.v1.PodDisruptionBudget = {
     status
@@ -1797,25 +1711,21 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodDisruptionBudget",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "policy/v1",
   },
   policy.v1.Eviction = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Eviction",
     deleteOptions
       | io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "policy/v1",
   },
   io.k8s.api.node.v1.Scheduling = {
     tolerations
@@ -1830,13 +1740,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "RuntimeClassList",
     items
       | (Array io.k8s.api.node.v1.RuntimeClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "node.k8s.io/v1",
   },
   node.k8s.io.v1.RuntimeClass = {
     scheduling
@@ -1849,13 +1757,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "RuntimeClass",
     handler
       | String,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "node.k8s.io/v1",
   },
   io.k8s.api.node.v1.Overhead = {
     podFixed
@@ -1877,13 +1783,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ServiceCIDRList",
     items
       | (Array io.k8s.api.networking.v1beta1.ServiceCIDR),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1beta1",
   },
   networking.k8s.io.v1beta1.ServiceCIDR = {
     status
@@ -1896,11 +1800,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ServiceCIDR",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1beta1",
   },
   io.k8s.api.networking.v1beta1.ParentReference = {
     resource
@@ -1923,13 +1825,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "IPAddressList",
     items
       | (Array io.k8s.api.networking.v1beta1.IPAddress),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1beta1",
   },
   networking.k8s.io.v1beta1.IPAddress = {
     spec
@@ -1939,11 +1839,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "IPAddress",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1beta1",
   },
   io.k8s.api.networking.v1.ServiceBackendPort = {
     number
@@ -1993,13 +1891,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "NetworkPolicyList",
     items
       | (Array io.k8s.api.networking.v1.NetworkPolicy),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1",
   },
   io.k8s.api.networking.v1.NetworkPolicyIngressRule = {
     ports
@@ -2025,11 +1921,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "NetworkPolicy",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1",
   },
   io.k8s.api.networking.v1.IngressTLS = {
     secretName
@@ -2103,13 +1997,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "IngressList",
     items
       | (Array io.k8s.api.networking.v1.Ingress),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1",
   },
   io.k8s.api.networking.v1.IngressClassSpec = {
     parameters
@@ -2139,13 +2031,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "IngressClassList",
     items
       | (Array io.k8s.api.networking.v1.IngressClass),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1",
   },
   networking.k8s.io.v1.IngressClass = {
     spec
@@ -2155,11 +2045,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "IngressClass",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1",
   },
   io.k8s.api.networking.v1.IngressBackend = {
     service
@@ -2180,11 +2068,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Ingress",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "networking.k8s.io/v1",
   },
   io.k8s.api.networking.v1.IPBlock = {
     except
@@ -2278,13 +2164,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PriorityLevelConfigurationList",
     items
       | (Array io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfiguration),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1beta3",
   },
   io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationCondition = {
     type
@@ -2314,11 +2198,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PriorityLevelConfiguration",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1beta3",
   },
   io.k8s.api.flowcontrol.v1beta3.PolicyRulesWithSubjects = {
     subjects
@@ -2384,13 +2266,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "FlowSchemaList",
     items
       | (Array io.k8s.api.flowcontrol.v1beta3.FlowSchema),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1beta3",
   },
   io.k8s.api.flowcontrol.v1beta3.FlowSchemaCondition = {
     type
@@ -2420,11 +2300,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "FlowSchema",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1beta3",
   },
   io.k8s.api.flowcontrol.v1beta3.FlowDistinguisherMethod = {
     type
@@ -2510,13 +2388,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PriorityLevelConfigurationList",
     items
       | (Array io.k8s.api.flowcontrol.v1.PriorityLevelConfiguration),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1",
   },
   io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationCondition = {
     type
@@ -2546,11 +2422,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PriorityLevelConfiguration",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1",
   },
   io.k8s.api.flowcontrol.v1.PolicyRulesWithSubjects = {
     subjects
@@ -2616,13 +2490,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "FlowSchemaList",
     items
       | (Array io.k8s.api.flowcontrol.v1.FlowSchema),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1",
   },
   io.k8s.api.flowcontrol.v1.FlowSchemaCondition = {
     type
@@ -2652,11 +2524,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "FlowSchema",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "flowcontrol.apiserver.k8s.io/v1",
   },
   io.k8s.api.flowcontrol.v1.FlowDistinguisherMethod = {
     type
@@ -2681,13 +2551,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "EventList",
     items
       | (Array io.k8s.api.events.v1.Event),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "events.k8s.io/v1",
   },
   events.k8s.io.v1.Event = {
     type
@@ -2718,8 +2586,7 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Event",
     eventTime
       | io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime,
     deprecatedSource
@@ -2735,8 +2602,7 @@ let lib = import "Contracts.ncl" in
       | std.number.Integer
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "events.k8s.io/v1",
     action
       | String
       | optional,
@@ -2750,13 +2616,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "EndpointSliceList",
     items
       | (Array io.k8s.api.discovery.v1.EndpointSlice),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "discovery.k8s.io/v1",
   },
   discovery.k8s.io.v1.EndpointSlice = {
     ports
@@ -2766,13 +2630,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "EndpointSlice",
     endpoints
       | (Array io.k8s.api.discovery.v1.Endpoint),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "discovery.k8s.io/v1",
     addressType
       | String,
   },
@@ -3261,13 +3123,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ServiceList",
     items
       | (Array io.k8s.api.core.v1.Service),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.ServiceAccountTokenProjection = {
     path
@@ -3284,13 +3144,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ServiceAccountList",
     items
       | (Array io.k8s.api.core.v1.ServiceAccount),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.ServiceAccount = {
     secrets
@@ -3300,8 +3158,7 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ServiceAccount",
     imagePullSecrets
       | (Array io.k8s.api.core.v1.LocalObjectReference)
       | optional,
@@ -3309,8 +3166,7 @@ let lib = import "Contracts.ncl" in
       | Bool
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.Service = {
     status
@@ -3323,11 +3179,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Service",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.SecurityContext = {
     windowsOptions
@@ -3405,13 +3259,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SecretList",
     items
       | (Array io.k8s.api.core.v1.Secret),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.SecretKeySelector = {
     optional
@@ -3442,8 +3294,7 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Secret",
     immutable
       | Bool
       | optional,
@@ -3451,8 +3302,7 @@ let lib = import "Contracts.ncl" in
       | { _ | String }
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.SeccompProfile = {
     type
@@ -3589,13 +3439,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceQuotaList",
     items
       | (Array io.k8s.api.core.v1.ResourceQuota),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.ResourceQuota = {
     status
@@ -3608,11 +3456,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ResourceQuota",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.ResourceHealth = {
     resourceID
@@ -3676,13 +3522,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ReplicationControllerList",
     items
       | (Array io.k8s.api.core.v1.ReplicationController),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.ReplicationControllerCondition = {
     type
@@ -3710,11 +3554,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ReplicationController",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.RBDVolumeSource = {
     user
@@ -3860,13 +3702,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodTemplateList",
     items
       | (Array io.k8s.api.core.v1.PodTemplate),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.PodTemplate = {
     template
@@ -3876,11 +3716,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodTemplate",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.PodStatus = {
     startTime
@@ -4122,13 +3960,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PodList",
     items
       | (Array io.k8s.api.core.v1.Pod),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.PodIP = {
     ip
@@ -4217,11 +4053,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Pod",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.PhotonPersistentDiskVolumeSource = {
     pdID
@@ -4344,13 +4178,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PersistentVolumeList",
     items
       | (Array io.k8s.api.core.v1.PersistentVolume),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.PersistentVolumeClaimVolumeSource = {
     readOnly
@@ -4426,13 +4258,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PersistentVolumeClaimList",
     items
       | (Array io.k8s.api.core.v1.PersistentVolumeClaim),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.PersistentVolumeClaimCondition = {
     type
@@ -4463,11 +4293,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PersistentVolumeClaim",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.PersistentVolume = {
     status
@@ -4480,11 +4308,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "PersistentVolume",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.ObjectReference = {
     uid
@@ -4644,13 +4470,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "NodeList",
     items
       | (Array io.k8s.api.core.v1.Node),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.NodeFeatures = {
     supplementalGroupsPolicy
@@ -4724,11 +4548,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Node",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.NamespaceStatus = {
     phase
@@ -4748,13 +4570,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "NamespaceList",
     items
       | (Array io.k8s.api.core.v1.Namespace),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.NamespaceCondition = {
     type
@@ -4782,11 +4602,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Namespace",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.NFSVolumeSource = {
     server
@@ -4853,13 +4671,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "LimitRangeList",
     items
       | (Array io.k8s.api.core.v1.LimitRange),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.LimitRangeItem = {
     type
@@ -4888,11 +4704,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "LimitRange",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.LifecycleHandler = {
     tcpSocket
@@ -5171,13 +4985,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "EventList",
     items
       | (Array io.k8s.api.core.v1.Event),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.Event = {
     type
@@ -5210,8 +5022,7 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Event",
     involvedObject
       | io.k8s.api.core.v1.ObjectReference,
     firstTimestamp
@@ -5224,8 +5035,7 @@ let lib = import "Contracts.ncl" in
       | std.number.Integer
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
     action
       | String
       | optional,
@@ -5351,13 +5161,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "EndpointsList",
     items
       | (Array io.k8s.api.core.v1.Endpoints),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.Endpoints = {
     subsets
@@ -5367,11 +5175,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Endpoints",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.EndpointSubset = {
     ports
@@ -5685,13 +5491,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ConfigMapList",
     items
       | (Array io.k8s.api.core.v1.ConfigMap),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.ConfigMapKeySelector = {
     optional
@@ -5716,8 +5520,7 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ConfigMap",
     immutable
       | Bool
       | optional,
@@ -5728,35 +5531,30 @@ let lib = import "Contracts.ncl" in
       | { _ | String }
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.ComponentStatusList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ComponentStatusList",
     items
       | (Array io.k8s.api.core.v1.ComponentStatus),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   v1.ComponentStatus = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ComponentStatus",
     conditions
       | (Array io.k8s.api.core.v1.ComponentCondition)
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.ComponentCondition = {
     type
@@ -5916,11 +5714,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Binding",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "v1",
   },
   io.k8s.api.core.v1.AzureFileVolumeSource = {
     shareName
@@ -6021,13 +5817,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "LeaseCandidateList",
     items
       | (Array io.k8s.api.coordination.v1alpha1.LeaseCandidate),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "coordination.k8s.io/v1alpha1",
   },
   coordination.k8s.io.v1alpha1.LeaseCandidate = {
     spec
@@ -6037,11 +5831,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "LeaseCandidate",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "coordination.k8s.io/v1alpha1",
   },
   io.k8s.api.coordination.v1.LeaseSpec = {
     strategy
@@ -6071,13 +5863,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "LeaseList",
     items
       | (Array io.k8s.api.coordination.v1.Lease),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "coordination.k8s.io/v1",
   },
   coordination.k8s.io.v1.Lease = {
     spec
@@ -6087,11 +5877,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Lease",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "coordination.k8s.io/v1",
   },
   io.k8s.api.certificates.v1alpha1.ClusterTrustBundleSpec = {
     trustBundle
@@ -6105,13 +5893,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ClusterTrustBundleList",
     items
       | (Array io.k8s.api.certificates.v1alpha1.ClusterTrustBundle),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "certificates.k8s.io/v1alpha1",
   },
   certificates.k8s.io.v1alpha1.ClusterTrustBundle = {
     spec
@@ -6120,11 +5906,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ClusterTrustBundle",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "certificates.k8s.io/v1alpha1",
   },
   io.k8s.api.certificates.v1.CertificateSigningRequestStatus = {
     conditions
@@ -6163,13 +5947,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CertificateSigningRequestList",
     items
       | (Array io.k8s.api.certificates.v1.CertificateSigningRequest),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "certificates.k8s.io/v1",
   },
   io.k8s.api.certificates.v1.CertificateSigningRequestCondition = {
     type
@@ -6199,11 +5981,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CertificateSigningRequest",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "certificates.k8s.io/v1",
   },
   io.k8s.api.batch.v1.UncountedTerminatedPods = {
     succeeded
@@ -6351,13 +6131,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "JobList",
     items
       | (Array io.k8s.api.batch.v1.Job),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "batch/v1",
   },
   io.k8s.api.batch.v1.JobCondition = {
     type
@@ -6388,11 +6166,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Job",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "batch/v1",
   },
   io.k8s.api.batch.v1.CronJobStatus = {
     lastSuccessfulTime
@@ -6434,13 +6210,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CronJobList",
     items
       | (Array io.k8s.api.batch.v1.CronJob),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "batch/v1",
   },
   batch.v1.CronJob = {
     status
@@ -6453,11 +6227,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "CronJob",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "batch/v1",
   },
   io.k8s.api.autoscaling.v2.ResourceMetricStatus = {
     name
@@ -6607,13 +6379,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "HorizontalPodAutoscalerList",
     items
       | (Array io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "autoscaling/v2",
   },
   io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerCondition = {
     type
@@ -6649,11 +6419,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "HorizontalPodAutoscaler",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "autoscaling/v2",
   },
   io.k8s.api.autoscaling.v2.HPAScalingRules = {
     stabilizationWindowSeconds
@@ -6734,11 +6502,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Scale",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "autoscaling/v1",
   },
   io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerStatus = {
     observedGeneration
@@ -6772,13 +6538,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "HorizontalPodAutoscalerList",
     items
       | (Array io.k8s.api.autoscaling.v1.HorizontalPodAutoscaler),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "autoscaling/v1",
   },
   autoscaling.v1.HorizontalPodAutoscaler = {
     status
@@ -6791,11 +6555,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "HorizontalPodAutoscaler",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "autoscaling/v1",
   },
   io.k8s.api.autoscaling.v1.CrossVersionObjectReference = {
     name
@@ -6860,11 +6622,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SubjectAccessReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authorization.k8s.io/v1",
   },
   io.k8s.api.authorization.v1.SelfSubjectRulesReviewSpec = {
     namespace
@@ -6881,11 +6641,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SelfSubjectRulesReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authorization.k8s.io/v1",
   },
   io.k8s.api.authorization.v1.SelfSubjectAccessReviewSpec = {
     resourceAttributes
@@ -6905,11 +6663,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SelfSubjectAccessReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authorization.k8s.io/v1",
   },
   io.k8s.api.authorization.v1.ResourceRule = {
     verbs
@@ -6978,11 +6734,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "LocalSubjectAccessReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authorization.k8s.io/v1",
   },
   io.k8s.api.authorization.v1.LabelSelectorAttributes = {
     requirements
@@ -7013,11 +6767,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SelfSubjectReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authentication.k8s.io/v1beta1",
   },
   io.k8s.api.authentication.v1alpha1.SelfSubjectReviewStatus = {
     userInfo
@@ -7032,11 +6784,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SelfSubjectReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authentication.k8s.io/v1alpha1",
   },
   io.k8s.api.authentication.v1.UserInfo = {
     username
@@ -7084,11 +6834,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "TokenReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authentication.k8s.io/v1",
   },
   io.k8s.api.authentication.v1.TokenRequestStatus = {
     token
@@ -7116,11 +6864,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "TokenRequest",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authentication.k8s.io/v1",
   },
   io.k8s.api.authentication.v1.SelfSubjectReviewStatus = {
     userInfo
@@ -7135,11 +6881,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "SelfSubjectReview",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "authentication.k8s.io/v1",
   },
   io.k8s.api.authentication.v1.BoundObjectReference = {
     uid
@@ -7244,13 +6988,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StatefulSetList",
     items
       | (Array io.k8s.api.apps.v1.StatefulSet),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.StatefulSetCondition = {
     type
@@ -7278,11 +7020,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StatefulSet",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.RollingUpdateStatefulSetStrategy = {
     partition
@@ -7345,13 +7085,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ReplicaSetList",
     items
       | (Array io.k8s.api.apps.v1.ReplicaSet),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.ReplicaSetCondition = {
     type
@@ -7379,11 +7117,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ReplicaSet",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.DeploymentStrategy = {
     type
@@ -7448,13 +7184,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "DeploymentList",
     items
       | (Array io.k8s.api.apps.v1.Deployment),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.DeploymentCondition = {
     type
@@ -7485,11 +7219,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "Deployment",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.DaemonSetUpdateStrategy = {
     type
@@ -7547,13 +7279,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "DaemonSetList",
     items
       | (Array io.k8s.api.apps.v1.DaemonSet),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apps.v1.DaemonSetCondition = {
     type
@@ -7581,24 +7311,20 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "DaemonSet",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   apps.v1.ControllerRevisionList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ControllerRevisionList",
     items
       | (Array io.k8s.api.apps.v1.ControllerRevision),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   apps.v1.ControllerRevision = {
     revision
@@ -7607,14 +7333,12 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ControllerRevision",
     data
       | io.k8s.apimachinery.pkg.runtime.RawExtension
       | optional,
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "apps/v1",
   },
   io.k8s.api.apiserverinternal.v1alpha1.StorageVersionStatus = {
     storageVersions
@@ -7633,13 +7357,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StorageVersionList",
     items
       | (Array io.k8s.api.apiserverinternal.v1alpha1.StorageVersion),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "internal.apiserver.k8s.io/v1alpha1",
   },
   io.k8s.api.apiserverinternal.v1alpha1.StorageVersionCondition = {
     type
@@ -7666,11 +7388,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "StorageVersion",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "internal.apiserver.k8s.io/v1alpha1",
   },
   io.k8s.api.apiserverinternal.v1alpha1.ServerStorageVersion = {
     servedVersions
@@ -7744,13 +7464,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyList",
     items
       | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicy),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1beta1",
   },
   io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBindingSpec = {
     validationActions
@@ -7771,13 +7489,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyBindingList",
     items
       | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBinding),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1beta1",
   },
   admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyBinding = {
     spec
@@ -7787,11 +7503,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyBinding",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1beta1",
   },
   admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicy = {
     status
@@ -7804,11 +7518,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicy",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1beta1",
   },
   io.k8s.api.admissionregistration.v1beta1.TypeChecking = {
     expressionWarnings
@@ -7950,13 +7662,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyList",
     items
       | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1alpha1",
   },
   io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBindingSpec = {
     validationActions
@@ -7977,13 +7687,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyBindingList",
     items
       | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBinding),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1alpha1",
   },
   admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyBinding = {
     spec
@@ -7993,11 +7701,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyBinding",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1alpha1",
   },
   admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicy = {
     status
@@ -8010,11 +7716,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicy",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1alpha1",
   },
   io.k8s.api.admissionregistration.v1alpha1.TypeChecking = {
     expressionWarnings
@@ -8133,13 +7837,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingWebhookConfigurationList",
     items
       | (Array io.k8s.api.admissionregistration.v1.ValidatingWebhookConfiguration),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   admissionregistration.k8s.io.v1.ValidatingWebhookConfiguration = {
     webhooks
@@ -8149,11 +7851,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingWebhookConfiguration",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   io.k8s.api.admissionregistration.v1.ValidatingWebhook = {
     timeoutSeconds
@@ -8225,13 +7925,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyList",
     items
       | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicy),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBindingSpec = {
     validationActions
@@ -8252,13 +7950,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyBindingList",
     items
       | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyBinding = {
     spec
@@ -8268,11 +7964,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicyBinding",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   admissionregistration.k8s.io.v1.ValidatingAdmissionPolicy = {
     status
@@ -8285,11 +7979,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "ValidatingAdmissionPolicy",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   io.k8s.api.admissionregistration.v1.TypeChecking = {
     expressionWarnings
@@ -8372,13 +8064,11 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "MutatingWebhookConfigurationList",
     items
       | (Array io.k8s.api.admissionregistration.v1.MutatingWebhookConfiguration),
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   admissionregistration.k8s.io.v1.MutatingWebhookConfiguration = {
     webhooks
@@ -8388,11 +8078,9 @@ let lib = import "Contracts.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
-      | String
-      | optional,
+      | std.contract.Equal "MutatingWebhookConfiguration",
     apiVersion
-      | String
-      | optional,
+      | std.contract.Equal "admissionregistration.k8s.io/v1",
   },
   io.k8s.api.admissionregistration.v1.MutatingWebhook = {
     timeoutSeconds

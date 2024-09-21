@@ -3,7 +3,6 @@
 # Or it could just a deployment with no service, configmap or whatever. Hence the user will need to annotate these themslves
 let dbgMsg = fun items => items |> std.array.fold_right (fun e acc => (std.to_string e) ++ " " ++ acc) "" in
 let { PodSpec, .. } = import "podspec.ncl" in
-let { Deployment, StatefulSet, .. } = (import "deployment.ncl")."apps/v1" in
 # TODO: This can be in types/pods and not exposed in the final all.ncl
 let PodOrPodTemplate
   | doc m%%"Contract representing a podspec in a workload (deployment, stateulfset, etc) or a Pod Manifest

@@ -22,3 +22,19 @@ check() {
 		exit 1
 	fi
 }
+
+# Remove Escape sequences from nickel code generated as a string from nickel itself
+# $1 string
+# $2 file_path
+raw_string() {
+	str=$1
+	str="${str:1:-1}"
+	str="${str//\\n/$'\n'}"
+	str="${str//\\\"/\"}"
+	echo "$str" >"$2"
+
+	# TODO: do we need these?
+	# sed 's/m%\\"/m%"/g' "$2" -i
+	# sed 's/\\"\\%/"%/g' "$2" -i
+	# sed 's/\\"/"/g' "$2" -i
+}

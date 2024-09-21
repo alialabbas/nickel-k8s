@@ -31,7 +31,7 @@ let otelConfig = import "./config.yaml" in
 {
   Inputs | not_exported
     = {
-      version | String | default = "0.0.95",
+      version | String | default = "0.0.97",
       namespace | String | default = "monitoring",
       releaseName | doc "release name controls metadata.name across all manifest" | String | default = "opentelemetry-collector",
     },
@@ -129,6 +129,8 @@ let otelConfig = import "./config.yaml" in
         revisionHistoryLimit = 10,
         selector = {
           matchLabels = commonLabels Inputs.releaseName Inputs.version,
+          # TODO: nothing in kube really check the correctness of these expressions.
+          # Logical testing should maybe out of concern here
           matchExpressions = [
             {
               key = "app.kubernetes.io/namesss",
@@ -175,7 +177,6 @@ let otelConfig = import "./config.yaml" in
                 ],
                 image = "otel/opentelemetry-collector-contrib:" ++ Inputs.version,
                 imagePullPolicy = "IfNotPresent",
-                livenessProbe = { httpGet = { path = otelConfig.extensions.health_check.path, port = 13133, }, },
                 name = "opentelemetry-collector",
                 ports = [
                   {
@@ -209,7 +210,8 @@ let otelConfig = import "./config.yaml" in
                     protocol = "TCP",
                   }
                 ],
-                readinessProbe = { httpGet = { path = otelConfig.extensions.health_check.path, port = 13133, }, },
+                livenessProbe = { httpGet = { path = otelConfig.extensions.health_check.path, port = 13133, }, },
+                readinessProbe = livenessProbe,
                 securityContext = {},
                 volumeMounts = [
                   {

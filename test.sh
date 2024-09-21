@@ -11,6 +11,8 @@
 
 set -e -o pipefail
 
+source lib.sh
+
 generate_and_run_tests() {
 
 	# base case when we are passing a file
@@ -29,10 +31,7 @@ generate_and_run_tests() {
 			echo "${result:1:-1}" >"$GENERATED_FILE_NAME"
 
 			# Fix some escaped special characters
-			sed 's/\\n/\n/g' "$GENERATED_FILE_NAME" -i
-			sed 's/m%\\"/m%"/g' "$GENERATED_FILE_NAME" -i
-			sed 's/\\"\\%/"%/g' "$GENERATED_FILE_NAME" -i
-			sed 's/\\"/"/g' "$GENERATED_FILE_NAME" -i
+			raw_string "$result" "$GENERATED_FILE_NAME"
 
 			# format and run the test
 			TESTFILE="$dir/test.ncl"

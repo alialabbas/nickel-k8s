@@ -442,7 +442,7 @@ let Converters = {
           {} => "Dyn",
           { type = "string", enum, ..rest } => StringConversion schema,
           { enum, ..rest } => Enum enum,
-          { const, ..rest } => "std.contract.from_predicate(fun val => val == %{PrintConstValue const})",
+          { const, ..rest } => "std.contract.Equal %{PrintConstValue const}",
           { type = "string", ..rest } => StringConversion schema,
           { type = "number", ..rest } => IntConversion schema,
           { type = "integer", ..rest } => IntConversion schema,

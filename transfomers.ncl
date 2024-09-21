@@ -1,3 +1,4 @@
+# This should be ideally what can't be produced by a simple referential
 let fromContainerPortToServicePort = fun p =>
   {
     name = p.name,

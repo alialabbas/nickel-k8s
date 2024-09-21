@@ -27,7 +27,7 @@ i=1
 result=$(curl -s "https://api.github.com/repos/kubernetes/kubernetes/tags?per_page=100&page=$i" | jq -r .[]?.name)
 
 while [[ $result != "" ]]; do
-	result=$(echo "$result" | grep '^v[0-9]*.[0-9]*.[0-9]*$' | sort --version-sort | sed -n '/v1.27.0/,$p')
+	result=$(echo "$result" | grep '^v[0-9]*.[0-9]*.[0-9]*$' | sort --version-sort | sed -n '/v1.30.0/,$p')
 
 	for version in $result; do
 
@@ -39,17 +39,13 @@ while [[ $result != "" ]]; do
 
 		file_path="$dir/$GENERATED_FILE_NAME"
 
+		log_info "Generating"
 		result=$(nickel eval -I "$dir" ./generated-k8s.ncl 2>./errs)
-		echo "${result:1:-1}" >"$file_path"
 
-		# Fix string formatting since nickel will always escape " and no other way to print this for now
-		# TODO: all of this could be done using bash premitives
-		# ❯ echo "${s//\\n/$'\n'}"
-		sed 's/\\n/\n/g' "$file_path" -i
-		sed 's/m%\\"/m%"/g' "$file_path" -i
-		sed 's/\\"\\%/"%/g' "$file_path" -i
-		sed 's/\\"/"/g' "$file_path" -i
+		log_info "Escaping code"
+		raw_string "$result" "$file_path"
 
+		log_info "Formatting"
 		nickel format "$file_path"
 
 	done

@@ -183,8 +183,11 @@ let collectionOfPathces
       # Operational hash to make it easier to find stale resources and delete them
       let packageHash = std.hash 'Sha256 (std.serialize 'Yaml value) in
       let extensions = extensions | ApiGroups in
-      let allContracts = (import "all.ncl") & extensions in
-      let all = (import "all.ncl") in
+      let serverSide = (import "all.ncl") in
+      let all = (import "./k8s/v1.31.0/k8s.ncl") in
+      let allContracts = all & extensions in
+      # how contracts are groked will need to change.
+      # find schemaContract, find the server one and then do std.contract.Sequence here
       if extensions |> std.record.to_array |> std.array.any (fun e => std.record.has_field e.field all) then
         std.contract.blame_with_message "Can't override a core contract in the library" label
       else
@@ -195,7 +198,29 @@ let collectionOfPathces
             std.array.map
               (
                 fun e =>
-                  (e & { metadata.labels = { "kubernetes.io/managed-by" = "nickel-k8s", "nickel-k8s/hash" = packageHash, } }) | allContracts."%{e.apiVersion}"."%{e.kind}"
+                  let api_and_group = std.string.split "/" e.apiVersion in
+                  let clientSideContract =
+                    if std.array.length api_and_group == 1 then
+                      allContracts."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
+                    else
+                      allContracts."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
+                  in
+                  let serverSideContract =
+                    if std.array.length api_and_group == 1 then
+                      serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
+                    else
+                      serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
+in
+                  (
+                    e
+                    & {
+                      metadata.labels = {
+                        "kubernetes.io/managed-by" = "nickel-k8s",
+                        # TODO: annotation is more appropriate here
+                        # "nickel-k8s/hash" = packageHash,
+                      }
+                    }
+                  ) | serverSideContract # | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
               )
               value,
           # 'Record => std.array.all(fun e => let contract = std.record.get e.kind allContracts in std.contract.apply contract e label),

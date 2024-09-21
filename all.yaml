@@ -1,0 +1,262 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    relay: |
+      connectors:
+        count: null
+        exceptions: {}
+        forward: {}
+      exporters:
+        debug: {}
+      extensions:
+        health_check:
+          endpoint: ${env:MY_POD_IP}:13133
+          path: /
+      processors:
+        batch: {}
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 25
+        metricstransform: {}
+      receivers:
+        jaeger:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:14250
+            thrift_compact:
+              endpoint: ${env:MY_POD_IP}:6831
+            thrift_http:
+              endpoint: ${env:MY_POD_IP}:14268
+        otlp:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4317
+            http:
+              endpoint: ${env:MY_POD_IP}:4318
+        otlp/test: null
+        prometheus:
+          config:
+            scrape_configs:
+            - job_name: opentelemetry-collector
+              scrape_interval: 10s
+              static_configs:
+              - targets:
+                - ${env:MY_POD_IP}:8888
+        zipkin:
+          endpoint: ${env:MY_POD_IP}:9411
+      service:
+        extensions:
+        - health_check
+        pipelines:
+          logs:
+            exporters:
+            - forward
+            - debug
+            processors:
+            - memory_limiter
+            - batch
+            receivers:
+            - otlp
+          logs/res:
+            exporters:
+            - debug
+            receivers:
+            - otlp/test
+          logs/test:
+            exporters:
+            - debug
+            receivers:
+            - forward
+            - otlp
+          logs/tests:
+            exporters:
+            - debug
+            receivers:
+            - otlp
+          metrics:
+            exporters:
+            - debug
+            processors:
+            - memory_limiter
+            - batch
+            - metricstransform
+            receivers:
+            - otlp
+            - count
+            - prometheus
+          traces:
+            exporters:
+            - debug
+            processors:
+            - memory_limiter
+            - batch
+            receivers:
+            - otlp
+            - jaeger
+            - zipkin
+        telemetry:
+          metrics:
+            address: ${env:MY_POD_IP}:8888
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/instance: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/version: 0.0.97
+      kubernetes.io/managed-by: nickel-k8s
+    name: opentelemetry-collector
+    namespace: monitoring
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app.kubernetes.io/instance: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/version: 0.0.97
+      kubernetes.io/managed-by: nickel-k8s
+    name: opentelemetry-collector
+    namespace: monitoring
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchExpressions:
+      - key: app.kubernetes.io/namesss
+        operator: DoesNotExist
+      - key: app.kubernetes.io/name
+        operator: Exists
+      - key: app.kubernetes.io/version
+        operator: In
+        values:
+        - 0.0.97
+        - invalid
+      - key: app.kubernetes.io/version
+        operator: NotIn
+        values:
+        - invalid
+      matchLabels:
+        app.kubernetes.io/instance: opentelemetry-collector
+        app.kubernetes.io/name: opentelemetry-collector
+        app.kubernetes.io/version: 0.0.97
+    strategy:
+      rollingUpdate:
+        maxSurge: 10
+        maxUnavailable: 50
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/instance: opentelemetry-collector
+          app.kubernetes.io/name: opentelemetry-collector
+          app.kubernetes.io/version: 0.0.97
+      spec:
+        containers:
+        - command:
+          - /otelcol-contrib
+          - --config=/conf/relay.yaml
+          env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          image: otel/opentelemetry-collector-contrib:0.0.97
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          name: opentelemetry-collector
+          ports:
+          - containerPort: 6831
+            name: jaeger-compact
+            protocol: UDP
+          - containerPort: 14250
+            name: jaeger-grpc
+            protocol: TCP
+          - containerPort: 14268
+            name: jaeger-thrift
+            protocol: TCP
+          - containerPort: 4317
+            name: otlp
+            protocol: TCP
+          - containerPort: 4318
+            name: otlp-http
+            protocol: TCP
+          - containerPort: 9411
+            name: zipkin
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          securityContext: {}
+          volumeMounts:
+          - mountPath: /conf
+            name: opentelemetry-collector
+        hostNetwork: false
+        securityContext: {}
+        serviceAccountName: opentelemetry-collector
+        volumes:
+        - configMap:
+            items:
+            - key: relay
+              path: relay.yaml
+            name: opentelemetry-collector
+          name: opentelemetry-collector
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app.kubernetes.io/instance: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/version: 0.0.97
+      kubernetes.io/managed-by: nickel-k8s
+    name: opentelemetry-collector
+    namespace: monitoring
+  spec:
+    internalTrafficPolicy: Cluster
+    ports:
+    - name: jaeger-compact
+      port: 6831
+      protocol: UDP
+      targetPort: 6831
+    - name: jaeger-grpc
+      port: 14250
+      protocol: TCP
+      targetPort: 14250
+    - name: jaeger-thrift
+      port: 14268
+      protocol: TCP
+      targetPort: 14268
+    - appProtocol: grpc
+      name: otlp
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - name: otlp-http
+      port: 4319
+      protocol: TCP
+      targetPort: 4318
+    - name: zipkin
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
+    selector:
+      app.kubernetes.io/instance: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/version: 0.0.97
+    type: ClusterIP
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    labels:
+      app.kubernetes.io/instance: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/version: 0.0.97
+      kubernetes.io/managed-by: nickel-k8s
+    name: opentelemetry-collector
+    namespace: monitoring
+kind: List

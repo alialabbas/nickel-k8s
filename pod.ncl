@@ -44,4 +44,4 @@ let p = {
       }
     ]
   }
-} in (p | v1.Pod | all.v1.Pod) == p
+} in (p | v1.Pod | all.v1.Pod)

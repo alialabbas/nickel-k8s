@@ -31,6 +31,7 @@ in
       metadata = ResourceMetadata,
       automountServiceAccountToken | Bool | optional,
       imagePullSecrets | Array { name | String } | optional,
+      ..
     },
 
   ClusterRole = {
@@ -39,6 +40,7 @@ in
     metadata | ResourceMetadata,
     aggregationRule | LabelSelector | optional,
     rules | Array PolicyRule | optional,
+    ..
   },
 
   ClusterRoleBinding = {
@@ -47,6 +49,7 @@ in
     metadata | ResourceMetadata,
     roleRef | RoleRef,
     subjects | Array Subject | optional,
+    ..
   },
 
   Role = {
@@ -55,6 +58,7 @@ in
     metadata | ResourceMetadata,
     aggregationRule | LabelSelector | optional,
     rules | Array PolicyRule | optional,
+    ..
   },
 
   RoleBinding = {
@@ -63,5 +67,6 @@ in
     metadata | ResourceMetadata,
     roleRef | RoleRef,
     subjects | Array Subject | optional,
+    ..
   },
 } | ApiGroups
