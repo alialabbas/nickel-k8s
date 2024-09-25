@@ -55,8 +55,7 @@ let collectionOfPathces
 
       Resource | doc "Kubernetes compute resource, cpu and memory"
         =
-          std.contract.from_predicate
-            (fun val => std.is_number val || std.string.is_match "^[0-9]+(\\.[0-9]+)?(mi?|k|Ki|Mi?|Gi?|Ti?|Pi?|Ei?)?$" val),
+          std.contract.from_predicate (fun val => std.is_number val || std.string.is_match "^[0-9]+(\\.[0-9]+)?(mi?|k|Ki|Mi?|Gi?|Ti?|Pi?|Ei?)?$" val),
 
       PortOrName
         | doc "Define a port either by standard port range a port name like http, grpc, etc."
@@ -93,6 +92,7 @@ let collectionOfPathces
               std.record.values Manifests
               |> std.array.map (fun e => Patcher Overlays e)
               |> std.array.map (fun e => Enforcer Constraints e)
+              # Applying contract is always the last item to give the previous steps means to modify values free from contracts checks
             ) | ManifestsValidation Kinds
         }, # | (import "self-contained-release.ncl"),
       Dns
@@ -106,11 +106,10 @@ let collectionOfPathces
           services
           |> std.array.map (fun e => e.value)
           |> std.array.fold_right
-            (
-              fun s acc =>
-                let domain = s.metadata.name ++ "." ++ s.metadata.namespace ++ ClusterDomain in
-                let r = std.array.fold_right (fun p acc => std.record.insert p.name (domain ++ ":" ++ std.to_string p.port) acc) {} s.spec.ports in
-                std.record.insert s.metadata.name r acc
+            (fun s acc =>
+              let domain = s.metadata.name ++ "." ++ s.metadata.namespace ++ ClusterDomain in
+              let r = std.array.fold_right (fun p acc => std.record.insert p.name (domain ++ ":" ++ std.to_string p.port) acc) {} s.spec.ports in
+              std.record.insert s.metadata.name r acc
             )
             {},
       Overlays | { _ | Patch } | default = {},
@@ -159,14 +158,12 @@ let collectionOfPathces
               (
                 Releases
                 |> std.record.values
-                |> std.array.map
-                  (
-                    fun e =>
-                      e.Manifests
-                      |> std.record.values
-                      |> std.array.map (fun m => Patcher e.Overlays m)
-                      |> std.array.map (fun m => Enforcer e.Constraints m)
-                  )
+                |> std.array.map (fun e =>
+                  e.Manifests
+                  |> std.record.values
+                  |> std.array.map (fun m => Patcher e.Overlays m)
+                  |> std.array.map (fun m => Enforcer e.Constraints m)
+                )
                 |> std.array.flatten
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
@@ -196,31 +193,30 @@ let collectionOfPathces
         |> match {
           'Array =>
             std.array.map
-              (
-                fun e =>
-                  let api_and_group = std.string.split "/" e.apiVersion in
-                  let clientSideContract =
-                    if std.array.length api_and_group == 1 then
-                      allContracts."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
-                    else
-                      allContracts."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
-                  in
-                  let serverSideContract =
-                    if std.array.length api_and_group == 1 then
-                      serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
-                    else
-                      serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
-in
-                  (
-                    e
-                    & {
-                      metadata.labels = {
-                        "kubernetes.io/managed-by" = "nickel-k8s",
-                        # TODO: annotation is more appropriate here
-                        # "nickel-k8s/hash" = packageHash,
-                      }
+              (fun e =>
+                let api_and_group = std.string.split "/" e.apiVersion in
+                let clientSideContract =
+                  if std.array.length api_and_group == 1 then
+                    allContracts."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
+                  else
+                    allContracts."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
+                in
+                let serverSideContract =
+                  if std.array.length api_and_group == 1 then
+                    serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
+                  else
+                    serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
+                in
+                (
+                  e
+                  & {
+                    metadata.labels = {
+                      "kubernetes.io/managed-by" = "nickel-k8s",
+                      # TODO: annotation is more appropriate here
+                      # "nickel-k8s/hash" = packageHash,
                     }
-                  ) | serverSideContract # | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
+                  }
+                ) | serverSideContract # | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
               )
               value,
           # 'Record => std.array.all(fun e => let contract = std.record.get e.kind allContracts in std.contract.apply contract e label),
@@ -232,9 +228,8 @@ in
       value
       |> std.record.values
       |> std.array.fold_right
-        (
-          fun e acc =>
-            { "%{e.apiVersion}" = { "%{e.kind}" = e } } & acc
+        (fun e acc =>
+          { "%{e.apiVersion}" = { "%{e.kind}" = e } } & acc
         )
         {},
   Patch
@@ -251,8 +246,10 @@ in
 
   Patcher
     | doc m%"Given a list of Overlays, find the one affecting the resource based on their kind or metadata.name and merge them"%
-    | Patch -> Kube.Manifest -> Kube.Manifest
+    # | Patch -> Kube.Manifest -> Kube.Manifest
     = fun overlays resource =>
+      let fromArrayC = import "./k8s/v1.31.0/mapToList.ncl" in
+      let toArrayC = import "./k8s/v1.31.0/mergeable.ncl" in
       # This has to support optional overlays for when a field kind doesn't exist
       # The question now becomes how to ensure the passed overlays are truly valid for the known Contracts
       # i.e. similar to constraints, it is fine if the we have no constraints, but it is not fine if a constraints is targetting an unknown contract/type
@@ -260,7 +257,12 @@ in
       let rKind = resource.kind in
       let rName = resource.metadata.name in
       if std.record.has_field rKind overlays then
-        resource & (std.record.get rKind overlays)
+        (
+          (resource | toArrayC.v1.Pod)
+          & (
+            (std.record.get rKind overlays) | toArrayC.v1.Pod
+          )
+        ) #| fromArrayC.apps.v1.Deployment
       else
         resource,
 

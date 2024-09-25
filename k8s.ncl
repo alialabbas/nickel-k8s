@@ -112,9 +112,8 @@ let Converters = {
       defs
       |> std.record.to_array
       |> std.array.fold_right
-        (
-          fun e acc =>
-            std.trace "generated definition for %{e.field}" acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
+        (fun e acc =>
+          std.trace "generated definition for %{e.field}" acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
         )
         m%"let rec _definitions =
       {"%
@@ -126,18 +125,17 @@ let Converters = {
       let propertiesSchema =
         if schema.properties != {} then
           std.array.fold_right
-            (
-              fun e acc =>
-                let isRequired = std.array.elem e.field schema.required in
-                let nickelContract = SchemaToNickel e.value noLazy in
-                # we only care about non-empty array contracts from this deep merge
-                if nickelContract != "" then
-                  acc
-                  ++ "\n"
-                  ++ "%{SanitizedName e.field} \n | %{(nickelContract)}"
-                  ++ (if isRequired then "," else "| optional,")
-                else
-                  acc
+            (fun e acc =>
+              let isRequired = std.array.elem e.field schema.required in
+              let nickelContract = SchemaToNickel e.value noLazy in
+              # we only care about non-empty array contracts from this deep merge
+              if nickelContract != "" then
+                acc
+                ++ "\n"
+                ++ "%{SanitizedName e.field} \n | %{(nickelContract)}"
+                ++ (if isRequired then "," else "| optional,")
+              else
+                acc
             )
             m%""%
             (std.record.to_array schema.properties)
@@ -189,8 +187,7 @@ let Converters = {
       (
         std.record.to_array schema
         |> std.array.fold_right
-          (
-            fun e acc => acc ++ e.field ++ "=" ++ (PrintConstValue e.value) ++ ",\n"
+          (fun e acc => acc ++ e.field ++ "=" ++ (PrintConstValue e.value) ++ ",\n"
           )
           "{"
       )
@@ -211,6 +208,7 @@ let Converters = {
       else
         schema
         |> match {
+          # TODO: all of these need handles to be overriden in specializations
           {} => "",
           { type = "string", enum, ..rest } => "",
           { enum, ..rest } => "",

@@ -29,19 +29,21 @@ let inner = {
   ..
 }
 in
-let p = {
-  spec = {
-    containers = [
+let p =
+  {
+    apiVersion = "v1",
+    kind = "Pod",
+    name = "opentelemetry-collector",
+    spec.containers = [
       {
-        name = "test",
-        image = "nginx",
-        ports = [
+        name = "opentelemetry-collector",
+        env = [
           {
-            containerPort = 80,
-            name = "http"
+            name = "deploment",
+            value = "test",
           }
         ],
-      }
-    ]
+      },
+    ],
   }
-} in (p | v1.Pod | all.v1.Pod)
+ in (p | v1.Pod | all.v1.Pod)

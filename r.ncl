@@ -1,86 +1,122 @@
-let { apps, .. } = import "deployment.ncl" in
-# Testability of these contracts sucks
-# I can't break laziness unless I evaluate it
-# And then I can't figure out if it failed.
-# optional 1: break the contracts to be Json Based implementation. This will work but it introduce so much work to shuffle back to contract once there is a support for it
-# non-lazy... I am banking on these to make sure what i have is correct.
-# another option is to test this with some sort of integration test to
-{
-  apiVersion = "apps/v1",
-  kind = "Deployment",
+let pod = {
+  apiVersion = "v1",
+  kind = "Pod",
   metadata = {
-    name = "otel"
+    name = "nginx"
   },
   spec = {
-    replicas = 1,
-    revisionHistoryLimit = 10,
-    strategy = { type = "RollingUpdate", rollingUpdate.maxSurge = 10, rollingUpdate.maxUnavailable = 50 },
-    selector = {
-      matchLabels = {
-        "apps.kubernetes.io/name" = "opentelemetry-collector"
-      },
-    },
-    template = {
-      metadata = {
-        labels = { "apps.kubernetes.io/name" = "opentelemetry-collector" },
-      },
-      spec = {
-        containers = [
+    containers = [
+      {
+        name = "sidecar",
+        image = "istio:1.14.2",
+        ports = [
           {
-            command = [
-              "/otelcol-contrib",
-              "--config=/conf/relay.yaml"
-            ],
-            env = [
-              {
-                name = "MY_POD_IP",
-                valueFrom = {
-                  fieldRef = {
-                    apiVersion = "v1",
-                    fieldPath = "status.podIP",
-                  },
-                },
-              }
-            ],
-            image = "otel/opentelemetry-collector-contrib:",
-            imagePullPolicy = "IfNotPresent",
-            name = "opentelemetry-collector",
-            ports = [
-              {
-                containerPort = 6831,
-                name = "jaeger-compact",
-                protocol = "UDP",
-              },
-              {
-                containerPort = 14250,
-                name = "jaeger-grpc",
-                protocol = "TCP",
-              },
-              {
-                containerPort = 14268,
-                name = "jaeger-thrift",
-                protocol = "TCP",
-              },
-              {
-                containerPort = 4317,
-                name = "otlp",
-                protocol = "TCP",
-              },
-              {
-                containerPort = 4318,
-                name = "otlp-http",
-                protocol = "TCP",
-              },
-              {
-                containerPort = 9411,
-                name = "zipkin",
-                protocol = "TCP",
-              }
-            ],
-            securityContext = {},
+            containerPort = 80,
+            name = "http",
+            protocol = "TCP",
+          }
+        ]
+      },
+      {
+        name = "nginx",
+        image = "nginx:1.14.2",
+        env = [
+          {
+            name = "test",
+            value = "test",
           }
         ],
-      },
-    },
-  },
-} | std.contract.check apps.v1.Deployment
+        ports = [
+          {
+            containerPort = 80,
+            name = "http",
+            protocol = "TCP",
+          }
+        ]
+      }
+    ]
+  }
+}
+in
+
+# Generates a record of ToMergable and FromMergable record for all resources in a swagger
+let templates = import "template.ncl" in
+let swagger = import "swagger.json" in
+let get_ref
+  | (String -> String)
+  = fun ref =>
+    let ref = std.string.split "/" ref in
+    ref
+    |> match {
+      ["#", "definitions", ..rest] => std.array.first rest,
+      ["#", "defs", ..rest] => std.array.first rest
+    }
+  in
+let rec get_paths = fun value =>
+  value
+  |> std.record.to_array
+  |> std.array.fold_right
+    (fun e acc =>
+      # we always have to expand the ref first because it's value is string but technically it references a record we want to inline in the final result
+      if e.field == "$ref" then
+        acc
+        @ (
+          std.array.map (fun p => p) (get_paths swagger.definitions."%{get_ref e.value}")
+        )
+      else if std.typeof e.value == 'Record
+      && (std.record.has_field "x-kubernetes-list-type" e.value)
+      && (e.value.x-kubernetes-list-type == "map") then
+        [
+          {
+            field = e.field,
+            value = (std.array.first e.value.x-kubernetes-list-map-keys),
+            nested = (
+              std.array.map
+                (fun p =>
+                  if e.field == "properties" || e.field == "items" then
+                    p
+                  else
+                    { field = p.field, value = p.value }
+                )
+                (get_paths e.value)
+            )
+          }
+        ]
+        @ acc
+      else if std.typeof e.value != 'Record then
+        acc
+      else
+        acc
+        @ (
+          std.array.map
+            (fun p =>
+              if e.field == "properties" || e.field == "items" then
+                p
+              else
+                { field = "%{e.field}." ++ p.field, value = p.value, nested = std.record.get_or "nested" [] p}
+            )
+            (get_paths e.value)
+        )
+    )
+    []
+in
+
+let generated =
+  swagger.definitions
+  |> std.record.filter (fun e v => std.record.has_field "x-kubernetes-group-version-kind" v)
+  |> std.record.filter (fun e v => !std.string.contains "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1" e)
+  |> std.record.to_array
+  |> std.array.map (fun e =>
+    let apiField =
+      let groupDef = std.array.first e.value.x-kubernetes-group-version-kind in
+      let group =
+        if groupDef.group == "" then
+          ""
+        else
+          groupDef.group ++ "."
+      in group ++ groupDef.version ++ "." ++ groupDef.kind
+    in
+    { field = apiField, value = get_paths e.value }
+  )
+  |> std.record.from_array
+in generated."v1.Pod"

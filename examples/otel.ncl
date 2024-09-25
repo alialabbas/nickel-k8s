@@ -245,4 +245,24 @@ let otelConfig = import "./config.yaml" in
       },
     },
   },
+  Overlays = {
+    Deployment = {
+      apiVersion = "apps/v1",
+      kind = "Deployment",
+      spec = {
+        replicas | force = 20,
+        template.spec.containers = [
+          {
+            name = "opentelemetry-collector",
+            env = [
+              {
+                name = "overlayed-env",
+                value = "test-val",
+              }
+            ],
+          },
+        ]
+      },
+    },
+  },
 } | Release
