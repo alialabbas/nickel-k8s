@@ -101,11 +101,10 @@ let lib = import "Contracts.ncl" in
       | String,
   },
   io.k8s.apimachinery.pkg.util.intstr.IntOrString = (
-    lib.OneOf
-      [
-        String,
-        Number,
-      ]
+    lib.OneOf [
+      String,
+      Number,
+    ]
   ),
   io.k8s.apimachinery.pkg.runtime.RawExtension = { .. },
   io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent = {

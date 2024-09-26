@@ -101,11 +101,10 @@ let lib = import "Contracts.ncl" in
       | String,
   },
   io.k8s.apimachinery.pkg.util.intstr.IntOrString = (
-    lib.OneOf
-      [
-        String,
-        Number,
-      ]
+    lib.OneOf [
+      String,
+      Number,
+    ]
   ),
   io.k8s.apimachinery.pkg.runtime.RawExtension = { .. },
   io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent = {
@@ -1192,7 +1191,7 @@ let lib = import "Contracts.ncl" in
       | optional,
   },
   resource.k8s.io.v1alpha3.ResourceSliceList = {
-    metadata
+    listMeta
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind

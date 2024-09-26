@@ -31,7 +31,7 @@ while [[ $result != "" ]]; do
 
 	for version in $result; do
 
-		echo -e "${GREEN}Generate Contracts for kube version ${version}${NC}"
+		log_info "Generate Contracts for kube version ${version}"
 		dir="./k8s/$version"
 		mkdir -p "$dir"
 
@@ -47,6 +47,15 @@ while [[ $result != "" ]]; do
 
 		log_info "Formatting"
 		nickel format "$file_path"
+
+		log_info "Generating Merge Functions"
+		merge_result=$(nickel eval -I "$dir" ./merge.ncl 2>./errs)
+		merge_file_name="$dir/merge.ncl"
+		log_info "Escaping code"
+		raw_string "$merge_result" "$merge_file_name"
+
+		log_info "Formatting"
+		nickel format "$merge_file_name"
 
 	done
 

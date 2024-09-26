@@ -1,4 +1,5 @@
-let m = import "gen.ncl" in
+let m = import "./k8s/v1.31.0/merge.ncl" in
+let all = (import "./k8s/v1.31.0/k8s.ncl") in
 let { Networking, .. } = import "types.ncl" in
 let patch = { apiVersion | String, kind | String, metadata.name | String | optional, .. } in
 # TODO: this is broken
@@ -181,7 +182,6 @@ let collectionOfPathces
       let packageHash = std.hash 'Sha256 (std.serialize 'Yaml value) in
       let extensions = extensions | ApiGroups in
       let serverSide = (import "all.ncl") in
-      let all = (import "./k8s/v1.31.0/k8s.ncl") in
       let allContracts = all & extensions in
       # how contracts are groked will need to change.
       # find schemaContract, find the server one and then do std.contract.Sequence here
@@ -253,13 +253,15 @@ let collectionOfPathces
       let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
       let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
       let to_mergeable =
-        if group != "" then # core apis don't have a group
+        if group != "" then
+          # core apis don't have a group
           m."%{group}"."%{version}"."%{kind}".to_merge_form
         else
           m."%{version}"."%{kind}".to_merge_form
       in
       let from_mergeable =
-        if group != "" then # core apis don't have a group
+        if group != "" then
+          # core apis don't have a group
           m."%{group}"."%{version}"."%{kind}".from_merge_form
         else
           m."%{version}"."%{kind}".from_merge_form
