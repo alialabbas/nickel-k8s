@@ -69,12 +69,10 @@ let generated =
     (fun e acc =>
       let apiField =
         let groupDef = std.array.first e.value.x-kubernetes-group-version-kind in
-        let group =
           if groupDef.group == "" then
-            ""
+            groupDef.version ++ "." ++ groupDef.kind
           else
-            groupDef.group
-        in "\"%{group}\"." ++ groupDef.version ++ "." ++ groupDef.kind
+            "\"%{groupDef.group}\"." ++ groupDef.version ++ "." ++ groupDef.kind
       in
       let paths = get_paths e.value in
       acc
