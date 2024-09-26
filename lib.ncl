@@ -25,10 +25,25 @@ let OnlyWhenInOrNotIn
       "%
     = {
       Name
-        | doc "Kubernetes Metadata.Name based on RFC1123, lowercase alphanumeric and '-'"
+        | doc m%"
+            Kubernetes Metadata.Name based on RFC1123, lowercase alphanumeric and '-'
+            ```nickel
+            "this-is-valid" | Name
+            ```
+          "%
         = std.contract.from_predicate (fun name => std.string.is_match "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" name),
 
-      Resource | doc "Kubernetes compute resource, cpu and memory"
+      Resource
+        | doc m%"
+          Kubernetes compute resource, cpu and memory
+          ```nickel
+          1000  | Resource
+          ```
+          Or
+          ```nickel
+          "100Mi"  | Resource
+          ```
+        "%
         =
           std.contract.from_predicate (fun val => std.is_number val || std.string.is_match "^[0-9]+(\\.[0-9]+)?(mi?|k|Ki|Mi?|Gi?|Ti?|Pi?|Ei?)?$" val),
 
@@ -407,7 +422,7 @@ let OnlyWhenInOrNotIn
           since those expect those values to be propagated back. The lazy version would always err which sometimes is not ideal
 
           ```nickel
-          { test = 1 | { test = { type = Number, optional = false } }
+          { test = 1 } | { test = { type = Number, optional = false } }
           ```
         "%
       = fun contract =>

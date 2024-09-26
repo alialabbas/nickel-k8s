@@ -1,4 +1,3 @@
-let { PodSpec, .. } = import "podspec.ncl" in
 let { Kube, .. } = import "kube.ncl" in
 let printArray : Array String -> String = fun value => value |> std.array.fold_right (fun e acc => e ++ " " ++ acc) "" in
 # The goal is to make this a series of release validation that can be applied to either Release.package or Env.env
@@ -217,7 +216,7 @@ let configsRefsAreValid = fun label value =>
 in
 
 let getPodsVolumes
-  | Array PodSpec
+  # | Array PodSpec
   = fun podSpecs =>
     podSpecs
     |> std.array.map (fun e => e.volumes)
