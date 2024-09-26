@@ -145,7 +145,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  v1.Status = {
+  io.k8s.apimachinery.pkg.apis.meta.v1.Status = {
     status
       | String
       | optional,
@@ -159,7 +159,8 @@ let lib = import "lib.ncl" in
       | String
       | optional,
     kind
-      | std.contract.from_predicate (fun val => val == "Status"),
+      | String
+      | optional,
     details
       | io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails
       | optional,
@@ -167,7 +168,8 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
     apiVersion
-      | std.contract.from_predicate (fun val => val == "v1"),
+      | String
+      | optional,
   },
   io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR = {
     serverAddress
@@ -309,15 +311,6 @@ let lib = import "lib.ncl" in
       | String,
   },
   io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1 = { .. },
-  io.k8s.apimachinery.pkg.apis.meta.v1.FieldSelectorRequirement = {
-    values
-      | (Array String)
-      | optional,
-    operator
-      | String,
-    key
-      | String,
-  },
   io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions = {
     propagationPolicy
       | String
@@ -860,31 +853,6 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  "storage.k8s.io".v1beta1.VolumeAttributesClassList = {
-    metadata
-      | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
-      | optional,
-    kind
-      | std.contract.from_predicate (fun val => val == "VolumeAttributesClassList"),
-    items
-      | (Array io.k8s.api.storage.v1beta1.VolumeAttributesClass),
-    apiVersion
-      | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1beta1"),
-  },
-  "storage.k8s.io".v1beta1.VolumeAttributesClass = {
-    parameters
-      | { _ | String }
-      | optional,
-    metadata
-      | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      | optional,
-    kind
-      | std.contract.from_predicate (fun val => val == "VolumeAttributesClass"),
-    driverName
-      | String,
-    apiVersion
-      | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1beta1"),
-  },
   "storage.k8s.io".v1alpha1.VolumeAttributesClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
@@ -1172,121 +1140,265 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "scheduling.k8s.io/v1"),
   },
-  io.k8s.api.resource.v1alpha3.ResourceSliceSpec = {
-    pool
-      | io.k8s.api.resource.v1alpha3.ResourcePool,
-    nodeSelector
-      | io.k8s.api.core.v1.NodeSelector
+  io.k8s.api.resource.v1alpha2.VendorParameters = {
+    parameters
+      | io.k8s.apimachinery.pkg.runtime.RawExtension
       | optional,
+    driverName
+      | String
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.StructuredResourceHandle = {
+    vendorClassParameters
+      | io.k8s.apimachinery.pkg.runtime.RawExtension
+      | optional,
+    vendorClaimParameters
+      | io.k8s.apimachinery.pkg.runtime.RawExtension
+      | optional,
+    results
+      | (Array io.k8s.api.resource.v1alpha2.DriverAllocationResult),
     nodeName
       | String
       | optional,
-    driver
-      | String,
-    devices
-      | (Array io.k8s.api.resource.v1alpha3.Device)
-      | optional,
-    allNodes
-      | Bool
-      | optional,
   },
-  "resource.k8s.io".v1alpha3.ResourceSliceList = {
-    listMeta
+  "resource.k8s.io".v1alpha2.ResourceSliceList = {
+    metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ResourceSliceList"),
     items
-      | (Array io.k8s.api.resource.v1alpha3.ResourceSlice),
+      | (Array io.k8s.api.resource.v1alpha2.ResourceSlice),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  "resource.k8s.io".v1alpha3.ResourceSlice = {
-    spec
-      | io.k8s.api.resource.v1alpha3.ResourceSliceSpec,
+  "resource.k8s.io".v1alpha2.ResourceSlice = {
+    nodeName
+      | String
+      | optional,
+    namedResources
+      | io.k8s.api.resource.v1alpha2.NamedResourcesResources
+      | optional,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ResourceSlice"),
+    driverName
+      | String,
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  io.k8s.api.resource.v1alpha3.ResourcePool = {
-    resourceSliceCount
-      | std.number.Integer,
+  io.k8s.api.resource.v1alpha2.ResourceRequest = {
+    vendorParameters
+      | io.k8s.apimachinery.pkg.runtime.RawExtension
+      | optional,
+    namedResources
+      | io.k8s.api.resource.v1alpha2.NamedResourcesRequest
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.ResourceHandle = {
+    structuredData
+      | io.k8s.api.resource.v1alpha2.StructuredResourceHandle
+      | optional,
+    driverName
+      | String
+      | optional,
+    data
+      | String
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.ResourceFilter = {
+    namedResources
+      | io.k8s.api.resource.v1alpha2.NamedResourcesFilter
+      | optional,
+    driverName
+      | String
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.ResourceClassParametersReference = {
+    namespace
+      | String
+      | optional,
     name
       | String,
-    generation
-      | std.number.Integer,
+    kind
+      | String,
+    apiGroup
+      | String
+      | optional,
   },
-  io.k8s.api.resource.v1alpha3.ResourceClaimTemplateSpec = {
+  "resource.k8s.io".v1alpha2.ResourceClassParametersList = {
+    metadata
+      | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
+      | optional,
+    kind
+      | std.contract.from_predicate (fun val => val == "ResourceClassParametersList"),
+    items
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClassParameters),
+    apiVersion
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
+  },
+  "resource.k8s.io".v1alpha2.ResourceClassParameters = {
+    vendorParameters
+      | (Array io.k8s.api.resource.v1alpha2.VendorParameters)
+      | optional,
+    metadata
+      | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      | optional,
+    kind
+      | std.contract.from_predicate (fun val => val == "ResourceClassParameters"),
+    generatedFrom
+      | io.k8s.api.resource.v1alpha2.ResourceClassParametersReference
+      | optional,
+    filters
+      | (Array io.k8s.api.resource.v1alpha2.ResourceFilter)
+      | optional,
+    apiVersion
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
+  },
+  "resource.k8s.io".v1alpha2.ResourceClassList = {
+    metadata
+      | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
+      | optional,
+    kind
+      | std.contract.from_predicate (fun val => val == "ResourceClassList"),
+    items
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClass),
+    apiVersion
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
+  },
+  "resource.k8s.io".v1alpha2.ResourceClass = {
+    suitableNodes
+      | io.k8s.api.core.v1.NodeSelector
+      | optional,
+    structuredParameters
+      | Bool
+      | optional,
+    parametersRef
+      | io.k8s.api.resource.v1alpha2.ResourceClassParametersReference
+      | optional,
+    metadata
+      | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      | optional,
+    kind
+      | std.contract.from_predicate (fun val => val == "ResourceClass"),
+    driverName
+      | String,
+    apiVersion
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
+  },
+  io.k8s.api.resource.v1alpha2.ResourceClaimTemplateSpec = {
     spec
-      | io.k8s.api.resource.v1alpha3.ResourceClaimSpec,
+      | io.k8s.api.resource.v1alpha2.ResourceClaimSpec,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
   },
-  "resource.k8s.io".v1alpha3.ResourceClaimTemplateList = {
+  "resource.k8s.io".v1alpha2.ResourceClaimTemplateList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ResourceClaimTemplateList"),
     items
-      | (Array io.k8s.api.resource.v1alpha3.ResourceClaimTemplate),
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClaimTemplate),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  "resource.k8s.io".v1alpha3.ResourceClaimTemplate = {
+  "resource.k8s.io".v1alpha2.ResourceClaimTemplate = {
     spec
-      | io.k8s.api.resource.v1alpha3.ResourceClaimTemplateSpec,
+      | io.k8s.api.resource.v1alpha2.ResourceClaimTemplateSpec,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ResourceClaimTemplate"),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  io.k8s.api.resource.v1alpha3.ResourceClaimStatus = {
+  io.k8s.api.resource.v1alpha2.ResourceClaimStatus = {
     reservedFor
-      | (Array io.k8s.api.resource.v1alpha3.ResourceClaimConsumerReference)
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClaimConsumerReference)
+      | optional,
+    driverName
+      | String
       | optional,
     deallocationRequested
       | Bool
       | optional,
     allocation
-      | io.k8s.api.resource.v1alpha3.AllocationResult
+      | io.k8s.api.resource.v1alpha2.AllocationResult
       | optional,
   },
-  io.k8s.api.resource.v1alpha3.ResourceClaimSpec = {
-    devices
-      | io.k8s.api.resource.v1alpha3.DeviceClaim
+  io.k8s.api.resource.v1alpha2.ResourceClaimSpec = {
+    resourceClassName
+      | String,
+    parametersRef
+      | io.k8s.api.resource.v1alpha2.ResourceClaimParametersReference
       | optional,
-    controller
+    allocationMode
       | String
       | optional,
   },
-  io.k8s.api.resource.v1alpha3.ResourceClaimSchedulingStatus = {
+  io.k8s.api.resource.v1alpha2.ResourceClaimSchedulingStatus = {
     unsuitableNodes
       | (Array String)
       | optional,
     name
-      | String,
+      | String
+      | optional,
   },
-  "resource.k8s.io".v1alpha3.ResourceClaimList = {
+  io.k8s.api.resource.v1alpha2.ResourceClaimParametersReference = {
+    name
+      | String,
+    kind
+      | String,
+    apiGroup
+      | String
+      | optional,
+  },
+  "resource.k8s.io".v1alpha2.ResourceClaimParametersList = {
+    metadata
+      | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
+      | optional,
+    kind
+      | std.contract.from_predicate (fun val => val == "ResourceClaimParametersList"),
+    items
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClaimParameters),
+    apiVersion
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
+  },
+  "resource.k8s.io".v1alpha2.ResourceClaimParameters = {
+    shareable
+      | Bool
+      | optional,
+    metadata
+      | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      | optional,
+    kind
+      | std.contract.from_predicate (fun val => val == "ResourceClaimParameters"),
+    generatedFrom
+      | io.k8s.api.resource.v1alpha2.ResourceClaimParametersReference
+      | optional,
+    driverRequests
+      | (Array io.k8s.api.resource.v1alpha2.DriverRequests)
+      | optional,
+    apiVersion
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
+  },
+  "resource.k8s.io".v1alpha2.ResourceClaimList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ResourceClaimList"),
     items
-      | (Array io.k8s.api.resource.v1alpha3.ResourceClaim),
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClaim),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  io.k8s.api.resource.v1alpha3.ResourceClaimConsumerReference = {
+  io.k8s.api.resource.v1alpha2.ResourceClaimConsumerReference = {
     uid
       | String,
     resource
@@ -1297,26 +1409,26 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  "resource.k8s.io".v1alpha3.ResourceClaim = {
+  "resource.k8s.io".v1alpha2.ResourceClaim = {
     status
-      | io.k8s.api.resource.v1alpha3.ResourceClaimStatus
+      | io.k8s.api.resource.v1alpha2.ResourceClaimStatus
       | optional,
     spec
-      | io.k8s.api.resource.v1alpha3.ResourceClaimSpec,
+      | io.k8s.api.resource.v1alpha2.ResourceClaimSpec,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ResourceClaim"),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  io.k8s.api.resource.v1alpha3.PodSchedulingContextStatus = {
+  io.k8s.api.resource.v1alpha2.PodSchedulingContextStatus = {
     resourceClaims
-      | (Array io.k8s.api.resource.v1alpha3.ResourceClaimSchedulingStatus)
+      | (Array io.k8s.api.resource.v1alpha2.ResourceClaimSchedulingStatus)
       | optional,
   },
-  io.k8s.api.resource.v1alpha3.PodSchedulingContextSpec = {
+  io.k8s.api.resource.v1alpha2.PodSchedulingContextSpec = {
     selectedNode
       | String
       | optional,
@@ -1324,141 +1436,75 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  "resource.k8s.io".v1alpha3.PodSchedulingContextList = {
+  "resource.k8s.io".v1alpha2.PodSchedulingContextList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "PodSchedulingContextList"),
     items
-      | (Array io.k8s.api.resource.v1alpha3.PodSchedulingContext),
+      | (Array io.k8s.api.resource.v1alpha2.PodSchedulingContext),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  "resource.k8s.io".v1alpha3.PodSchedulingContext = {
+  "resource.k8s.io".v1alpha2.PodSchedulingContext = {
     status
-      | io.k8s.api.resource.v1alpha3.PodSchedulingContextStatus
+      | io.k8s.api.resource.v1alpha2.PodSchedulingContextStatus
       | optional,
     spec
-      | io.k8s.api.resource.v1alpha3.PodSchedulingContextSpec,
+      | io.k8s.api.resource.v1alpha2.PodSchedulingContextSpec,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "PodSchedulingContext"),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
+      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha2"),
   },
-  io.k8s.api.resource.v1alpha3.OpaqueDeviceConfiguration = {
-    parameters
-      | io.k8s.apimachinery.pkg.runtime.RawExtension,
-    driver
-      | String,
+  io.k8s.api.resource.v1alpha2.NamedResourcesStringSlice = {
+    strings
+      | (Array String),
   },
-  io.k8s.api.resource.v1alpha3.DeviceSelector = {
-    cel
-      | io.k8s.api.resource.v1alpha3.CELDeviceSelector
-      | optional,
+  io.k8s.api.resource.v1alpha2.NamedResourcesResources = {
+    instances
+      | (Array io.k8s.api.resource.v1alpha2.NamedResourcesInstance),
   },
-  io.k8s.api.resource.v1alpha3.DeviceRequestAllocationResult = {
-    request
-      | String,
-    pool
-      | String,
-    driver
-      | String,
-    device
+  io.k8s.api.resource.v1alpha2.NamedResourcesRequest = {
+    selector
       | String,
   },
-  io.k8s.api.resource.v1alpha3.DeviceRequest = {
-    selectors
-      | (Array io.k8s.api.resource.v1alpha3.DeviceSelector)
-      | optional,
+  io.k8s.api.resource.v1alpha2.NamedResourcesIntSlice = {
+    ints
+      | (Array std.number.Integer),
+  },
+  io.k8s.api.resource.v1alpha2.NamedResourcesInstance = {
     name
       | String,
-    deviceClassName
+    attributes
+      | (Array io.k8s.api.resource.v1alpha2.NamedResourcesAttribute)
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.NamedResourcesFilter = {
+    selector
       | String,
-    count
-      | std.number.Integer
-      | optional,
-    allocationMode
-      | String
-      | optional,
-    adminAccess
-      | Bool
-      | optional,
   },
-  io.k8s.api.resource.v1alpha3.DeviceConstraint = {
-    requests
-      | (Array String)
-      | optional,
-    matchAttribute
-      | String
-      | optional,
-  },
-  io.k8s.api.resource.v1alpha3.DeviceClassSpec = {
-    suitableNodes
-      | io.k8s.api.core.v1.NodeSelector
-      | optional,
-    selectors
-      | (Array io.k8s.api.resource.v1alpha3.DeviceSelector)
-      | optional,
-    config
-      | (Array io.k8s.api.resource.v1alpha3.DeviceClassConfiguration)
-      | optional,
-  },
-  "resource.k8s.io".v1alpha3.DeviceClassList = {
-    metadata
-      | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
-      | optional,
-    kind
-      | std.contract.from_predicate (fun val => val == "DeviceClassList"),
-    items
-      | (Array io.k8s.api.resource.v1alpha3.DeviceClass),
-    apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
-  },
-  io.k8s.api.resource.v1alpha3.DeviceClassConfiguration = {
-    opaque
-      | io.k8s.api.resource.v1alpha3.OpaqueDeviceConfiguration
-      | optional,
-  },
-  "resource.k8s.io".v1alpha3.DeviceClass = {
-    spec
-      | io.k8s.api.resource.v1alpha3.DeviceClassSpec,
-    metadata
-      | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      | optional,
-    kind
-      | std.contract.from_predicate (fun val => val == "DeviceClass"),
-    apiVersion
-      | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
-  },
-  io.k8s.api.resource.v1alpha3.DeviceClaimConfiguration = {
-    requests
-      | (Array String)
-      | optional,
-    opaque
-      | io.k8s.api.resource.v1alpha3.OpaqueDeviceConfiguration
-      | optional,
-  },
-  io.k8s.api.resource.v1alpha3.DeviceClaim = {
-    requests
-      | (Array io.k8s.api.resource.v1alpha3.DeviceRequest)
-      | optional,
-    constraints
-      | (Array io.k8s.api.resource.v1alpha3.DeviceConstraint)
-      | optional,
-    config
-      | (Array io.k8s.api.resource.v1alpha3.DeviceClaimConfiguration)
-      | optional,
-  },
-  io.k8s.api.resource.v1alpha3.DeviceAttribute = {
+  io.k8s.api.resource.v1alpha2.NamedResourcesAttribute = {
     version
       | String
       | optional,
+    stringSlice
+      | io.k8s.api.resource.v1alpha2.NamedResourcesStringSlice
+      | optional,
     string
       | String
+      | optional,
+    quantity
+      | io.k8s.apimachinery.pkg.api.resource.Quantity
+      | optional,
+    name
+      | String,
+    intSlice
+      | io.k8s.api.resource.v1alpha2.NamedResourcesIntSlice
       | optional,
     int
       | std.number.Integer
@@ -1467,52 +1513,38 @@ let lib = import "lib.ncl" in
       | Bool
       | optional,
   },
-  io.k8s.api.resource.v1alpha3.DeviceAllocationResult = {
-    results
-      | (Array io.k8s.api.resource.v1alpha3.DeviceRequestAllocationResult)
-      | optional,
-    config
-      | (Array io.k8s.api.resource.v1alpha3.DeviceAllocationConfiguration)
-      | optional,
-  },
-  io.k8s.api.resource.v1alpha3.DeviceAllocationConfiguration = {
-    source
-      | String,
-    requests
-      | (Array String)
-      | optional,
-    opaque
-      | io.k8s.api.resource.v1alpha3.OpaqueDeviceConfiguration
-      | optional,
-  },
-  io.k8s.api.resource.v1alpha3.Device = {
+  io.k8s.api.resource.v1alpha2.NamedResourcesAllocationResult = {
     name
       | String,
-    basic
-      | io.k8s.api.resource.v1alpha3.BasicDevice
-      | optional,
   },
-  io.k8s.api.resource.v1alpha3.CELDeviceSelector = {
-    expression
-      | String,
-  },
-  io.k8s.api.resource.v1alpha3.BasicDevice = {
-    capacity
-      | { _ | io.k8s.apimachinery.pkg.api.resource.Quantity }
+  io.k8s.api.resource.v1alpha2.DriverRequests = {
+    vendorParameters
+      | io.k8s.apimachinery.pkg.runtime.RawExtension
       | optional,
-    attributes
-      | { _ | io.k8s.api.resource.v1alpha3.DeviceAttribute }
+    requests
+      | (Array io.k8s.api.resource.v1alpha2.ResourceRequest)
       | optional,
-  },
-  io.k8s.api.resource.v1alpha3.AllocationResult = {
-    nodeSelector
-      | io.k8s.api.core.v1.NodeSelector
-      | optional,
-    devices
-      | io.k8s.api.resource.v1alpha3.DeviceAllocationResult
-      | optional,
-    controller
+    driverName
       | String
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.DriverAllocationResult = {
+    vendorRequestParameters
+      | io.k8s.apimachinery.pkg.runtime.RawExtension
+      | optional,
+    namedResources
+      | io.k8s.api.resource.v1alpha2.NamedResourcesAllocationResult
+      | optional,
+  },
+  io.k8s.api.resource.v1alpha2.AllocationResult = {
+    shareable
+      | Bool
+      | optional,
+    resourceHandles
+      | (Array io.k8s.api.resource.v1alpha2.ResourceHandle)
+      | optional,
+    availableOnNodes
+      | io.k8s.api.core.v1.NodeSelector
       | optional,
   },
   io.k8s.api.rbac.v1.Subject = {
@@ -1767,33 +1799,33 @@ let lib = import "lib.ncl" in
       | { _ | io.k8s.apimachinery.pkg.api.resource.Quantity }
       | optional,
   },
-  io.k8s.api.networking.v1beta1.ServiceCIDRStatus = {
+  io.k8s.api.networking.v1alpha1.ServiceCIDRStatus = {
     conditions
       | (Array io.k8s.apimachinery.pkg.apis.meta.v1.Condition)
       | optional,
   },
-  io.k8s.api.networking.v1beta1.ServiceCIDRSpec = {
+  io.k8s.api.networking.v1alpha1.ServiceCIDRSpec = {
     cidrs
       | (Array String)
       | optional,
   },
-  "networking.k8s.io".v1beta1.ServiceCIDRList = {
+  "networking.k8s.io".v1alpha1.ServiceCIDRList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "ServiceCIDRList"),
     items
-      | (Array io.k8s.api.networking.v1beta1.ServiceCIDR),
+      | (Array io.k8s.api.networking.v1alpha1.ServiceCIDR),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1beta1"),
+      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1alpha1"),
   },
-  "networking.k8s.io".v1beta1.ServiceCIDR = {
+  "networking.k8s.io".v1alpha1.ServiceCIDR = {
     status
-      | io.k8s.api.networking.v1beta1.ServiceCIDRStatus
+      | io.k8s.api.networking.v1alpha1.ServiceCIDRStatus
       | optional,
     spec
-      | io.k8s.api.networking.v1beta1.ServiceCIDRSpec
+      | io.k8s.api.networking.v1alpha1.ServiceCIDRSpec
       | optional,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
@@ -1801,9 +1833,9 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ServiceCIDR"),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1beta1"),
+      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1alpha1"),
   },
-  io.k8s.api.networking.v1beta1.ParentReference = {
+  io.k8s.api.networking.v1alpha1.ParentReference = {
     resource
       | String,
     namespace
@@ -1815,24 +1847,24 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  io.k8s.api.networking.v1beta1.IPAddressSpec = {
+  io.k8s.api.networking.v1alpha1.IPAddressSpec = {
     parentRef
-      | io.k8s.api.networking.v1beta1.ParentReference,
+      | io.k8s.api.networking.v1alpha1.ParentReference,
   },
-  "networking.k8s.io".v1beta1.IPAddressList = {
+  "networking.k8s.io".v1alpha1.IPAddressList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
       | std.contract.from_predicate (fun val => val == "IPAddressList"),
     items
-      | (Array io.k8s.api.networking.v1beta1.IPAddress),
+      | (Array io.k8s.api.networking.v1alpha1.IPAddress),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1beta1"),
+      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1alpha1"),
   },
-  "networking.k8s.io".v1beta1.IPAddress = {
+  "networking.k8s.io".v1alpha1.IPAddress = {
     spec
-      | io.k8s.api.networking.v1beta1.IPAddressSpec
+      | io.k8s.api.networking.v1alpha1.IPAddressSpec
       | optional,
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
@@ -1840,7 +1872,7 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "IPAddress"),
     apiVersion
-      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1beta1"),
+      | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1alpha1"),
   },
   io.k8s.api.networking.v1.ServiceBackendPort = {
     number
@@ -2833,9 +2865,6 @@ let lib = import "lib.ncl" in
     iscsi
       | io.k8s.api.core.v1.ISCSIVolumeSource
       | optional,
-    image
-      | io.k8s.api.core.v1.ImageVolumeSource
-      | optional,
     hostPath
       | io.k8s.api.core.v1.HostPathVolumeSource
       | optional,
@@ -3396,13 +3425,6 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  io.k8s.api.core.v1.ResourceStatus = {
-    resources
-      | (Array io.k8s.api.core.v1.ResourceHealth)
-      | optional,
-    name
-      | String,
-  },
   io.k8s.api.core.v1.ResourceRequirements = {
     requests
       | { _ | io.k8s.apimachinery.pkg.api.resource.Quantity }
@@ -3459,13 +3481,6 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  io.k8s.api.core.v1.ResourceHealth = {
-    resourceID
-      | String,
-    health
-      | String
-      | optional,
-  },
   io.k8s.api.core.v1.ResourceFieldSelector = {
     resource
       | String,
@@ -3477,9 +3492,6 @@ let lib = import "lib.ncl" in
       | optional,
   },
   io.k8s.api.core.v1.ResourceClaim = {
-    request
-      | String
-      | optional,
     name
       | String,
   },
@@ -3894,9 +3906,6 @@ let lib = import "lib.ncl" in
     sysctls
       | (Array io.k8s.api.core.v1.Sysctl)
       | optional,
-    supplementalGroupsPolicy
-      | String
-      | optional,
     supplementalGroups
       | (Array std.number.Integer)
       | optional,
@@ -3937,11 +3946,8 @@ let lib = import "lib.ncl" in
       | String,
   },
   io.k8s.api.core.v1.PodResourceClaim = {
-    resourceClaimTemplateName
-      | String
-      | optional,
-    resourceClaimName
-      | String
+    source
+      | io.k8s.api.core.v1.ClaimSource
       | optional,
     name
       | String,
@@ -3967,7 +3973,8 @@ let lib = import "lib.ncl" in
   },
   io.k8s.api.core.v1.PodIP = {
     ip
-      | String,
+      | String
+      | optional,
   },
   io.k8s.api.core.v1.PodDNSConfigOption = {
     value
@@ -4382,9 +4389,6 @@ let lib = import "lib.ncl" in
     images
       | (Array io.k8s.api.core.v1.ContainerImage)
       | optional,
-    features
-      | io.k8s.api.core.v1.NodeFeatures
-      | optional,
     daemonEndpoints
       | io.k8s.api.core.v1.NodeDaemonEndpoints
       | optional,
@@ -4449,9 +4453,6 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.core.v1.NodeSelectorTerm),
   },
   io.k8s.api.core.v1.NodeRuntimeHandlerFeatures = {
-    userNamespaces
-      | Bool
-      | optional,
     recursiveReadOnlyMounts
       | Bool
       | optional,
@@ -4474,11 +4475,6 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.core.v1.Node),
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
-  },
-  io.k8s.api.core.v1.NodeFeatures = {
-    supplementalGroupsPolicy
-      | Bool
-      | optional,
   },
   io.k8s.api.core.v1.NodeDaemonEndpoints = {
     kubeletEndpoint
@@ -4652,15 +4648,6 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  io.k8s.api.core.v1.LinuxContainerUser = {
-    uid
-      | std.number.Integer,
-    supplementalGroups
-      | (Array std.number.Integer)
-      | optional,
-    gid
-      | std.number.Integer,
-  },
   io.k8s.api.core.v1.LimitRangeSpec = {
     limits
       | (Array io.k8s.api.core.v1.LimitRangeItem),
@@ -4738,14 +4725,6 @@ let lib = import "lib.ncl" in
     key
       | String,
   },
-  io.k8s.api.core.v1.ImageVolumeSource = {
-    reference
-      | String
-      | optional,
-    pullPolicy
-      | String
-      | optional,
-  },
   io.k8s.api.core.v1.ISCSIVolumeSource = {
     targetPortal
       | String,
@@ -4819,7 +4798,8 @@ let lib = import "lib.ncl" in
   },
   io.k8s.api.core.v1.HostIP = {
     ip
-      | String,
+      | String
+      | optional,
   },
   io.k8s.api.core.v1.HostAlias = {
     ip
@@ -5253,17 +5233,9 @@ let lib = import "lib.ncl" in
     Port
       | std.number.Integer,
   },
-  io.k8s.api.core.v1.ContainerUser = {
-    linux
-      | io.k8s.api.core.v1.LinuxContainerUser
-      | optional,
-  },
   io.k8s.api.core.v1.ContainerStatus = {
     volumeMounts
       | (Array io.k8s.api.core.v1.VolumeMountStatus)
-      | optional,
-    user
-      | io.k8s.api.core.v1.ContainerUser
       | optional,
     state
       | io.k8s.api.core.v1.ContainerState
@@ -5289,9 +5261,6 @@ let lib = import "lib.ncl" in
       | String,
     containerID
       | String
-      | optional,
-    allocatedResourcesStatus
-      | (Array io.k8s.api.core.v1.ResourceStatus)
       | optional,
     allocatedResources
       | { _ | io.k8s.apimachinery.pkg.api.resource.Quantity }
@@ -5588,6 +5557,14 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
+  io.k8s.api.core.v1.ClaimSource = {
+    resourceClaimTemplateName
+      | String
+      | optional,
+    resourceClaimName
+      | String
+      | optional,
+  },
   io.k8s.api.core.v1.CinderVolumeSource = {
     volumeID
       | String,
@@ -5793,56 +5770,9 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  io.k8s.api.coordination.v1alpha1.LeaseCandidateSpec = {
-    renewTime
-      | io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime
-      | optional,
-    preferredStrategies
-      | (Array String),
-    pingTime
-      | io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime
-      | optional,
-    leaseName
-      | String,
-    emulationVersion
-      | String
-      | optional,
-    binaryVersion
-      | String
-      | optional,
-  },
-  "coordination.k8s.io".v1alpha1.LeaseCandidateList = {
-    metadata
-      | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
-      | optional,
-    kind
-      | std.contract.from_predicate (fun val => val == "LeaseCandidateList"),
-    items
-      | (Array io.k8s.api.coordination.v1alpha1.LeaseCandidate),
-    apiVersion
-      | std.contract.from_predicate (fun val => val == "coordination.k8s.io/v1alpha1"),
-  },
-  "coordination.k8s.io".v1alpha1.LeaseCandidate = {
-    spec
-      | io.k8s.api.coordination.v1alpha1.LeaseCandidateSpec
-      | optional,
-    metadata
-      | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      | optional,
-    kind
-      | std.contract.from_predicate (fun val => val == "LeaseCandidate"),
-    apiVersion
-      | std.contract.from_predicate (fun val => val == "coordination.k8s.io/v1alpha1"),
-  },
   io.k8s.api.coordination.v1.LeaseSpec = {
-    strategy
-      | String
-      | optional,
     renewTime
       | io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime
-      | optional,
-    preferredHolder
-      | String
       | optional,
     leaseTransitions
       | std.number.Integer
@@ -6698,14 +6628,8 @@ let lib = import "lib.ncl" in
     name
       | String
       | optional,
-    labelSelector
-      | io.k8s.api.authorization.v1.LabelSelectorAttributes
-      | optional,
     group
       | String
-      | optional,
-    fieldSelector
-      | io.k8s.api.authorization.v1.FieldSelectorAttributes
       | optional,
   },
   io.k8s.api.authorization.v1.NonResourceRule = {
@@ -6736,22 +6660,6 @@ let lib = import "lib.ncl" in
       | std.contract.from_predicate (fun val => val == "LocalSubjectAccessReview"),
     apiVersion
       | std.contract.from_predicate (fun val => val == "authorization.k8s.io/v1"),
-  },
-  io.k8s.api.authorization.v1.LabelSelectorAttributes = {
-    requirements
-      | (Array io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement)
-      | optional,
-    rawSelector
-      | String
-      | optional,
-  },
-  io.k8s.api.authorization.v1.FieldSelectorAttributes = {
-    requirements
-      | (Array io.k8s.apimachinery.pkg.apis.meta.v1.FieldSelectorRequirement)
-      | optional,
-    rawSelector
-      | String
-      | optional,
   },
   io.k8s.api.authentication.v1beta1.SelfSubjectReviewStatus = {
     userInfo
@@ -7465,7 +7373,8 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ValidatingAdmissionPolicyList"),
     items
-      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicy),
+      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicy)
+      | optional,
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1beta1"),
   },
@@ -7490,7 +7399,8 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ValidatingAdmissionPolicyBindingList"),
     items
-      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBinding),
+      | (Array io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBinding)
+      | optional,
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1beta1"),
   },
@@ -7663,7 +7573,8 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ValidatingAdmissionPolicyList"),
     items
-      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy),
+      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy)
+      | optional,
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1alpha1"),
   },
@@ -7688,7 +7599,8 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ValidatingAdmissionPolicyBindingList"),
     items
-      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBinding),
+      | (Array io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBinding)
+      | optional,
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1alpha1"),
   },
@@ -7926,7 +7838,8 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ValidatingAdmissionPolicyList"),
     items
-      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicy),
+      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicy)
+      | optional,
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1"),
   },
@@ -7951,7 +7864,8 @@ let lib = import "lib.ncl" in
     kind
       | std.contract.from_predicate (fun val => val == "ValidatingAdmissionPolicyBindingList"),
     items
-      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding),
+      | (Array io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding)
+      | optional,
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1"),
   },

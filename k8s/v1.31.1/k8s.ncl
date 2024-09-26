@@ -1191,7 +1191,7 @@ let lib = import "lib.ncl" in
       | optional,
   },
   "resource.k8s.io".v1alpha3.ResourceSliceList = {
-    listMeta
+    metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
     kind
