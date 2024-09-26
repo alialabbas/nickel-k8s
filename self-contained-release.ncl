@@ -1,4 +1,4 @@
-let { Kube, .. } = import "kube.ncl" in
+let lib = import "lib.ncl" in
 let printArray : Array String -> String = fun value => value |> std.array.fold_right (fun e acc => e ++ " " ++ acc) "" in
 # The goal is to make this a series of release validation that can be applied to either Release.package or Env.env
 # Both of these types are meant to allow to group resources and apply correctness contract to them
@@ -7,7 +7,7 @@ let printArray : Array String -> String = fun value => value |> std.array.fold_r
 
 # TODO: need a helper scope for manipulate KubeList and Array Kube.Manifest
 # Good demo point to show how you can move away from random call stack to a much leander representive error
-let getWorkloads | Array Kube.Manifest -> Array Kube.Manifest
+let getWorkloads | Array lib.k8s.Manifest -> Array lib.k8s.Manifest
   = fun resources =>
     resources
     |> std.array.filter (fun e => e.kind == "Deployment" || e.kind == "StatefulSet" || e.kind == "DaemonSet")
