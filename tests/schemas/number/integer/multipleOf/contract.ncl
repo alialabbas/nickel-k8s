@@ -1,3 +1,3 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-std.contract.all_of [std.number.Integer, lib.Numbers.MultipleOf 5]
+std.contract.all_of [std.number.Integer, lib.numbers.MultipleOf 5]

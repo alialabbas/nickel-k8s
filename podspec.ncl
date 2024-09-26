@@ -1,12 +1,10 @@
-let { Numbers, Arrays, Strings, Records, .. } = import "types.ncl" in
-let { Kube, .. } = import "kube.ncl" in
+let lib = import "lib.ncl" in
 let { ContainerSpec, .. } = import "containerSpec.ncl" in
-let { Metadata, ResourceMetadata, LabelSelector, ValidLabel, Labels, .. } = import "metadata.ncl" in
 
 let _podAffinityTerm = {
-  labelSelector | LabelSelector | optional,
-  namespaceSelecor | LabelSelector | optional,
-  namespaces | Array Kube.Name | optional,
+  labelSelector | lib.k8s.LabelSelector | optional,
+  namespaceSelecor | lib.k8s.LabelSelector | optional,
+  namespaces | Array lib.k8s.Name | optional,
   topologyKey | std.string.NonEmpty,
 }
 in
@@ -27,7 +25,7 @@ let nodeSelectorRequirments =
       operator
   in
   {
-    key | ValidLabel,
+    key | lib.k8s.ValidLabel,
     operator
       | std.enum.TagOrString
       | [| 'In, 'NotIn, 'Exists, 'DoesNotExist, 'Gt, 'Lt |]
@@ -46,31 +44,31 @@ let _volumeSource = fun label value =>
     { configMap, name } =>
       value
         | {
-          name | Kube.Name,
-          configMap | { name | Kube.Name, .. }
+          name | lib.k8s.Name,
+          configMap | { name | lib.k8s.Name, .. }
         },
     { secret, name } =>
       value
         | {
-          name | Kube.Name,
-          secret | { secretName | Kube.Name, .. }
+          name | lib.k8s.Name,
+          secret | { secretName | lib.k8s.Name, .. }
         },
     { persistentVolumeClaim, name } =>
       value
         | {
-          name | Kube.Name,
-          persistentVolumeClaim | { claimName | Kube.Name, .. }
+          name | lib.k8s.Name,
+          persistentVolumeClaim | { claimName | lib.k8s.Name, .. }
         },
     { emptyDir, name } =>
       value
         | {
-          name | Kube.Name,
-          emptyDir | { medium | String | optional, sizeLimit | Kube.Resource | optional }
+          name | lib.k8s.Name,
+          emptyDir | { medium | String | optional, sizeLimit | lib.k8s.Resource | optional }
         },
     { projected, name } =>
       value
         | {
-          name | Kube.Name,
+          name | lib.k8s.Name,
           projected
             | {
               defaultMode | Number | optional,
@@ -78,7 +76,7 @@ let _volumeSource = fun label value =>
                 | Array {
                   configMap
                     | {
-                      name | Kube.Name,
+                      name | lib.k8s.Name,
                       optional | Bool | optional,
                       items | Array { key | String, mode | Number | optional, path | String, } | optional
                     }
@@ -93,7 +91,7 @@ let _volumeSource = fun label value =>
                 }
             }
         },
-    { hostPath, name } => value | { name | Kube.Name, hostPath | { path | String } },
+    { hostPath, name } => value | { name | lib.k8s.Name, hostPath | { path | String } },
     _ => std.contract.blame_with_message "Either missing a name for the volume source or you have defined multiple volume sources" label,
   }
 in
@@ -103,16 +101,16 @@ let _affinity = {
       preferredDuringSchedulingIgnoredDuringExecution
         | Array {
           preference | nodeSelectorTerm,
-          weight | Numbers.InRange 0 100,
+          weight | lib.numbers.InRange 0 100,
         }
         | optional,
-      requiredDuringSchedulingIgnoredDuringExecution | { nodeSelectorTerms | Array nodeSelectorTerm | Arrays.MinItems 1 } | optional,
+      requiredDuringSchedulingIgnoredDuringExecution | { nodeSelectorTerms | Array nodeSelectorTerm | std.array.NonEmpty } | optional,
     }
     | optional,
   podAffinity
     | {
       preferredDuringSchedulingIgnoredDuringExecution
-        | Array { podAffinityTerm | _podAffinityTerm, weight | Numbers.InRange 0 100 }
+        | Array { podAffinityTerm | _podAffinityTerm, weight | lib.numbers.InRange 0 100 }
         | optional,
       requiredDuringSchedulingIgnoredDuringExecution | Array _podAffinityTerm | optional,
     }
@@ -120,7 +118,7 @@ let _affinity = {
   podAntiAffinity
     | {
       preferredDuringSchedulingIgnoredDuringExecution
-        | Array { podAffinityTerm | _podAffinityTerm, weight | Numbers.InRange 0 100 }
+        | Array { podAffinityTerm | _podAffinityTerm, weight | lib.numbers.InRange 0 100 }
         | optional,
       requiredDuringSchedulingIgnoredDuringExecution | Array _podAffinityTerm | optional,
     }
@@ -143,9 +141,9 @@ let podSpec = {
     }
     | optional,
 
-  serviceAccountName | Kube.Name | optional,
+  serviceAccountName | lib.k8s.Name | optional,
   # TODO: would this be necessary if we are always converting to a map then back to a list 🤔
-  containers | Array ContainerSpec | Arrays.MinItems 1 | Arrays.UniqueRecords "name",
+  containers | Array ContainerSpec | std.array.NonEmpty, # | lib.arrays.UniqueRecords "name",
 
   dnsConfig # TODO: figure out what server is validating here
     | {
@@ -162,10 +160,10 @@ let podSpec = {
 
   hostAliases | Array { hostnames | Array String, ip | String } | optional,
   initContainers | Array ContainerSpec | optional,
-  nodeSelector | Labels | optional, # TODO: basic selector thingy
+  nodeSelector | lib.k8s.Labels | optional, # TODO: basic selector thingy
   restartPolicy | std.enum.TagOrString | [| 'Always, 'OnFailure, 'Never |] | optional,
   os
-    | Records.Nullable { name | std.enum.TagOrString | [| 'linux, 'windows |], }
+    | { name | std.enum.TagOrString | [| 'linux, 'windows |], }
     | optional,
   preemptionPolicy | std.enum.TagOrString | [| 'Never, 'PreemptLowerPriority |] | optional,
 
@@ -219,14 +217,14 @@ let podSpec = {
     }
     | optional,
 
-  subdomain | Kube.Name | optional,
+  subdomain | lib.k8s.Name | optional,
   terminationGracePeriodSeconds | std.number.PosNat | optional,
   topologySpreadConstraints
     | Array {
       maxSkew | std.number.PosNat,
-      topologyKey | ValidLabel,
-      labelSelector | LabelSelector | optional,
-      matchLabelKeys | Array Kube.Name | optional,
+      topologyKey | lib.k8s.ValidLabel,
+      labelSelector | lib.k8s.LabelSelector | optional,
+      matchLabelKeys | Array lib.k8s.Name | optional,
       nodeAffinityPolicy | std.enum.TagOrString | [| 'Honor, 'Ignore, |] | optional,
       nodeTaintsPolicy | std.enum.TagOrString | [| 'Honor, 'Ignore, |] | optional,
       ..
@@ -237,12 +235,5 @@ let podSpec = {
 }
 in
 {
-  Pod = {
-    metadata | ResourceMetadata,
-    apiVersion = "v1",
-    kind = "Pod",
-    spec | PodSpec,
-    ..
-  },
   PodSpec = podSpec,
 }

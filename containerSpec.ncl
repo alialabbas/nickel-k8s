@@ -1,10 +1,8 @@
-let lib = import "Contracts.ncl" in
-let { Networking, Records, Arrays, .. } = import "types.ncl" in
-let { Kube, .. } = import "kube.ncl" in
+let lib = import "lib.ncl" in
 let ContainerPort = {
-  containerPort | Networking.Port,
-  name | Kube.Name | optional,
-  protocol | lib.Enum.StringOrEnum [| 'TCP, 'STCP', 'UDP |] | optional,
+  containerPort | lib.networking.Port,
+  name | lib.k8s.Name | optional,
+  protocol | lib.enum.StringOrEnum [| 'TCP, 'STCP', 'UDP |] | optional,
   ..
 }
 in
@@ -83,7 +81,7 @@ let Env = fun label env =>
                 | {
                   resourceFieldRef
                     | {
-                      containerName | Kube.Name | optional,
+                      containerName | lib.k8s.Name | optional,
                       quantity | String | optional,
                       resource | std.enum.TagOrString | ResourceRefs
                     }
@@ -98,7 +96,7 @@ let Env = fun label env =>
                   secretKeyRef
                     | {
                       key | String,
-                      name | Kube.Name,
+                      name | lib.k8s.Name,
                       "optional" | Bool | optional,
                     }
                 }
@@ -111,7 +109,7 @@ let Env = fun label env =>
                   configMapKeyRef
                     | {
                       key | String,
-                      name | Kube.Name,
+                      name | lib.k8s.Name,
                       "optional" | Bool | optional,
                     }
                 }
@@ -132,19 +130,19 @@ let Env = fun label env =>
   }
 in
 let EnvFrom = {
-  configMapRef | { name | Kube.Name, .. } | optional,
-  secretRef | { name | Kube.Name, .. } | optional,
+  configMapRef | { name | lib.k8s.Name, .. } | optional,
+  secretRef | { name | lib.k8s.Name, .. } | optional,
   ..
 }
 in
 let HttpProbeAction = {
-  port | Kube.PortOrName, # This technically work but if we write these contracts like this we lose on the big benifit, actually checking if http port is defined? TODO:
+  port | lib.k8s.PortOrName, # This technically work but if we write these contracts like this we lose on the big benifit, actually checking if http port is defined? TODO:
   path | String,
   ..
 }
 in
 let ExecAction | doc "Array of commands to execute" = Array String in
-let TcpSocketAction = { host | String | optional, port | Networking.Port } in
+let TcpSocketAction = { host | String | optional, port | lib.networking.Port } in
 let Probe = {
   httpGet | HttpProbeAction | optional,
   exec | Array String | optional,
@@ -187,22 +185,22 @@ in
     name | String | std.string.NonEmpty,
     image | String,
     imagePullPolicy
-      | lib.Enum.StringOrEnum [| 'Always, 'Never, 'IfNotPresent |]
+      | lib.enum.StringOrEnum [| 'Always, 'Never, 'IfNotPresent |]
       | optional,
     ports | Array ContainerPort | optional,
-    env | Arrays.Nullable Env | optional,
-    envFrom | Arrays.Nullable EnvFrom | optional,
+    env | Array Env | optional,
+    envFrom | Array  EnvFrom | optional,
     livenessProbe
       | AllPreds [(OnlyOneOf ["httpGet", "exec", "tcpSocket"])]
-      | Records.Nullable Probe
+      | Probe
       | optional,
     readinessProbe
       | AllPreds [(OnlyOneOf ["httpGet", "exec", "tcpSocket"])]
-      | Records.Nullable Probe
+      | Probe
       | optional,
     startupProbe
       | AllPreds [(OnlyOneOf ["httpGet", "exec", "tcpSocket"])]
-      | Records.Nullable Probe
+      | Probe
       | optional,
     lifecycle # TODO: check these, can lifecycle be something else
       | {

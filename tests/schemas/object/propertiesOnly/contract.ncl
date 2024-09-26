@@ -1,4 +1,4 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
 {
   string

@@ -18,18 +18,18 @@ let templateToMergable
       let paramName = std.array.last parentPath in
       let pathAsString = print_array parentPath in
       acc ++ "\n" ++ m%"
-        let val = utils.records.get_value_at_path %{pathAsString} result in
+        let val = lib.records.get_value_at_path %{pathAsString} result in
         let val_map =
           val
           |> match {
-            'Found val => utils.kube.from_list_to_map "name" val,
+            'Found val => lib.k8s.from_list_to_map "name" val,
             _ => val
           }
         in
-        let result = utils.records.update_value_at_path %{pathAsString} val_map result in
+        let result = lib.records.update_value_at_path %{pathAsString} val_map result in
         %{
             m%"
-              let inner = utils.records.get_value_at_path %{pathAsString} result |> match {
+              let inner = lib.records.get_value_at_path %{pathAsString} result |> match {
                 'Found val => val,
                 _ => {}
               } in
@@ -38,15 +38,15 @@ let templateToMergable
                 std.array.fold_right
                   (fun e acc =>
                     let path = %{print_array (parentPath @ ["e"] @ ["\"%{e.field}\""])} in
-                    let value = utils.records.get_value_at_path path result in
+                    let value = lib.records.get_value_at_path path result in
                     let value_map =
                       value
                       |> match {
-                        'Found val => utils.kube.from_list_to_map "%{e.value}" val,
+                        'Found val => lib.k8s.from_list_to_map "%{e.value}" val,
                         _ => value
                       }
                     in
-                    utils.records.update_value_at_path path value_map acc
+                    lib.records.update_value_at_path path value_map acc
                   )
                   result
                   (std.record.fields inner)
@@ -79,7 +79,7 @@ let templateFromMergable
       acc ++ "\n" ++ m%"
         %{
             m%"
-              let inner = utils.records.get_value_at_path %{pathAsString} result |> match {
+              let inner = lib.records.get_value_at_path %{pathAsString} result |> match {
                 'Found val => val,
                 _ => {}
               } in
@@ -88,15 +88,15 @@ let templateFromMergable
                 std.array.fold_right
                   (fun e acc =>
                     let path = %{print_array (parentPath @ ["e"] @ ["\"%{e.field}\""])} in
-                    let value = utils.records.get_value_at_path path result in
+                    let value = lib.records.get_value_at_path path result in
                     let value_map =
                       value
                       |> match {
-                        'Found val => utils.kube.from_map_to_list "%{e.value}" val,
+                        'Found val => lib.k8s.from_map_to_list "%{e.value}" val,
                         _ => value
                       }
                     in
-                    utils.records.update_value_at_path path value_map acc
+                    lib.records.update_value_at_path path value_map acc
                   )
                   result
                   (std.record.fields inner)
@@ -104,15 +104,15 @@ let templateFromMergable
               "%) "" e.nested}
             "%
           }
-        let val = utils.records.get_value_at_path %{pathAsString} result in
+        let val = lib.records.get_value_at_path %{pathAsString} result in
         let val_map =
           val
           |> match {
-            'Found val => utils.kube.from_map_to_list "name" val,
+            'Found val => lib.k8s.from_map_to_list "name" val,
             _ => val
           }
         in
-        let result = utils.records.update_value_at_path %{pathAsString} val_map result in
+        let result = lib.records.update_value_at_path %{pathAsString} val_map result in
       "%
       in
     std.array.fold_right(aggregator) "" specs

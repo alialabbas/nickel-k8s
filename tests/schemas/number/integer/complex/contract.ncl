@@ -1,12 +1,12 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
 (
   std.contract.all_of [
-    std.contract.all_of [std.number.Integer, lib.Numbers.MinRange 20 false ],
+    std.contract.all_of [std.number.Integer, lib.numbers.MinRange 20 false ],
     (
-      lib.OneOf [
-        std.contract.all_of [std.number.Integer, lib.Numbers.MultipleOf 5],
-        std.contract.all_of [std.number.Integer, lib.Numbers.MultipleOf 3],
+      lib.contracts.OneOf [
+        std.contract.all_of [std.number.Integer, lib.numbers.MultipleOf 5],
+        std.contract.all_of [std.number.Integer, lib.numbers.MultipleOf 3],
       ]
     )
   ]

@@ -1,6 +1,6 @@
 let m = import "./k8s/v1.31.0/merge.ncl" in
 let all = (import "./k8s/v1.31.0/k8s.ncl") in
-let { Networking, .. } = import "types.ncl" in
+let lib = import "lib.ncl" in
 let patch = { apiVersion | String, kind | String, metadata.name | String | optional, .. } in
 # TODO: this is broken
 # The only way for this to work is if we had a construct path and path check function in nickel to get all the possible paths in the original contract Best we can do close the dictionary and the supplied constrained are captured
@@ -13,71 +13,6 @@ let collectionOfPathces
       std.contract.blame label
   in
 {
-
-  Kube | doc "Collection of various kubernetes types and contracts"
-    = {
-      Name
-        | doc "Kubernetes Metadata.Name based on RFC1123, lowercase alphanumeric and '-'"
-        = std.contract.from_predicate (fun name => std.string.is_match "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" name),
-
-      ToBytes | doc "Convert Request/Limits to total bytes" | Resource -> Number
-        = fun resource =>
-          let allUnits = [| 'm, 'mi, 'k, 'Ki, 'M, 'Mi, 'G, 'Gi, 'T, 'Ti, 'P, 'Pi, 'E, 'Ei |] in
-          let powerOf2 = std.number.pow 2 in
-          let unit =
-            resource
-            |> std.string.characters
-            |> std.array.filter (fun e => !std.string.is_match "^[0-9]*$" e)
-            |> std.array.reduce_right (++) | std.enum.TagOrString | allUnits
-          in
-          let value =
-            resource
-            |> std.string.characters
-            |> std.array.filter (fun e => std.string.is_match "^[0-9]*$" e)
-            |> std.array.reduce_right (++)
-            |> std.string.to_number
-          in
-          unit
-          |> match {
-            'k => value * 1e3,
-            'M => value * 1e6,
-            'G => value * 1e9,
-            'T => value * 1e12,
-            'P => value * 1e15,
-            'E => value * 1e18,
-            'm => value / 1000,
-            'mi => value / 1024,
-            'Ki => value * powerOf2 10,
-            'Mi => value * powerOf2 20,
-            'Gi => value * powerOf2 30,
-            'Ti => value * powerOf2 40,
-            'Pi => value * powerOf2 50,
-            'Ei => value * powerOf2 60,
-          },
-
-      Resource | doc "Kubernetes compute resource, cpu and memory"
-        =
-          std.contract.from_predicate (fun val => std.is_number val || std.string.is_match "^[0-9]+(\\.[0-9]+)?(mi?|k|Ki|Mi?|Gi?|Ti?|Pi?|Ei?)?$" val),
-
-      PortOrName
-        | doc "Define a port either by standard port range a port name like http, grpc, etc."
-        = fun label port =>
-          std.typeof port
-          |> match {
-            'String => port | Name,
-            'Number => port | Networking.Port,
-            _ => std.contract.blame_with_message "Expected either a port name or port number, got neither" label,
-          },
-
-      Manifest
-        | doc m%"KubeResrouce requires apiVersion, kind and metadata.name"%
-        = { apiVersion | String, kind | String, metadata | { name | String, .. }, .. },
-
-      List
-        | doc m%"KubeList is a list of resources of various types"%
-        = { apiVersion = "v1", kind = "List", items | Array Kube.Manifest },
-    },
-
   Release
     | doc m%%"
       Release is the core contract and the only contract that you need to apply to your config to ensure what you are producing is a valid set of kubernetes resources.
@@ -85,9 +20,9 @@ let collectionOfPathces
     "%%
     = {
       Inputs | { .. } | optional, # This can't be validated by us, this is up to the user to decide how to use it or even better not use it
-      Manifests | { _ : Kube.Manifest },
+      Manifests | { _ : lib.k8s.Manifest },
       Package
-        | Kube.List
+        | lib.k8s.List
         = {
           items =
             (
@@ -123,7 +58,7 @@ let collectionOfPathces
       Kinds
         | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
         | not_exported
-        | { _ | Kube.Manifest }
+        | { _ | lib.k8s.Manifest }
         | default
         = {},
       ClusterDomain | not_exported | String | default = ".cluster.local",
@@ -146,7 +81,7 @@ let collectionOfPathces
       Kinds
         | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
         | not_exported
-        | { _ | Kube.Manifest }
+        | { _ | lib.k8s.Manifest }
         | default
         = {},
       Env
@@ -169,14 +104,14 @@ let collectionOfPathces
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
               ) | ManifestsValidation Kinds
-          } | Kube.List | (import "self-contained-release.ncl"),
+          } | lib.k8s.List | (import "self-contained-release.ncl"),
     },
 
   ManifestsValidation
     | doc m%%"
       Extensible contract that allows to augment the native k8 contracts and introduce your own type.
       This is already included in both Release and Env and user not expecting to use this unless they are creating their own contracts."%%
-    | { _ | Kube.Manifest } -> Dyn -> Dyn
+    | { _ | lib.k8s.Manifest } -> Dyn -> Dyn
     = fun extensions label value =>
       # Operational hash to make it easier to find stale resources and delete them
       let packageHash = std.hash 'Sha256 (std.serialize 'Yaml value) in
@@ -242,11 +177,11 @@ let collectionOfPathces
 
   Overlays
     | doc "an overlay is a collection of patches that describe to merge with a resource"
-    = { _ | Kube.Manifest },
+    = { _ | lib.k8s.Manifest },
 
   Patcher
     | doc m%"Given a list of Overlays, find the one affecting the resource based on their kind or metadata.name and merge them"%
-    | Patch -> Kube.Manifest -> Kube.Manifest
+    | Patch -> lib.k8s.Manifest -> lib.k8s.Manifest
     = fun overlays resource =>
       let kind = resource.kind in
       let rApiVersion = std.string.split "/" resource.apiVersion in
@@ -281,7 +216,7 @@ let collectionOfPathces
   Enforcer
   # : forall a. { _ : { apiVersion | String, kind | String, ..} } -> { apiVersion: String, kind:  String; a } -> _
     | doc "Dynamically apply a contract on a list of resources"
-    | { .. } -> Kube.Manifest -> Kube.Manifest
+    | { .. } -> lib.k8s.Manifest -> lib.k8s.Manifest
     = fun contraints resource =>
       let rName = resource.kind in
       if std.record.has_field rName contraints then

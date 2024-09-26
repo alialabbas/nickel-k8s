@@ -110,7 +110,7 @@ let Converters = {
     = fun prop =>
       let multiple =
         if std.record.has_field "multipleOf" prop then
-          ", lib.Numbers.MultipleOf %{std.string.from_number prop.multipleOf}"
+          ", lib.numbers.MultipleOf %{std.string.from_number prop.multipleOf}"
         else
           ""
       in
@@ -149,9 +149,9 @@ let Converters = {
         range
         |> match {
           { minimum, maximum, exclusiveMaximum, exclusiveMinimum } if maximum == null && minimum == null => "",
-          { minimum, maximum, exclusiveMaximum, exclusiveMinimum } if maximum == null => ", lib.Numbers.MinRange %{std.string.from_number minimum} %{std.string.from_bool (!exclusiveMinimum)}",
-          { minimum, maximum, exclusiveMaximum, exclusiveMinimum } if minimum == null => ", lib.Numbers.MaxRange %{std.string.from_number maximum} %{std.string.from_bool (!exclusiveMaximum)}",
-          { minimum, maximum, exclusiveMaximum, exclusiveMinimum } => ", lib.Numbers.InRange %{std.string.from_number minimum} %{std.string.from_bool (!exclusiveMinimum)} %{std.string.from_number maximum} %{std.string.from_bool (!exclusiveMaximum)}",
+          { minimum, maximum, exclusiveMaximum, exclusiveMinimum } if maximum == null => ", lib.numbers.MinRange %{std.string.from_number minimum} %{std.string.from_bool (!exclusiveMinimum)}",
+          { minimum, maximum, exclusiveMaximum, exclusiveMinimum } if minimum == null => ", lib.numbers.MaxRange %{std.string.from_number maximum} %{std.string.from_bool (!exclusiveMaximum)}",
+          { minimum, maximum, exclusiveMaximum, exclusiveMinimum } => ", lib.numbers.InRange %{std.string.from_number minimum} %{std.string.from_bool (!exclusiveMinimum)} %{std.string.from_number maximum} %{std.string.from_bool (!exclusiveMaximum)}",
         }
       in
       let baseType =
@@ -170,19 +170,19 @@ let Converters = {
     = fun prop =>
       let minLen =
         if std.record.has_field "minLength" prop then
-          ", lib.Strings.MinLength %{std.string.from_number prop.minLength}"
+          ", lib.strings.MinLength %{std.string.from_number prop.minLength}"
         else
           ""
       in
       let maxLen =
         if std.record.has_field "maxLength" prop then
-          ", lib.Strings.MaxLength %{std.string.from_number prop.maxLength}"
+          ", lib.strings.MaxLength %{std.string.from_number prop.maxLength}"
         else
           ""
       in
       let pattern =
         if std.record.has_field "pattern" prop then
-          m%", lib.Strings.Regex "%{prop.pattern}""% # TODO: RAW STRINGS
+          m%", lib.strings.Regex "%{prop.pattern}""% # TODO: RAW STRINGS
         else
           ""
       in
@@ -191,14 +191,14 @@ let Converters = {
         if std.record.has_field "enum" prop && std.array.length prop.enum == 1 then
           # TODO: need a way to escape these, quotes will work but need special tokens to replace them
           # Bug: can't assign an enum to an exporter property as this contract will fail miserably
-          "lib.Enum.StringOrEnum [| '\"%{std.array.first prop.enum}\" |]"
+          "lib.enum.StringOrEnum [| '\"%{std.array.first prop.enum}\" |]"
         else if std.record.has_field "enum" prop then
           std.array.fold_right
             (
               # We need to check the empty array here and escape the quotes to get '"" as a tag
               fun e acc => acc ++ " '\"%{e}\", "
             )
-            "lib.Enum.StringOrEnum [| "
+            "lib.enum.StringOrEnum [| "
             prop.enum
           ++ " |]"
         else if std.record.has_field "format" prop then
@@ -322,7 +322,7 @@ let Converters = {
         if !std.record.has_field "additionalProperties" schema
           && schema.patternProperties == {}
           && !noLazy => std.trace "prop only" propertiesSchema,
-        _ => std.trace "modeling json object" "lib.Records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
+        _ => std.trace "modeling json object" "lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
       },
 
   ArrayConversion | Schemas.ArraySchema -> String
@@ -351,16 +351,16 @@ let Converters = {
         in
         range
         |> match {
-          { min, } => "| lib.Arrays.Length { min = %{std.to_string min} } ",
-          { max, } => "| lib.Arrays.Length { max = %{std.to_string max} }",
-          { min, max } => "| lib.Arrays.Length { min = %{std.to_string min},  max = %{std.to_string max} }",
+          { min, } => "| lib.arrays.Length { min = %{std.to_string min} } ",
+          { max, } => "| lib.arrays.Length { max = %{std.to_string max} }",
+          { min, max } => "| lib.arrays.Length { min = %{std.to_string min},  max = %{std.to_string max} }",
           {} => "", # TODO: Is this safe to assume
         }
       in
       let setContract =
         let hasSetFlag = std.record.get_or "uniqueness" false schema in
         if hasSetFlag then
-          "| lib.Arrays.AsSet"
+          "| lib.arrays.AsSet"
         else
           ""
       in
@@ -391,10 +391,10 @@ let Converters = {
   # NOTE: contract defaulted method to allow customization by external user if they want to handle it differently, this now is done only for k8s
   # TODO: Expirement with a toggle to control the prefix for generation. This could be useful
 
-  OneOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(lib.OneOf [ " schema ++ "])",
+  OneOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(lib.contracts.OneOf [ " schema ++ "])",
   AnyOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(std.contract.any_of[ " schema ++ "])",
   AllOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(std.contract.all_of[ " schema ++ "])",
-  Enum = fun schema => std.array.fold_right (fun e acc => acc ++ (PrintConstValue e) ++ ",\n") "lib.Enum.ArrayEnum [ " schema ++ "]",
+  Enum = fun schema => std.array.fold_right (fun e acc => acc ++ (PrintConstValue e) ++ ",\n") "lib.enum.ArrayEnum [ " schema ++ "]",
 
   PrintConstValue = fun schema =>
     let recordAsString =
@@ -442,7 +442,7 @@ let Converters = {
           {} => "Dyn",
           { type = "string", enum, ..rest } => StringConversion schema,
           { enum, ..rest } => Enum enum,
-          { const, ..rest } => "std.contract.Equal %{PrintConstValue const}",
+          { const, ..rest } => "std.contract.from_predicate(fun val => val == %{PrintConstValue const})",
           { type = "string", ..rest } => StringConversion schema,
           { type = "number", ..rest } => IntConversion schema,
           { type = "integer", ..rest } => IntConversion schema,

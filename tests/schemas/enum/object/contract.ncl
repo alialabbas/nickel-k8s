@@ -1,6 +1,6 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-lib.Enum.ArrayEnum [
+lib.enum.ArrayEnum [
   {
     string = "str",
   },

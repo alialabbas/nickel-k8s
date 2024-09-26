@@ -1,3 +1,3 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-std.contract.all_of [ Number, lib.Numbers.InRange 0 false 100 false ]
+std.contract.all_of [ Number, lib.numbers.InRange 0 false 100 false ]

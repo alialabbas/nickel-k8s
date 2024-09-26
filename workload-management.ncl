@@ -1,39 +1,37 @@
-let { Metadata, LabelSelector, .. } = import "metadata.ncl" in
-let { Numbers, Arrays, Records, .. } = import "types.ncl" in
-let { Kube, ApiGroups, .. } = import "kube.ncl" in
+let { k8s, numbers, arrays, records, .. } = import "lib.ncl" in
 
 let HPAScalingRules = {
   policies
     | Array {
-      periodSeconds | Numbers.InRange 0 1800,
+      periodSeconds | numbers.InRange 0 1800,
       type | std.enum.TagOrString | [| 'Percent, 'Pods |],
       value | std.number.PosNat,
     }
-    | Arrays.MinItems 1
+    | std.array.NonEmpty
     | optional,
   selectPolicy | std.enum.TagOrString | [| 'Max, 'Min, 'Disabled |] | optional,
-  stabilizationWindowSeconds | Numbers.InRange 0 3600 | optional,
+  stabilizationWindowSeconds | numbers.InRange 0 3600 | optional,
 }
 in
 {
-  PodDisruptionBudget = {
+  policy.v1.PodDisruptionBudget = {
     apiVersion | String | force = "policy/v1",
     kind | String | force  = "PodDisruptionBudget",
-    metadata | Metadata,
+    metadata | k8s.Metadata,
     spec
-      | Records.MutualExclusive ["maxUnavailable", "minAvailable"]
+      | records.MutualExclusive ["maxUnavailable", "minAvailable"]
       | {
-        selector | LabelSelector,
-        maxUnavailable | Numbers.NumberOrPercentage | optional,
-        minAvailable | Numbers.NumberOrPercentage | optional,
+        selector | k8s.LabelSelector,
+        maxUnavailable | numbers.NumberOrPercentage | optional,
+        minAvailable | numbers.NumberOrPercentage | optional,
       },
     ..
   },
 
-  HorizontalPodAutoscaler = {
+  autoscaling.v2.HorizontalPodAutoscaler = {
     apiVersion | String | force  = "autoscaling/v2",
     kind | String | force = "HorizontalPodAutoscaler",
-    metadata | Metadata,
+    metadata | k8s.Metadata,
     spec
       | {
         minReplicas | std.number.PosNat,
@@ -41,7 +39,7 @@ in
         scaleTargetRef
           | {
             kind | String,
-            name | Kube.Name,
+            name | k8s.Name,
             apiVersion | String | optional
           },
         behavior
@@ -53,4 +51,4 @@ in
       },
       ..
   },
-} | ApiGroups
+}

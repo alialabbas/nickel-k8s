@@ -1,8 +1,8 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
 (
   std.contract.all_of [
-    std.contract.all_of [ Number, lib.Numbers.MultipleOf 5],
+    std.contract.all_of [ Number, lib.numbers.MultipleOf 5],
     Number,
   ]
 )

@@ -1,4 +1,4 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
 {
   _ | (
@@ -16,20 +16,20 @@ in
         ..
       },
       (
-        lib.OneOf [
-          lib.Records.JsonObject
+        lib.contracts.OneOf [
+          lib.records.JsonObject
             {
               regex = { contract = Dyn, optional = false, },
             }
             {}
             true,
-          lib.Records.JsonObject
+          lib.records.JsonObject
             {
               prefix = { contract = Dyn, optional = false, },
             }
             {}
             true,
-          lib.Records.JsonObject
+          lib.records.JsonObject
             {
               exact = { contract = Dyn, optional = false, },
             }
@@ -38,19 +38,19 @@ in
           (
             std.contract.not (
               std.contract.any_of [
-                lib.Records.JsonObject
+                lib.records.JsonObject
                   {
                     regex = { contract = Dyn, optional = false, },
                   }
                   {}
                   true,
-                lib.Records.JsonObject
+                lib.records.JsonObject
                   {
                     prefix = { contract = Dyn, optional = false, },
                   }
                   {}
                   true,
-                lib.Records.JsonObject
+                lib.records.JsonObject
                   {
                     exact = { contract = Dyn, optional = false, },
                   }

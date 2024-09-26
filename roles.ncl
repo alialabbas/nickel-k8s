@@ -1,12 +1,10 @@
-let { ResourceMetadata, LabelSelector, .. } = import "metadata.ncl" in
-let { Arrays, .. } = import "types.ncl" in
-let { Kube, ApiGroups, .. } = import "kube.ncl" in
+let lib = import "lib.ncl" in
 let PolicyRule = {
   apiGroups | Array String,
   nonResourceURLs | Array String | optional,
   resourceNames | Array String | optional,
-  resources | Arrays.MinItems 1 | Array String,
-  verbs | Arrays.MinItems 1 | Array String
+  resources | std.array.NonEmpty | Array String,
+  verbs | std.array.NonEmpty | Array String
 }
 in
 let RoleRef = {
@@ -17,56 +15,59 @@ let RoleRef = {
 in
 let Subject = {
   apiGroup | String | optional,
-  name | Kube.Name,
-  namespace | Kube.Name | optional,
+  name | lib.k8s.Name,
+  namespace | lib.k8s.Name | optional,
   kind | String
 }
 in
 {
-  ServiceAccount
+  v1.ServiceAccount
     | doc "Kuberntes Service Account"
     = {
       apiVersion = "v1",
       kind = "ServiceAccount",
-      metadata = ResourceMetadata,
+      metadata = lib.k8s.ResourceMetadata,
       automountServiceAccountToken | Bool | optional,
       imagePullSecrets | Array { name | String } | optional,
       ..
     },
 
-  ClusterRole = {
-    apiVersion = "rbac.authorization.k8s.io/v1",
-    kind = "ClusterRole",
-    metadata | ResourceMetadata,
-    aggregationRule | LabelSelector | optional,
-    rules | Array PolicyRule | optional,
-    ..
-  },
+  # TODO: this is technically one part only, i.e. "rbac.authorization.k8s.io" is the group
+  rbac.authorization.k8s.io.v1 = {
+    ClusterRole = {
+      apiVersion = "rbac.authorization.k8s.io/v1",
+      kind = "ClusterRole",
+      metadata | lib.k8s.ResourceMetadata,
+      aggregationRule | lib.k8sLabelSelector | optional,
+      rules | Array PolicyRule | optional,
+      ..
+    },
 
-  ClusterRoleBinding = {
-    apiVersion = "rbac.authorization.k8s.io/v1",
-    kind = "ClusterRoleBinding",
-    metadata | ResourceMetadata,
-    roleRef | RoleRef,
-    subjects | Array Subject | optional,
-    ..
-  },
+    ClusterRoleBinding = {
+      apiVersion = "rbac.authorization.k8s.io/v1",
+      kind = "ClusterRoleBinding",
+      metadata | lib.k8s.ResourceMetadata,
+      roleRef | RoleRef,
+      subjects | Array Subject | optional,
+      ..
+    },
 
-  Role = {
-    apiVersion = "rbac.authorization.k8s.io/v1",
-    kind = "Role",
-    metadata | ResourceMetadata,
-    aggregationRule | LabelSelector | optional,
-    rules | Array PolicyRule | optional,
-    ..
-  },
+    Role = {
+      apiVersion = "rbac.authorization.k8s.io/v1",
+      kind = "Role",
+      metadata | lib.k8s.ResourceMetadata,
+      aggregationRule | lib.k8s.LabelSelector | optional,
+      rules | Array PolicyRule | optional,
+      ..
+    },
 
-  RoleBinding = {
-    apiVersion = "rbac.authorization.k8s.io/v1",
-    kind = "RoleBinding",
-    metadata | ResourceMetadata,
-    roleRef | RoleRef,
-    subjects | Array Subject | optional,
-    ..
+    RoleBinding = {
+      apiVersion = "rbac.authorization.k8s.io/v1",
+      kind = "RoleBinding",
+      metadata | lib.k8s.ResourceMetadata,
+      roleRef | RoleRef,
+      subjects | Array Subject | optional,
+      ..
+    },
   },
-} | ApiGroups
+}

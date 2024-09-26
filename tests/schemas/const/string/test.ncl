@@ -1,7 +1,7 @@
-let lib = import "Contracts.ncl" in
+let lib = import "lib.ncl" in
 let contract = import "contract.ncl" in
 std.test.assert_all
   [
-    "test" | lib.IsContract contract,
-    !("not-matching" | lib.IsContract contract),
+    "test" | lib.contracts.IsContract contract,
+    !("not-matching" | lib.contracts.IsContract contract),
   ]

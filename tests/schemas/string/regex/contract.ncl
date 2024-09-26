@@ -1,3 +1,3 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-std.contract.all_of [ String, lib.Strings.Regex "^[a-zA-Z]+\\.yaml"]
+std.contract.all_of [ String, lib.strings.Regex "^[a-zA-Z]+\\.yaml"]

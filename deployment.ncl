@@ -1,8 +1,5 @@
-let lib = import "Contracts.ncl" in
-let { Metadata, ResourceMetadata, LabelSelector, WorkloadSelector, .. } = import "metadata.ncl" in
-let { Numbers, .. } = import "types.ncl" in
-let { Kube, ApiGroups, .. } = import "kube.ncl" in
-let { PodSpec, Pod, .. } = import "podspec.ncl" in
+let lib = import "lib.ncl" in
+let { PodSpec, .. } = import "podspec.ncl" in
 
 let deployment_rolling_strategy = fun other_field =>
   std.contract.custom (fun label value =>
@@ -20,25 +17,25 @@ let job_spec = {
   completionMode | String | optional, # TODO: enum
   manualSelector | Bool | optional,
   parallelism | std.number.PosNat | optional,
-  selector | LabelSelector | optional,
+  selector | lib.k8s.LabelSelector | optional,
   suspend | Bool | optional,
   ttlSecondsAfterFinished | std.number.PosNat | optional,
   template
     | {
-      metadata | Metadata | optional,
+      metadata | lib.k8s.Metadata | optional,
       spec | PodSpec,
     },
   podFailurePolicy
     | {
       rules
         | {
-          action | lib.Enum.StringOrEnum [| 'FailJob, 'Ignore, 'Count |],
+          action | lib.enum.StringOrEnum [| 'FailJob, 'Ignore, 'Count |],
           # TODO: container name here can be null
           # TODO: In can't use 0 in values
           # TODO: MinItems 1 for the number array
           # TODO: At most 255
           onExitCodes
-            | { containerName | Kube.Name, operator | lib.Enum.StringOrEnum [| 'In, 'NotIn, |], values | Array Number, },
+            | { containerName | lib.k8s.Name, operator | lib.enum.StringOrEnum [| 'In, 'NotIn, |], values | Array Number, },
           onPodConditions | Array { status | String | optional, type | String, } | optional,
         }
         | optional,
@@ -132,7 +129,7 @@ let rec SelectorValidatorContract = fun template label value =>
 in
 {
   apps.v1.Deployment = {
-    metadata | ResourceMetadata,
+    metadata | lib.k8s.ResourceMetadata,
     apiVersion = "apps/v1",
     kind = "Deployment",
     spec
@@ -141,14 +138,14 @@ in
         progressDeadlineSeconds | std.number.PosNat | optional,
         replicas | std.number.PosNat | optional,
         revisionHistoryLimit | std.number.PosNat | optional,
-        selector | WorkloadSelector | SelectorValidatorContract template,
+        selector | lib.k8s.WorkloadSelector | SelectorValidatorContract template,
         strategy
           | {
-            type | lib.Enum.StringOrEnum [| 'RollingUpdate, 'Recreate |] | optional,
+            type | lib.enum.StringOrEnum [| 'RollingUpdate, 'Recreate |] | optional,
             rollingUpdate
               | {
                 # This wiill capture strategy, meaning if it is defined it needs a value at least
-                maxSurge | deployment_rolling_strategy strategy | Numbers.NumberOrPercentage | optional,
+                maxSurge | deployment_rolling_strategy strategy | lib.numbers.NumberOrPercentage | optional,
                 maxUnavailable | deployment_rolling_strategy strategy | std.number.Nat | optional,
               }
               | std.contract.from_predicate (fun val => !(val.maxSurge == 0 && val.maxUnavailable == 0)) # TODO: should these be scoped internally into a predicates record
@@ -157,7 +154,7 @@ in
           | optional,
         template
           | {
-            metadata | Metadata,
+            metadata | lib.k8s.Metadata,
             spec | PodSpec,
           },
         ..
@@ -166,7 +163,7 @@ in
   },
 
   apps.v1.StatefulSet = {
-    metadata | ResourceMetadata,
+    metadata | lib.k8s.ResourceMetadata,
     apiVersion = "apps/v1",
     kind = "StatefulSet",
     spec
@@ -175,26 +172,26 @@ in
         ordinals | { start | std.number.PosNat } | optional,
         replicas | std.number.PosNat | optional,
         revisionHistoryLimit | std.number.PosNat | optional,
-        podManagementPolicy | lib.Enum.StringOrEnum [| 'Parallel, 'OrderedReady |] | optional,
-        selector | WorkloadSelector | SelectorValidatorContract template,
-        serviceName | Kube.Name,
+        podManagementPolicy | lib.enum.StringOrEnum [| 'Parallel, 'OrderedReady |] | optional,
+        selector | lib.k8s.WorkloadSelector | SelectorValidatorContract template,
+        serviceName | lib.k8s.Name,
         template = {
-          metadata | Metadata,
-          spec | Pod.spec,
+          metadata | lib.k8s.Metadata,
+          spec | PodSpec,
         },
         persistentVolumeClaimRetentionPolicy
           | {
-            whenDeleted | lib.Enum.StringOrEnum [| 'Delete, 'Retain |] | optional,
-            whenScaled | lib.Enum.StringOrEnum [| 'Delete, 'Retain |] | optional,
+            whenDeleted | lib.enum.StringOrEnum [| 'Delete, 'Retain |] | optional,
+            whenScaled | lib.enum.StringOrEnum [| 'Delete, 'Retain |] | optional,
           }
           | optional,
         updateStrategy
           | {
-            type | lib.Enum.StringOrEnum [| 'RollingUpdate, 'OnDelete |] | optional,
+            type | lib.enum.StringOrEnum [| 'RollingUpdate, 'OnDelete |] | optional,
             rollingUpdate # TODO: Lock this similar to deployment spec
               | {
                 partition | std.number.Nat | optional,
-                maxUnavailable | Numbers.NumberOrPercentage | optional
+                maxUnavailable | lib.numbers.NumberOrPercentage | optional
               }
               | optional,
           }
@@ -206,7 +203,7 @@ in
   },
 
   v1.Pod = {
-    metadata | ResourceMetadata,
+    metadata | lib.k8s.ResourceMetadata,
     apiVersion = "v1",
     kind = "Pod",
     spec | PodSpec,
@@ -214,7 +211,7 @@ in
   },
 
   batch.v1.CronJob = {
-    metadata | ResourceMetadata,
+    metadata | lib.k8s.ResourceMetadata,
     apiVersion = "batch/v1",
     kind = "CronJob",
     spec
@@ -224,7 +221,7 @@ in
         startingDeadline | std.number.PosNat | optional,
         successfulJobsHistoryLimit | std.number.PosNat | optional,
         timeZone | String | optional, # timezone contract later
-        jobTemplate | { metadata | Metadata | optional, spec | job_spec },
+        jobTemplate | { metadata | lib.k8s.Metadata | optional, spec | job_spec },
       },
     ..
   },
@@ -232,7 +229,7 @@ in
   batch.v1.Job = {
     apiVersion = "batch/v1",
     kind = "Job",
-    metadata | ResourceMetadata,
+    metadata | lib.k8s.ResourceMetadata,
     spec
       | {
         activeDeadlineSeconds | std.number.PosNat | optional,
@@ -241,24 +238,24 @@ in
         completionMode | String | optional, # TODO: enum
         manualSelector | Bool | optional,
         parallelism | std.number.PosNat | optional,
-        selector | LabelSelector | optional,
+        selector | lib.k8s.LabelSelector | optional,
         ttlSecondsAfterFinished | std.number.PosNat | optional,
         template
           | {
-            metadata | Metadata | optional,
-            spec | Pod.spec,
+            metadata | lib.k8s.Metadata | optional,
+            spec | PodSpec,
           },
         podFailurePolicy
           | {
             rules
               | {
-                action | lib.Enum.StringOrEnum [| 'FailJob, 'Ignore, 'Count |],
+                action | lib.enum.StringOrEnum [| 'FailJob, 'Ignore, 'Count |],
                 # TODO: container name here can be null
                 # TODO: In can't use 0 in values
                 # TODO: MinItems 1 for the number array
                 # TODO: At most 255
                 onExitCodes
-                  | { containerName | Kube.Name, operator | lib.Enum.StringOrEnum [| 'In, 'NotIn, |], values | Array Number, },
+                  | { containerName | lib.k8s.Name, operator | lib.enum.StringOrEnum [| 'In, 'NotIn, |], values | Array Number, },
                 onPodConditions | Array { status | String | optional, type | String, } | optional,
               }
               | optional,
@@ -271,12 +268,12 @@ in
   apps.v1.DaemonSet = {
     apiVersion = "apps/v1",
     kind = "DaemonSet",
-    metadata | ResourceMetadata,
+    metadata | lib.k8s.ResourceMetadata,
     spec
       | {
-        selector | WorkloadSelector | SelectorValidatorContract template,
+        selector | lib.k8s.WorkloadSelector | SelectorValidatorContract template,
         updateStrategy | { .. } | optional,
-        template | { spec | PodSpec, metadata | Metadata | optional },
+        template | { spec | PodSpec, metadata | lib.k8s.Metadata | optional },
       },
     ..
   },

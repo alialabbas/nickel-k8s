@@ -1,3 +1,3 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-std.contract.all_of [ String, lib.Strings.MaxLength 4]
+std.contract.all_of [ String, lib.strings.MaxLength 4]

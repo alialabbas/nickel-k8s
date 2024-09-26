@@ -1,6 +1,6 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-lib.Records.JsonObject
+lib.records.JsonObject
   {
     rank = {
       contract = Number,

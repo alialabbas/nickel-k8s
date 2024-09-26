@@ -1,3 +1,3 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
-lib.Enum.StringOrEnum [| '"green", '"amber", '"red", |]
+lib.enum.StringOrEnum [| '"green", '"amber", '"red", |]

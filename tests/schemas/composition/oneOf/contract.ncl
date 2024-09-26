@@ -1,7 +1,7 @@
-let lib = import "Contracts.ncl"
+let lib = import "lib.ncl"
 in
 (
-  lib.OneOf [
+  lib.contracts.OneOf [
     Bool,
     Number,
   ]
