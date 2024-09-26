@@ -655,13 +655,19 @@ let OnlyWhenInOrNotIn
 
     NumberOrPercentage
       | doc "Custom type that can be represented as number, e.g. 10 or percentage 23%"
-      = fun label value =>
-        std.typeof value
-        |> match {
-          'Number => value,
-          'String => if std.string.is_match "^[0-9]+%$" value then value else std.contract.blame_with_message "Expected a string number precented as percentage e.g. 10%" label,
-          _ => std.contract.blame_with_message "Expected either a number or a string percentage" label,
-        },
+      =
+        std.contract.custom (fun label value =>
+          std.typeof value
+          |> match {
+            'Number => 'Ok value,
+            'String =>
+              if std.string.is_match "^[0-9]+%$" value then
+                'Ok value
+              else
+                'Error { message = "Expected a string number precented as percentage e.g. 10%" },
+            _ => std.contract.blame_with_message "Expected either a number or a string percentage" label,
+          }
+        ),
   },
 
   strings = {
