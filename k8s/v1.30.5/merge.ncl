@@ -2,7 +2,7 @@
 # Auto Generated Contracts
 let lib = import "lib.ncl" in
 {
-  apiregistration.k8s.io.v1.APIServiceList = {
+  "apiregistration.k8s.io".v1.APIServiceList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -81,7 +81,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apiregistration.k8s.io.v1.APIService = {
+  "apiregistration.k8s.io".v1.APIService = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -160,7 +160,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.WatchEvent = {
+  "".v1.WatchEvent = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -170,7 +170,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Status = {
+  "".v1.Status = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -180,7 +180,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.DeleteOptions = {
+  "".v1.DeleteOptions = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -190,7 +190,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.APIVersions = {
+  "".v1.APIVersions = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -200,7 +200,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.APIResourceList = {
+  "".v1.APIResourceList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -210,7 +210,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.APIGroupList = {
+  "".v1.APIGroupList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -220,7 +220,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.APIGroup = {
+  "".v1.APIGroup = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -230,7 +230,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storagemigration.k8s.io.v1alpha1.StorageVersionMigrationList = {
+  "storagemigration.k8s.io".v1alpha1.StorageVersionMigrationList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -344,7 +344,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storagemigration.k8s.io.v1alpha1.StorageVersionMigration = {
+  "storagemigration.k8s.io".v1alpha1.StorageVersionMigration = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -423,7 +423,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1beta1.VolumeAttributesClassList = {
+  "storage.k8s.io".v1beta1.VolumeAttributesClassList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -468,7 +468,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1beta1.VolumeAttributesClass = {
+  "storage.k8s.io".v1beta1.VolumeAttributesClass = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -513,7 +513,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1alpha1.VolumeAttributesClassList = {
+  "storage.k8s.io".v1alpha1.VolumeAttributesClassList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -558,7 +558,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1alpha1.VolumeAttributesClass = {
+  "storage.k8s.io".v1alpha1.VolumeAttributesClass = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -603,7 +603,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.VolumeAttachmentList = {
+  "storage.k8s.io".v1.VolumeAttachmentList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -648,7 +648,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.VolumeAttachment = {
+  "storage.k8s.io".v1.VolumeAttachment = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -693,7 +693,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.StorageClassList = {
+  "storage.k8s.io".v1.StorageClassList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -738,7 +738,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.StorageClass = {
+  "storage.k8s.io".v1.StorageClass = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -783,7 +783,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.CSIStorageCapacityList = {
+  "storage.k8s.io".v1.CSIStorageCapacityList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -828,7 +828,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.CSIStorageCapacity = {
+  "storage.k8s.io".v1.CSIStorageCapacity = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -873,7 +873,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.CSINodeList = {
+  "storage.k8s.io".v1.CSINodeList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -952,7 +952,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.CSINode = {
+  "storage.k8s.io".v1.CSINode = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1031,7 +1031,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.CSIDriverList = {
+  "storage.k8s.io".v1.CSIDriverList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1076,7 +1076,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  storage.k8s.io.v1.CSIDriver = {
+  "storage.k8s.io".v1.CSIDriver = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1121,7 +1121,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  scheduling.k8s.io.v1.PriorityClassList = {
+  "scheduling.k8s.io".v1.PriorityClassList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1166,7 +1166,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  scheduling.k8s.io.v1.PriorityClass = {
+  "scheduling.k8s.io".v1.PriorityClass = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1211,7 +1211,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.ResourceSliceList = {
+  "resource.k8s.io".v1alpha3.ResourceSliceList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1256,7 +1256,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.ResourceSlice = {
+  "resource.k8s.io".v1alpha3.ResourceSlice = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1301,86 +1301,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.ResourceClaimTemplateList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["spec", "metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["spec", "metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  resource.k8s.io.v1alpha3.ResourceClaimTemplate = {
+  "resource.k8s.io".v1alpha3.ResourceClaimTemplateList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1459,7 +1380,86 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.ResourceClaimList = {
+  "resource.k8s.io".v1alpha3.ResourceClaimTemplate = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["spec", "metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["spec", "metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["spec", "metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "resource.k8s.io".v1alpha3.ResourceClaimList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1538,7 +1538,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.ResourceClaim = {
+  "resource.k8s.io".v1alpha3.ResourceClaim = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1617,7 +1617,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.PodSchedulingContextList = {
+  "resource.k8s.io".v1alpha3.PodSchedulingContextList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1696,7 +1696,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.PodSchedulingContext = {
+  "resource.k8s.io".v1alpha3.PodSchedulingContext = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1775,7 +1775,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.DeviceClassList = {
+  "resource.k8s.io".v1alpha3.DeviceClassList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1820,7 +1820,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  resource.k8s.io.v1alpha3.DeviceClass = {
+  "resource.k8s.io".v1alpha3.DeviceClass = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1865,7 +1865,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.RoleList = {
+  "rbac.authorization.k8s.io".v1.RoleList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1910,7 +1910,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.RoleBindingList = {
+  "rbac.authorization.k8s.io".v1.RoleBindingList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -1955,7 +1955,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.RoleBinding = {
+  "rbac.authorization.k8s.io".v1.RoleBinding = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2000,7 +2000,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.Role = {
+  "rbac.authorization.k8s.io".v1.Role = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2045,7 +2045,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.ClusterRoleList = {
+  "rbac.authorization.k8s.io".v1.ClusterRoleList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2090,7 +2090,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.ClusterRoleBindingList = {
+  "rbac.authorization.k8s.io".v1.ClusterRoleBindingList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2135,7 +2135,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.ClusterRoleBinding = {
+  "rbac.authorization.k8s.io".v1.ClusterRoleBinding = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2180,7 +2180,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  rbac.authorization.k8s.io.v1.ClusterRole = {
+  "rbac.authorization.k8s.io".v1.ClusterRole = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2225,86 +2225,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  policy.v1.PodDisruptionBudgetList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-
-      result,
-  },
-  policy.v1.PodDisruptionBudget = {
+  "policy".v1.PodDisruptionBudgetList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2383,142 +2304,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  policy.v1.Eviction = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  node.k8s.io.v1.RuntimeClassList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  node.k8s.io.v1.RuntimeClass = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1beta1.ServiceCIDRList = {
+  "policy".v1.PodDisruptionBudget = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2597,7 +2383,142 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  networking.k8s.io.v1beta1.ServiceCIDR = {
+  "policy".v1.Eviction = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "node.k8s.io".v1.RuntimeClassList = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "node.k8s.io".v1.RuntimeClass = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1beta1.ServiceCIDRList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -2676,367 +2597,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  networking.k8s.io.v1beta1.IPAddressList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1beta1.IPAddress = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1.NetworkPolicyList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1.NetworkPolicy = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1.IngressList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1.IngressClassList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1.IngressClass = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  networking.k8s.io.v1.Ingress = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  flowcontrol.apiserver.k8s.io.v1beta3.PriorityLevelConfigurationList = {
+  "networking.k8s.io".v1beta1.ServiceCIDR = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3115,7 +2676,367 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.PriorityLevelConfiguration = {
+  "networking.k8s.io".v1beta1.IPAddressList = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1beta1.IPAddress = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1.NetworkPolicyList = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1.NetworkPolicy = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1.IngressList = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1.IngressClassList = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1.IngressClass = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "networking.k8s.io".v1.Ingress = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "flowcontrol.apiserver.k8s.io".v1beta3.PriorityLevelConfigurationList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3194,7 +3115,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.FlowSchemaList = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.PriorityLevelConfiguration = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3273,7 +3194,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.FlowSchema = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.FlowSchemaList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3352,7 +3273,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1.PriorityLevelConfigurationList = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.FlowSchema = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3431,7 +3352,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1.PriorityLevelConfiguration = {
+  "flowcontrol.apiserver.k8s.io".v1.PriorityLevelConfigurationList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3510,7 +3431,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1.FlowSchemaList = {
+  "flowcontrol.apiserver.k8s.io".v1.PriorityLevelConfiguration = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3589,7 +3510,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  flowcontrol.apiserver.k8s.io.v1.FlowSchema = {
+  "flowcontrol.apiserver.k8s.io".v1.FlowSchemaList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3668,7 +3589,86 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  events.k8s.io.v1.EventList = {
+  "flowcontrol.apiserver.k8s.io".v1.FlowSchema = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+
+      result,
+  },
+  "events.k8s.io".v1.EventList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3713,7 +3713,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  events.k8s.io.v1.Event = {
+  "events.k8s.io".v1.Event = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3758,7 +3758,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  discovery.k8s.io.v1.EndpointSliceList = {
+  "discovery.k8s.io".v1.EndpointSliceList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3803,7 +3803,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  discovery.k8s.io.v1.EndpointSlice = {
+  "discovery.k8s.io".v1.EndpointSlice = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3848,7 +3848,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ServiceList = {
+  "".v1.ServiceList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -3961,7 +3961,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ServiceAccountList = {
+  "".v1.ServiceAccountList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4040,7 +4040,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ServiceAccount = {
+  "".v1.ServiceAccount = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4119,7 +4119,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Service = {
+  "".v1.Service = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4232,7 +4232,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.SecretList = {
+  "".v1.SecretList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4277,7 +4277,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Secret = {
+  "".v1.Secret = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4322,7 +4322,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ResourceQuotaList = {
+  "".v1.ResourceQuotaList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4367,7 +4367,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ResourceQuota = {
+  "".v1.ResourceQuota = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -4412,7 +4412,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ReplicationControllerList = {
+  "".v1.ReplicationControllerList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -5375,7 +5375,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ReplicationController = {
+  "".v1.ReplicationController = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -6338,7 +6338,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.PodTemplateList = {
+  "".v1.PodTemplateList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -7268,7 +7268,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.PodTemplate = {
+  "".v1.PodTemplate = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -8198,7 +8198,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.PodList = {
+  "".v1.PodList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -9603,7 +9603,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Pod = {
+  "".v1.Pod = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11008,7 +11008,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.PersistentVolumeList = {
+  "".v1.PersistentVolumeList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11053,86 +11053,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.PersistentVolumeClaimList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-
-      result,
-  },
-  v1.PersistentVolumeClaim = {
+  "".v1.PersistentVolumeClaimList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11211,52 +11132,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.PersistentVolume = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  v1.NodeList = {
+  "".v1.PersistentVolumeClaim = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11288,23 +11164,6 @@ let lib = import "lib.ncl" in
       let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
       let inner =
         lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "addresses", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "addresses", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "addresses", ] result
         |> match {
           'Found val => val,
           _ => {}
@@ -11349,15 +11208,43 @@ let lib = import "lib.ncl" in
         }
       in
       let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+
+      result,
+  },
+  "".v1.PersistentVolume = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
       let inner =
-        lib.records.get_value_at_path ["status", "addresses", ] result
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
         |> match {
           'Found val => val,
           _ => {}
         }
       in
 
-      let val = lib.records.get_value_at_path ["status", "addresses", ] result in
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
       let val_map =
         val
         |> match {
@@ -11365,11 +11252,11 @@ let lib = import "lib.ncl" in
           _ => val
         }
       in
-      let result = lib.records.update_value_at_path ["status", "addresses", ] val_map result in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
 
       result,
   },
-  v1.Node = {
+  "".v1.NodeList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11482,7 +11369,120 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.NamespaceList = {
+  "".v1.Node = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "addresses", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "addresses", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "addresses", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "addresses", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "addresses", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "addresses", ] val_map result in
+
+      result,
+  },
+  "".v1.NamespaceList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11561,7 +11561,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Namespace = {
+  "".v1.Namespace = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11640,7 +11640,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.LimitRangeList = {
+  "".v1.LimitRangeList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11685,7 +11685,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.LimitRange = {
+  "".v1.LimitRange = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11730,7 +11730,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.EventList = {
+  "".v1.EventList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11775,7 +11775,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Event = {
+  "".v1.Event = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11820,7 +11820,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.EndpointsList = {
+  "".v1.EndpointsList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11865,7 +11865,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Endpoints = {
+  "".v1.Endpoints = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11910,7 +11910,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ConfigMapList = {
+  "".v1.ConfigMapList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -11955,7 +11955,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ConfigMap = {
+  "".v1.ConfigMap = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12000,7 +12000,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ComponentStatusList = {
+  "".v1.ComponentStatusList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12079,7 +12079,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.ComponentStatus = {
+  "".v1.ComponentStatus = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12158,7 +12158,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  v1.Binding = {
+  "".v1.Binding = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12203,7 +12203,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  coordination.k8s.io.v1alpha1.LeaseCandidateList = {
+  "coordination.k8s.io".v1alpha1.LeaseCandidateList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12248,7 +12248,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  coordination.k8s.io.v1alpha1.LeaseCandidate = {
+  "coordination.k8s.io".v1alpha1.LeaseCandidate = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12293,7 +12293,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  coordination.k8s.io.v1.LeaseList = {
+  "coordination.k8s.io".v1.LeaseList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12338,7 +12338,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  coordination.k8s.io.v1.Lease = {
+  "coordination.k8s.io".v1.Lease = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12383,7 +12383,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  certificates.k8s.io.v1alpha1.ClusterTrustBundleList = {
+  "certificates.k8s.io".v1alpha1.ClusterTrustBundleList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12428,7 +12428,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  certificates.k8s.io.v1alpha1.ClusterTrustBundle = {
+  "certificates.k8s.io".v1alpha1.ClusterTrustBundle = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12473,86 +12473,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  certificates.k8s.io.v1.CertificateSigningRequestList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-
-      result,
-  },
-  certificates.k8s.io.v1.CertificateSigningRequest = {
+  "certificates.k8s.io".v1.CertificateSigningRequestList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -12631,7 +12552,86 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  batch.v1.JobList = {
+  "certificates.k8s.io".v1.CertificateSigningRequest = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+
+      result,
+  },
+  "batch".v1.JobList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -13561,7 +13561,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  batch.v1.Job = {
+  "batch".v1.Job = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -14491,7 +14491,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  batch.v1.CronJobList = {
+  "batch".v1.CronJobList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -15455,7 +15455,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  batch.v1.CronJob = {
+  "batch".v1.CronJob = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16419,7 +16419,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  autoscaling.v2.HorizontalPodAutoscalerList = {
+  "autoscaling".v2.HorizontalPodAutoscalerList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16498,7 +16498,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  autoscaling.v2.HorizontalPodAutoscaler = {
+  "autoscaling".v2.HorizontalPodAutoscaler = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16577,7 +16577,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  autoscaling.v1.Scale = {
+  "autoscaling".v1.Scale = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16622,7 +16622,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  autoscaling.v1.HorizontalPodAutoscalerList = {
+  "autoscaling".v1.HorizontalPodAutoscalerList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16667,7 +16667,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  autoscaling.v1.HorizontalPodAutoscaler = {
+  "autoscaling".v1.HorizontalPodAutoscaler = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16712,7 +16712,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authorization.k8s.io.v1.SubjectAccessReview = {
+  "authorization.k8s.io".v1.SubjectAccessReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16757,7 +16757,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authorization.k8s.io.v1.SelfSubjectRulesReview = {
+  "authorization.k8s.io".v1.SelfSubjectRulesReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16802,7 +16802,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authorization.k8s.io.v1.SelfSubjectAccessReview = {
+  "authorization.k8s.io".v1.SelfSubjectAccessReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16847,7 +16847,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authorization.k8s.io.v1.LocalSubjectAccessReview = {
+  "authorization.k8s.io".v1.LocalSubjectAccessReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16892,7 +16892,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authentication.k8s.io.v1beta1.SelfSubjectReview = {
+  "authentication.k8s.io".v1beta1.SelfSubjectReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16937,7 +16937,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authentication.k8s.io.v1alpha1.SelfSubjectReview = {
+  "authentication.k8s.io".v1alpha1.SelfSubjectReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -16982,7 +16982,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authentication.k8s.io.v1.TokenReview = {
+  "authentication.k8s.io".v1.TokenReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -17027,7 +17027,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authentication.k8s.io.v1.TokenRequest = {
+  "authentication.k8s.io".v1.TokenRequest = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -17072,7 +17072,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  authentication.k8s.io.v1.SelfSubjectReview = {
+  "authentication.k8s.io".v1.SelfSubjectReview = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -17117,7 +17117,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.StatefulSetList = {
+  "apps".v1.StatefulSetList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -18148,7 +18148,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.StatefulSet = {
+  "apps".v1.StatefulSet = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -19179,7 +19179,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.ReplicaSetList = {
+  "apps".v1.ReplicaSetList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -20142,7 +20142,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.ReplicaSet = {
+  "apps".v1.ReplicaSet = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -21105,7 +21105,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.DeploymentList = {
+  "apps".v1.DeploymentList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -22068,7 +22068,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.Deployment = {
+  "apps".v1.Deployment = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -23031,7 +23031,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.DaemonSetList = {
+  "apps".v1.DaemonSetList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -23994,7 +23994,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.DaemonSet = {
+  "apps".v1.DaemonSet = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -24957,7 +24957,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.ControllerRevisionList = {
+  "apps".v1.ControllerRevisionList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25002,7 +25002,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  apps.v1.ControllerRevision = {
+  "apps".v1.ControllerRevision = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25047,7 +25047,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  internal.apiserver.k8s.io.v1alpha1.StorageVersionList = {
+  "internal.apiserver.k8s.io".v1alpha1.StorageVersionList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25160,7 +25160,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  internal.apiserver.k8s.io.v1alpha1.StorageVersion = {
+  "internal.apiserver.k8s.io".v1alpha1.StorageVersion = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25273,7 +25273,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyList = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicyList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25420,7 +25420,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyBindingList = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicyBindingList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25465,7 +25465,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyBinding = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicyBinding = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25510,154 +25510,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicy = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["spec", "variables", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["spec", "variables", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["spec", "variables", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["spec", "matchConditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["spec", "matchConditions", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["spec", "matchConditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["spec", "variables", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["spec", "variables", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["spec", "variables", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["spec", "matchConditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["spec", "matchConditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["spec", "matchConditions", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["status", "conditions", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
-
-      result,
-  },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyList = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicy = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -25804,97 +25657,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyBindingList = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyBinding = {
-    to_merge_form = fun value =>
-      let result = value in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_list_to_map "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      result,
-    from_merge_form = fun value =>
-      let result = value in
-
-      let inner =
-        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
-        |> match {
-          'Found val => val,
-          _ => {}
-        }
-      in
-
-      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
-      let val_map =
-        val
-        |> match {
-          'Found val => lib.k8s.from_map_to_list "name" val,
-          _ => val
-        }
-      in
-      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
-
-      result,
-  },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicy = {
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicyList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26041,7 +25804,244 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.ValidatingWebhookConfigurationList = {
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicyBindingList = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicyBinding = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+
+      result,
+  },
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicy = {
+    to_merge_form = fun value =>
+      let result = value in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["spec", "variables", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["spec", "variables", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["spec", "variables", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["spec", "matchConditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["spec", "matchConditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["spec", "matchConditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_list_to_map "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      result,
+    from_merge_form = fun value =>
+      let result = value in
+
+      let inner =
+        lib.records.get_value_at_path ["metadata", "ownerReferences", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["metadata", "ownerReferences", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["metadata", "ownerReferences", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["spec", "variables", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["spec", "variables", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["spec", "variables", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["spec", "matchConditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["spec", "matchConditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["spec", "matchConditions", ] val_map result in
+      let inner =
+        lib.records.get_value_at_path ["status", "conditions", ] result
+        |> match {
+          'Found val => val,
+          _ => {}
+        }
+      in
+
+      let val = lib.records.get_value_at_path ["status", "conditions", ] result in
+      let val_map =
+        val
+        |> match {
+          'Found val => lib.k8s.from_map_to_list "name" val,
+          _ => val
+        }
+      in
+      let result = lib.records.update_value_at_path ["status", "conditions", ] val_map result in
+
+      result,
+  },
+  "admissionregistration.k8s.io".v1.ValidatingWebhookConfigurationList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26155,7 +26155,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.ValidatingWebhookConfiguration = {
+  "admissionregistration.k8s.io".v1.ValidatingWebhookConfiguration = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26269,7 +26269,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyList = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicyList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26416,7 +26416,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyBindingList = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicyBindingList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26461,7 +26461,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyBinding = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicyBinding = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26506,7 +26506,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicy = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicy = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26653,7 +26653,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.MutatingWebhookConfigurationList = {
+  "admissionregistration.k8s.io".v1.MutatingWebhookConfigurationList = {
     to_merge_form = fun value =>
       let result = value in
 
@@ -26767,7 +26767,7 @@ let lib = import "lib.ncl" in
 
       result,
   },
-  admissionregistration.k8s.io.v1.MutatingWebhookConfiguration = {
+  "admissionregistration.k8s.io".v1.MutatingWebhookConfiguration = {
     to_merge_form = fun value =>
       let result = value in
 

@@ -33,7 +33,7 @@ in
     },
 
   # TODO: this is technically one part only, i.e. "rbac.authorization.k8s.io" is the group
-  rbac.authorization.k8s.io.v1 = {
+  "rbac.authorization.k8s.io".v1 = {
     ClusterRole = {
       apiVersion = "rbac.authorization.k8s.io/v1",
       kind = "ClusterRole",

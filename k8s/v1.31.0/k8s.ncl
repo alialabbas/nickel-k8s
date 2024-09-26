@@ -39,7 +39,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  apiregistration.k8s.io.v1.APIServiceList = {
+  "apiregistration.k8s.io".v1.APIServiceList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -65,7 +65,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  apiregistration.k8s.io.v1.APIService = {
+  "apiregistration.k8s.io".v1.APIService = {
     status
       | io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceStatus
       | optional,
@@ -145,7 +145,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  v1.Status = {
+  "".v1.Status = {
     status
       | String
       | optional,
@@ -356,7 +356,7 @@ let lib = import "lib.ncl" in
     lastTransitionTime
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time,
   },
-  v1.APIVersions = {
+  "".v1.APIVersions = {
     versions
       | (Array String),
     serverAddressByClientCIDRs
@@ -366,7 +366,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.APIResourceList = {
+  "".v1.APIResourceList = {
     resources
       | (Array io.k8s.apimachinery.pkg.apis.meta.v1.APIResource),
     kind
@@ -403,7 +403,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  v1.APIGroupList = {
+  "".v1.APIGroupList = {
     kind
       | std.contract.from_predicate (fun val => val == "APIGroupList"),
     groups
@@ -411,7 +411,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.APIGroup = {
+  "".v1.APIGroup = {
     versions
       | (Array io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionForDiscovery),
     serverAddressByClientCIDRs
@@ -729,7 +729,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  apiextensions.k8s.io.v1.CustomResourceDefinitionList = {
+  "apiextensions.k8s.io".v1.CustomResourceDefinitionList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -755,7 +755,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  apiextensions.k8s.io.v1.CustomResourceDefinition = {
+  "apiextensions.k8s.io".v1.CustomResourceDefinition = {
     status
       | io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionStatus
       | optional,
@@ -808,7 +808,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  storagemigration.k8s.io.v1alpha1.StorageVersionMigrationList = {
+  "storagemigration.k8s.io".v1alpha1.StorageVersionMigrationList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -819,7 +819,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storagemigration.k8s.io/v1alpha1"),
   },
-  storagemigration.k8s.io.v1alpha1.StorageVersionMigration = {
+  "storagemigration.k8s.io".v1alpha1.StorageVersionMigration = {
     status
       | io.k8s.api.storagemigration.v1alpha1.StorageVersionMigrationStatus
       | optional,
@@ -860,7 +860,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  storage.k8s.io.v1beta1.VolumeAttributesClassList = {
+  "storage.k8s.io".v1beta1.VolumeAttributesClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -871,7 +871,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1beta1"),
   },
-  storage.k8s.io.v1beta1.VolumeAttributesClass = {
+  "storage.k8s.io".v1beta1.VolumeAttributesClass = {
     parameters
       | { _ | String }
       | optional,
@@ -885,7 +885,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1beta1"),
   },
-  storage.k8s.io.v1alpha1.VolumeAttributesClassList = {
+  "storage.k8s.io".v1alpha1.VolumeAttributesClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -896,7 +896,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1alpha1"),
   },
-  storage.k8s.io.v1alpha1.VolumeAttributesClass = {
+  "storage.k8s.io".v1alpha1.VolumeAttributesClass = {
     parameters
       | { _ | String }
       | optional,
@@ -952,7 +952,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.core.v1.PersistentVolumeSpec
       | optional,
   },
-  storage.k8s.io.v1.VolumeAttachmentList = {
+  "storage.k8s.io".v1.VolumeAttachmentList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -963,7 +963,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1"),
   },
-  storage.k8s.io.v1.VolumeAttachment = {
+  "storage.k8s.io".v1.VolumeAttachment = {
     status
       | io.k8s.api.storage.v1.VolumeAttachmentStatus
       | optional,
@@ -984,7 +984,7 @@ let lib = import "lib.ncl" in
     audience
       | String,
   },
-  storage.k8s.io.v1.StorageClassList = {
+  "storage.k8s.io".v1.StorageClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -995,7 +995,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1"),
   },
-  storage.k8s.io.v1.StorageClass = {
+  "storage.k8s.io".v1.StorageClass = {
     volumeBindingMode
       | String
       | optional,
@@ -1024,7 +1024,7 @@ let lib = import "lib.ncl" in
       | Bool
       | optional,
   },
-  storage.k8s.io.v1.CSIStorageCapacityList = {
+  "storage.k8s.io".v1.CSIStorageCapacityList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1035,7 +1035,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1"),
   },
-  storage.k8s.io.v1.CSIStorageCapacity = {
+  "storage.k8s.io".v1.CSIStorageCapacity = {
     storageClassName
       | String,
     nodeTopology
@@ -1059,7 +1059,7 @@ let lib = import "lib.ncl" in
     drivers
       | (Array io.k8s.api.storage.v1.CSINodeDriver),
   },
-  storage.k8s.io.v1.CSINodeList = {
+  "storage.k8s.io".v1.CSINodeList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1082,7 +1082,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.storage.v1.VolumeNodeResources
       | optional,
   },
-  storage.k8s.io.v1.CSINode = {
+  "storage.k8s.io".v1.CSINode = {
     spec
       | io.k8s.api.storage.v1.CSINodeSpec,
     metadata
@@ -1119,7 +1119,7 @@ let lib = import "lib.ncl" in
       | Bool
       | optional,
   },
-  storage.k8s.io.v1.CSIDriverList = {
+  "storage.k8s.io".v1.CSIDriverList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1130,7 +1130,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1"),
   },
-  storage.k8s.io.v1.CSIDriver = {
+  "storage.k8s.io".v1.CSIDriver = {
     spec
       | io.k8s.api.storage.v1.CSIDriverSpec,
     metadata
@@ -1141,7 +1141,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "storage.k8s.io/v1"),
   },
-  scheduling.k8s.io.v1.PriorityClassList = {
+  "scheduling.k8s.io".v1.PriorityClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1152,7 +1152,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "scheduling.k8s.io/v1"),
   },
-  scheduling.k8s.io.v1.PriorityClass = {
+  "scheduling.k8s.io".v1.PriorityClass = {
     value
       | std.number.Integer,
     preemptionPolicy
@@ -1190,7 +1190,7 @@ let lib = import "lib.ncl" in
       | Bool
       | optional,
   },
-  resource.k8s.io.v1alpha3.ResourceSliceList = {
+  "resource.k8s.io".v1alpha3.ResourceSliceList = {
     listMeta
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1201,7 +1201,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
   },
-  resource.k8s.io.v1alpha3.ResourceSlice = {
+  "resource.k8s.io".v1alpha3.ResourceSlice = {
     spec
       | io.k8s.api.resource.v1alpha3.ResourceSliceSpec,
     metadata
@@ -1227,7 +1227,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
   },
-  resource.k8s.io.v1alpha3.ResourceClaimTemplateList = {
+  "resource.k8s.io".v1alpha3.ResourceClaimTemplateList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1238,7 +1238,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
   },
-  resource.k8s.io.v1alpha3.ResourceClaimTemplate = {
+  "resource.k8s.io".v1alpha3.ResourceClaimTemplate = {
     spec
       | io.k8s.api.resource.v1alpha3.ResourceClaimTemplateSpec,
     metadata
@@ -1275,7 +1275,7 @@ let lib = import "lib.ncl" in
     name
       | String,
   },
-  resource.k8s.io.v1alpha3.ResourceClaimList = {
+  "resource.k8s.io".v1alpha3.ResourceClaimList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1297,7 +1297,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  resource.k8s.io.v1alpha3.ResourceClaim = {
+  "resource.k8s.io".v1alpha3.ResourceClaim = {
     status
       | io.k8s.api.resource.v1alpha3.ResourceClaimStatus
       | optional,
@@ -1324,7 +1324,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  resource.k8s.io.v1alpha3.PodSchedulingContextList = {
+  "resource.k8s.io".v1alpha3.PodSchedulingContextList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1335,7 +1335,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "resource.k8s.io/v1alpha3"),
   },
-  resource.k8s.io.v1alpha3.PodSchedulingContext = {
+  "resource.k8s.io".v1alpha3.PodSchedulingContext = {
     status
       | io.k8s.api.resource.v1alpha3.PodSchedulingContextStatus
       | optional,
@@ -1407,7 +1407,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.resource.v1alpha3.DeviceClassConfiguration)
       | optional,
   },
-  resource.k8s.io.v1alpha3.DeviceClassList = {
+  "resource.k8s.io".v1alpha3.DeviceClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1423,7 +1423,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.resource.v1alpha3.OpaqueDeviceConfiguration
       | optional,
   },
-  resource.k8s.io.v1alpha3.DeviceClass = {
+  "resource.k8s.io".v1alpha3.DeviceClass = {
     spec
       | io.k8s.api.resource.v1alpha3.DeviceClassSpec,
     metadata
@@ -1535,7 +1535,7 @@ let lib = import "lib.ncl" in
     apiGroup
       | String,
   },
-  rbac.authorization.k8s.io.v1.RoleList = {
+  "rbac.authorization.k8s.io".v1.RoleList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1546,7 +1546,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "rbac.authorization.k8s.io/v1"),
   },
-  rbac.authorization.k8s.io.v1.RoleBindingList = {
+  "rbac.authorization.k8s.io".v1.RoleBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1557,7 +1557,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "rbac.authorization.k8s.io/v1"),
   },
-  rbac.authorization.k8s.io.v1.RoleBinding = {
+  "rbac.authorization.k8s.io".v1.RoleBinding = {
     subjects
       | (Array io.k8s.api.rbac.v1.Subject)
       | optional,
@@ -1571,7 +1571,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "rbac.authorization.k8s.io/v1"),
   },
-  rbac.authorization.k8s.io.v1.Role = {
+  "rbac.authorization.k8s.io".v1.Role = {
     rules
       | (Array io.k8s.api.rbac.v1.PolicyRule)
       | optional,
@@ -1599,7 +1599,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  rbac.authorization.k8s.io.v1.ClusterRoleList = {
+  "rbac.authorization.k8s.io".v1.ClusterRoleList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1610,7 +1610,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "rbac.authorization.k8s.io/v1"),
   },
-  rbac.authorization.k8s.io.v1.ClusterRoleBindingList = {
+  "rbac.authorization.k8s.io".v1.ClusterRoleBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1621,7 +1621,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "rbac.authorization.k8s.io/v1"),
   },
-  rbac.authorization.k8s.io.v1.ClusterRoleBinding = {
+  "rbac.authorization.k8s.io".v1.ClusterRoleBinding = {
     subjects
       | (Array io.k8s.api.rbac.v1.Subject)
       | optional,
@@ -1635,7 +1635,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "rbac.authorization.k8s.io/v1"),
   },
-  rbac.authorization.k8s.io.v1.ClusterRole = {
+  "rbac.authorization.k8s.io".v1.ClusterRole = {
     rules
       | (Array io.k8s.api.rbac.v1.PolicyRule)
       | optional,
@@ -1688,7 +1688,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.util.intstr.IntOrString
       | optional,
   },
-  policy.v1.PodDisruptionBudgetList = {
+  "policy".v1.PodDisruptionBudgetList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1699,7 +1699,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "policy/v1"),
   },
-  policy.v1.PodDisruptionBudget = {
+  "policy".v1.PodDisruptionBudget = {
     status
       | io.k8s.api.policy.v1.PodDisruptionBudgetStatus
       | optional,
@@ -1714,7 +1714,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "policy/v1"),
   },
-  policy.v1.Eviction = {
+  "policy".v1.Eviction = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
@@ -1734,7 +1734,7 @@ let lib = import "lib.ncl" in
       | { _ | String }
       | optional,
   },
-  node.k8s.io.v1.RuntimeClassList = {
+  "node.k8s.io".v1.RuntimeClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1745,7 +1745,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "node.k8s.io/v1"),
   },
-  node.k8s.io.v1.RuntimeClass = {
+  "node.k8s.io".v1.RuntimeClass = {
     scheduling
       | io.k8s.api.node.v1.Scheduling
       | optional,
@@ -1777,7 +1777,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  networking.k8s.io.v1beta1.ServiceCIDRList = {
+  "networking.k8s.io".v1beta1.ServiceCIDRList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1788,7 +1788,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1beta1"),
   },
-  networking.k8s.io.v1beta1.ServiceCIDR = {
+  "networking.k8s.io".v1beta1.ServiceCIDR = {
     status
       | io.k8s.api.networking.v1beta1.ServiceCIDRStatus
       | optional,
@@ -1819,7 +1819,7 @@ let lib = import "lib.ncl" in
     parentRef
       | io.k8s.api.networking.v1beta1.ParentReference,
   },
-  networking.k8s.io.v1beta1.IPAddressList = {
+  "networking.k8s.io".v1beta1.IPAddressList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1830,7 +1830,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1beta1"),
   },
-  networking.k8s.io.v1beta1.IPAddress = {
+  "networking.k8s.io".v1beta1.IPAddress = {
     spec
       | io.k8s.api.networking.v1beta1.IPAddressSpec
       | optional,
@@ -1885,7 +1885,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.networking.v1.IPBlock
       | optional,
   },
-  networking.k8s.io.v1.NetworkPolicyList = {
+  "networking.k8s.io".v1.NetworkPolicyList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -1912,7 +1912,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.networking.v1.NetworkPolicyPort)
       | optional,
   },
-  networking.k8s.io.v1.NetworkPolicy = {
+  "networking.k8s.io".v1.NetworkPolicy = {
     spec
       | io.k8s.api.networking.v1.NetworkPolicySpec
       | optional,
@@ -1991,7 +1991,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  networking.k8s.io.v1.IngressList = {
+  "networking.k8s.io".v1.IngressList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2025,7 +2025,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  networking.k8s.io.v1.IngressClassList = {
+  "networking.k8s.io".v1.IngressClassList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2036,7 +2036,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "networking.k8s.io/v1"),
   },
-  networking.k8s.io.v1.IngressClass = {
+  "networking.k8s.io".v1.IngressClass = {
     spec
       | io.k8s.api.networking.v1.IngressClassSpec
       | optional,
@@ -2056,7 +2056,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.core.v1.TypedLocalObjectReference
       | optional,
   },
-  networking.k8s.io.v1.Ingress = {
+  "networking.k8s.io".v1.Ingress = {
     status
       | io.k8s.api.networking.v1.IngressStatus
       | optional,
@@ -2158,7 +2158,7 @@ let lib = import "lib.ncl" in
     name
       | String,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.PriorityLevelConfigurationList = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.PriorityLevelConfigurationList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2186,7 +2186,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.PriorityLevelConfiguration = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.PriorityLevelConfiguration = {
     status
       | io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationStatus
       | optional,
@@ -2260,7 +2260,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.flowcontrol.v1beta3.FlowDistinguisherMethod
       | optional,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.FlowSchemaList = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.FlowSchemaList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2288,7 +2288,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  flowcontrol.apiserver.k8s.io.v1beta3.FlowSchema = {
+  "flowcontrol.apiserver.k8s.io".v1beta3.FlowSchema = {
     status
       | io.k8s.api.flowcontrol.v1beta3.FlowSchemaStatus
       | optional,
@@ -2382,7 +2382,7 @@ let lib = import "lib.ncl" in
     name
       | String,
   },
-  flowcontrol.apiserver.k8s.io.v1.PriorityLevelConfigurationList = {
+  "flowcontrol.apiserver.k8s.io".v1.PriorityLevelConfigurationList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2410,7 +2410,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  flowcontrol.apiserver.k8s.io.v1.PriorityLevelConfiguration = {
+  "flowcontrol.apiserver.k8s.io".v1.PriorityLevelConfiguration = {
     status
       | io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationStatus
       | optional,
@@ -2484,7 +2484,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.flowcontrol.v1.FlowDistinguisherMethod
       | optional,
   },
-  flowcontrol.apiserver.k8s.io.v1.FlowSchemaList = {
+  "flowcontrol.apiserver.k8s.io".v1.FlowSchemaList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2512,7 +2512,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  flowcontrol.apiserver.k8s.io.v1.FlowSchema = {
+  "flowcontrol.apiserver.k8s.io".v1.FlowSchema = {
     status
       | io.k8s.api.flowcontrol.v1.FlowSchemaStatus
       | optional,
@@ -2545,7 +2545,7 @@ let lib = import "lib.ncl" in
     count
       | std.number.Integer,
   },
-  events.k8s.io.v1.EventList = {
+  "events.k8s.io".v1.EventList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2556,7 +2556,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "events.k8s.io/v1"),
   },
-  events.k8s.io.v1.Event = {
+  "events.k8s.io".v1.Event = {
     type
       | String
       | optional,
@@ -2610,7 +2610,7 @@ let lib = import "lib.ncl" in
     name
       | String,
   },
-  discovery.k8s.io.v1.EndpointSliceList = {
+  "discovery.k8s.io".v1.EndpointSliceList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -2621,7 +2621,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "discovery.k8s.io/v1"),
   },
-  discovery.k8s.io.v1.EndpointSlice = {
+  "discovery.k8s.io".v1.EndpointSlice = {
     ports
       | (Array io.k8s.api.discovery.v1.EndpointPort)
       | optional,
@@ -3117,7 +3117,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  v1.ServiceList = {
+  "".v1.ServiceList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -3138,7 +3138,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  v1.ServiceAccountList = {
+  "".v1.ServiceAccountList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -3149,7 +3149,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.ServiceAccount = {
+  "".v1.ServiceAccount = {
     secrets
       | (Array io.k8s.api.core.v1.ObjectReference)
       | optional,
@@ -3167,7 +3167,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.Service = {
+  "".v1.Service = {
     status
       | io.k8s.api.core.v1.ServiceStatus
       | optional,
@@ -3253,7 +3253,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.core.v1.KeyToPath)
       | optional,
   },
-  v1.SecretList = {
+  "".v1.SecretList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -3282,7 +3282,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  v1.Secret = {
+  "".v1.Secret = {
     type
       | String
       | optional,
@@ -3433,7 +3433,7 @@ let lib = import "lib.ncl" in
       | { _ | io.k8s.apimachinery.pkg.api.resource.Quantity }
       | optional,
   },
-  v1.ResourceQuotaList = {
+  "".v1.ResourceQuotaList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -3444,7 +3444,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.ResourceQuota = {
+  "".v1.ResourceQuota = {
     status
       | io.k8s.api.core.v1.ResourceQuotaStatus
       | optional,
@@ -3516,7 +3516,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  v1.ReplicationControllerList = {
+  "".v1.ReplicationControllerList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -3542,7 +3542,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  v1.ReplicationController = {
+  "".v1.ReplicationController = {
     status
       | io.k8s.api.core.v1.ReplicationControllerStatus
       | optional,
@@ -3696,7 +3696,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
   },
-  v1.PodTemplateList = {
+  "".v1.PodTemplateList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -3707,7 +3707,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.PodTemplate = {
+  "".v1.PodTemplate = {
     template
       | io.k8s.api.core.v1.PodTemplateSpec
       | optional,
@@ -3954,7 +3954,7 @@ let lib = import "lib.ncl" in
     name
       | String,
   },
-  v1.PodList = {
+  "".v1.PodList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4041,7 +4041,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.core.v1.WeightedPodAffinityTerm)
       | optional,
   },
-  v1.Pod = {
+  "".v1.Pod = {
     status
       | io.k8s.api.core.v1.PodStatus
       | optional,
@@ -4172,7 +4172,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  v1.PersistentVolumeList = {
+  "".v1.PersistentVolumeList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4252,7 +4252,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  v1.PersistentVolumeClaimList = {
+  "".v1.PersistentVolumeClaimList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4281,7 +4281,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  v1.PersistentVolumeClaim = {
+  "".v1.PersistentVolumeClaim = {
     status
       | io.k8s.api.core.v1.PersistentVolumeClaimStatus
       | optional,
@@ -4296,7 +4296,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.PersistentVolume = {
+  "".v1.PersistentVolume = {
     status
       | io.k8s.api.core.v1.PersistentVolumeStatus
       | optional,
@@ -4464,7 +4464,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.core.v1.NodeRuntimeHandlerFeatures
       | optional,
   },
-  v1.NodeList = {
+  "".v1.NodeList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4536,7 +4536,7 @@ let lib = import "lib.ncl" in
     address
       | String,
   },
-  v1.Node = {
+  "".v1.Node = {
     status
       | io.k8s.api.core.v1.NodeStatus
       | optional,
@@ -4564,7 +4564,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  v1.NamespaceList = {
+  "".v1.NamespaceList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4590,7 +4590,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  v1.Namespace = {
+  "".v1.Namespace = {
     status
       | io.k8s.api.core.v1.NamespaceStatus
       | optional,
@@ -4665,7 +4665,7 @@ let lib = import "lib.ncl" in
     limits
       | (Array io.k8s.api.core.v1.LimitRangeItem),
   },
-  v1.LimitRangeList = {
+  "".v1.LimitRangeList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4695,7 +4695,7 @@ let lib = import "lib.ncl" in
       | { _ | io.k8s.apimachinery.pkg.api.resource.Quantity }
       | optional,
   },
-  v1.LimitRange = {
+  "".v1.LimitRange = {
     spec
       | io.k8s.api.core.v1.LimitRangeSpec
       | optional,
@@ -4979,7 +4979,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  v1.EventList = {
+  "".v1.EventList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -4990,7 +4990,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.Event = {
+  "".v1.Event = {
     type
       | String
       | optional,
@@ -5155,7 +5155,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.core.v1.ConfigMapEnvSource
       | optional,
   },
-  v1.EndpointsList = {
+  "".v1.EndpointsList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5166,7 +5166,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.Endpoints = {
+  "".v1.Endpoints = {
     subsets
       | (Array io.k8s.api.core.v1.EndpointSubset)
       | optional,
@@ -5485,7 +5485,7 @@ let lib = import "lib.ncl" in
     kubeletConfigKey
       | String,
   },
-  v1.ConfigMapList = {
+  "".v1.ConfigMapList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5514,7 +5514,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  v1.ConfigMap = {
+  "".v1.ConfigMap = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
@@ -5532,7 +5532,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.ComponentStatusList = {
+  "".v1.ComponentStatusList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5543,7 +5543,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "v1"),
   },
-  v1.ComponentStatus = {
+  "".v1.ComponentStatus = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       | optional,
@@ -5706,7 +5706,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.core.v1.SecretReference
       | optional,
   },
-  v1.Binding = {
+  "".v1.Binding = {
     target
       | io.k8s.api.core.v1.ObjectReference,
     metadata
@@ -5811,7 +5811,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  coordination.k8s.io.v1alpha1.LeaseCandidateList = {
+  "coordination.k8s.io".v1alpha1.LeaseCandidateList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5822,7 +5822,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "coordination.k8s.io/v1alpha1"),
   },
-  coordination.k8s.io.v1alpha1.LeaseCandidate = {
+  "coordination.k8s.io".v1alpha1.LeaseCandidate = {
     spec
       | io.k8s.api.coordination.v1alpha1.LeaseCandidateSpec
       | optional,
@@ -5857,7 +5857,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime
       | optional,
   },
-  coordination.k8s.io.v1.LeaseList = {
+  "coordination.k8s.io".v1.LeaseList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5868,7 +5868,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "coordination.k8s.io/v1"),
   },
-  coordination.k8s.io.v1.Lease = {
+  "coordination.k8s.io".v1.Lease = {
     spec
       | io.k8s.api.coordination.v1.LeaseSpec
       | optional,
@@ -5887,7 +5887,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  certificates.k8s.io.v1alpha1.ClusterTrustBundleList = {
+  "certificates.k8s.io".v1alpha1.ClusterTrustBundleList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5898,7 +5898,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "certificates.k8s.io/v1alpha1"),
   },
-  certificates.k8s.io.v1alpha1.ClusterTrustBundle = {
+  "certificates.k8s.io".v1alpha1.ClusterTrustBundle = {
     spec
       | io.k8s.api.certificates.v1alpha1.ClusterTrustBundleSpec,
     metadata
@@ -5941,7 +5941,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  certificates.k8s.io.v1.CertificateSigningRequestList = {
+  "certificates.k8s.io".v1.CertificateSigningRequestList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -5970,7 +5970,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  certificates.k8s.io.v1.CertificateSigningRequest = {
+  "certificates.k8s.io".v1.CertificateSigningRequest = {
     status
       | io.k8s.api.certificates.v1.CertificateSigningRequestStatus
       | optional,
@@ -6125,7 +6125,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  batch.v1.JobList = {
+  "batch".v1.JobList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -6154,7 +6154,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  batch.v1.Job = {
+  "batch".v1.Job = {
     status
       | io.k8s.api.batch.v1.JobStatus
       | optional,
@@ -6204,7 +6204,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  batch.v1.CronJobList = {
+  "batch".v1.CronJobList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -6215,7 +6215,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "batch/v1"),
   },
-  batch.v1.CronJob = {
+  "batch".v1.CronJob = {
     status
       | io.k8s.api.batch.v1.CronJobStatus
       | optional,
@@ -6373,7 +6373,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerBehavior
       | optional,
   },
-  autoscaling.v2.HorizontalPodAutoscalerList = {
+  "autoscaling".v2.HorizontalPodAutoscalerList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -6407,7 +6407,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.autoscaling.v2.HPAScalingRules
       | optional,
   },
-  autoscaling.v2.HorizontalPodAutoscaler = {
+  "autoscaling".v2.HorizontalPodAutoscaler = {
     status
       | io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerStatus
       | optional,
@@ -6490,7 +6490,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  autoscaling.v1.Scale = {
+  "autoscaling".v1.Scale = {
     status
       | io.k8s.api.autoscaling.v1.ScaleStatus
       | optional,
@@ -6532,7 +6532,7 @@ let lib = import "lib.ncl" in
     maxReplicas
       | std.number.Integer,
   },
-  autoscaling.v1.HorizontalPodAutoscalerList = {
+  "autoscaling".v1.HorizontalPodAutoscalerList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -6543,7 +6543,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "autoscaling/v1"),
   },
-  autoscaling.v1.HorizontalPodAutoscaler = {
+  "autoscaling".v1.HorizontalPodAutoscaler = {
     status
       | io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerStatus
       | optional,
@@ -6611,7 +6611,7 @@ let lib = import "lib.ncl" in
       | { _ | (Array String) }
       | optional,
   },
-  authorization.k8s.io.v1.SubjectAccessReview = {
+  "authorization.k8s.io".v1.SubjectAccessReview = {
     status
       | io.k8s.api.authorization.v1.SubjectAccessReviewStatus
       | optional,
@@ -6630,7 +6630,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  authorization.k8s.io.v1.SelfSubjectRulesReview = {
+  "authorization.k8s.io".v1.SelfSubjectRulesReview = {
     status
       | io.k8s.api.authorization.v1.SubjectRulesReviewStatus
       | optional,
@@ -6652,7 +6652,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.authorization.v1.NonResourceAttributes
       | optional,
   },
-  authorization.k8s.io.v1.SelfSubjectAccessReview = {
+  "authorization.k8s.io".v1.SelfSubjectAccessReview = {
     status
       | io.k8s.api.authorization.v1.SubjectAccessReviewStatus
       | optional,
@@ -6723,7 +6723,7 @@ let lib = import "lib.ncl" in
       | String
       | optional,
   },
-  authorization.k8s.io.v1.LocalSubjectAccessReview = {
+  "authorization.k8s.io".v1.LocalSubjectAccessReview = {
     status
       | io.k8s.api.authorization.v1.SubjectAccessReviewStatus
       | optional,
@@ -6758,7 +6758,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.authentication.v1.UserInfo
       | optional,
   },
-  authentication.k8s.io.v1beta1.SelfSubjectReview = {
+  "authentication.k8s.io".v1beta1.SelfSubjectReview = {
     status
       | io.k8s.api.authentication.v1beta1.SelfSubjectReviewStatus
       | optional,
@@ -6775,7 +6775,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.authentication.v1.UserInfo
       | optional,
   },
-  authentication.k8s.io.v1alpha1.SelfSubjectReview = {
+  "authentication.k8s.io".v1alpha1.SelfSubjectReview = {
     status
       | io.k8s.api.authentication.v1alpha1.SelfSubjectReviewStatus
       | optional,
@@ -6823,7 +6823,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  authentication.k8s.io.v1.TokenReview = {
+  "authentication.k8s.io".v1.TokenReview = {
     status
       | io.k8s.api.authentication.v1.TokenReviewStatus
       | optional,
@@ -6853,7 +6853,7 @@ let lib = import "lib.ncl" in
     audiences
       | (Array String),
   },
-  authentication.k8s.io.v1.TokenRequest = {
+  "authentication.k8s.io".v1.TokenRequest = {
     status
       | io.k8s.api.authentication.v1.TokenRequestStatus
       | optional,
@@ -6872,7 +6872,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.authentication.v1.UserInfo
       | optional,
   },
-  authentication.k8s.io.v1.SelfSubjectReview = {
+  "authentication.k8s.io".v1.SelfSubjectReview = {
     status
       | io.k8s.api.authentication.v1.SelfSubjectReviewStatus
       | optional,
@@ -6982,7 +6982,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  apps.v1.StatefulSetList = {
+  "apps".v1.StatefulSetList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7008,7 +7008,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  apps.v1.StatefulSet = {
+  "apps".v1.StatefulSet = {
     status
       | io.k8s.api.apps.v1.StatefulSetStatus
       | optional,
@@ -7079,7 +7079,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  apps.v1.ReplicaSetList = {
+  "apps".v1.ReplicaSetList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7105,7 +7105,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  apps.v1.ReplicaSet = {
+  "apps".v1.ReplicaSet = {
     status
       | io.k8s.api.apps.v1.ReplicaSetStatus
       | optional,
@@ -7178,7 +7178,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  apps.v1.DeploymentList = {
+  "apps".v1.DeploymentList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7207,7 +7207,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  apps.v1.Deployment = {
+  "apps".v1.Deployment = {
     status
       | io.k8s.api.apps.v1.DeploymentStatus
       | optional,
@@ -7273,7 +7273,7 @@ let lib = import "lib.ncl" in
       | std.number.Integer
       | optional,
   },
-  apps.v1.DaemonSetList = {
+  "apps".v1.DaemonSetList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7299,7 +7299,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  apps.v1.DaemonSet = {
+  "apps".v1.DaemonSet = {
     status
       | io.k8s.api.apps.v1.DaemonSetStatus
       | optional,
@@ -7314,7 +7314,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "apps/v1"),
   },
-  apps.v1.ControllerRevisionList = {
+  "apps".v1.ControllerRevisionList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7325,7 +7325,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "apps/v1"),
   },
-  apps.v1.ControllerRevision = {
+  "apps".v1.ControllerRevision = {
     revision
       | std.number.Integer,
     metadata
@@ -7351,7 +7351,7 @@ let lib = import "lib.ncl" in
       | optional,
   },
   io.k8s.api.apiserverinternal.v1alpha1.StorageVersionSpec = { .. },
-  internal.apiserver.k8s.io.v1alpha1.StorageVersionList = {
+  "internal.apiserver.k8s.io".v1alpha1.StorageVersionList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7378,7 +7378,7 @@ let lib = import "lib.ncl" in
       | io.k8s.apimachinery.pkg.apis.meta.v1.Time
       | optional,
   },
-  internal.apiserver.k8s.io.v1alpha1.StorageVersion = {
+  "internal.apiserver.k8s.io".v1alpha1.StorageVersion = {
     status
       | io.k8s.api.apiserverinternal.v1alpha1.StorageVersionStatus,
     spec
@@ -7458,7 +7458,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.admissionregistration.v1beta1.AuditAnnotation)
       | optional,
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyList = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicyList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7483,7 +7483,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.admissionregistration.v1beta1.MatchResources
       | optional,
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyBindingList = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicyBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7494,7 +7494,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1beta1"),
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicyBinding = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicyBinding = {
     spec
       | io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBindingSpec
       | optional,
@@ -7506,7 +7506,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1beta1"),
   },
-  admissionregistration.k8s.io.v1beta1.ValidatingAdmissionPolicy = {
+  "admissionregistration.k8s.io".v1beta1.ValidatingAdmissionPolicy = {
     status
       | io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyStatus
       | optional,
@@ -7656,7 +7656,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.admissionregistration.v1alpha1.AuditAnnotation)
       | optional,
   },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyList = {
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicyList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7681,7 +7681,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.admissionregistration.v1alpha1.MatchResources
       | optional,
   },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyBindingList = {
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicyBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7692,7 +7692,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1alpha1"),
   },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicyBinding = {
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicyBinding = {
     spec
       | io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyBindingSpec
       | optional,
@@ -7704,7 +7704,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1alpha1"),
   },
-  admissionregistration.k8s.io.v1alpha1.ValidatingAdmissionPolicy = {
+  "admissionregistration.k8s.io".v1alpha1.ValidatingAdmissionPolicy = {
     status
       | io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyStatus
       | optional,
@@ -7831,7 +7831,7 @@ let lib = import "lib.ncl" in
     expression
       | String,
   },
-  admissionregistration.k8s.io.v1.ValidatingWebhookConfigurationList = {
+  "admissionregistration.k8s.io".v1.ValidatingWebhookConfigurationList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7842,7 +7842,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1"),
   },
-  admissionregistration.k8s.io.v1.ValidatingWebhookConfiguration = {
+  "admissionregistration.k8s.io".v1.ValidatingWebhookConfiguration = {
     webhooks
       | (Array io.k8s.api.admissionregistration.v1.ValidatingWebhook)
       | optional,
@@ -7919,7 +7919,7 @@ let lib = import "lib.ncl" in
       | (Array io.k8s.api.admissionregistration.v1.AuditAnnotation)
       | optional,
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyList = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicyList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7944,7 +7944,7 @@ let lib = import "lib.ncl" in
       | io.k8s.api.admissionregistration.v1.MatchResources
       | optional,
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyBindingList = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicyBindingList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -7955,7 +7955,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1"),
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicyBinding = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicyBinding = {
     spec
       | io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBindingSpec
       | optional,
@@ -7967,7 +7967,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1"),
   },
-  admissionregistration.k8s.io.v1.ValidatingAdmissionPolicy = {
+  "admissionregistration.k8s.io".v1.ValidatingAdmissionPolicy = {
     status
       | io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyStatus
       | optional,
@@ -8058,7 +8058,7 @@ let lib = import "lib.ncl" in
       | (Array String)
       | optional,
   },
-  admissionregistration.k8s.io.v1.MutatingWebhookConfigurationList = {
+  "admissionregistration.k8s.io".v1.MutatingWebhookConfigurationList = {
     metadata
       | io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta
       | optional,
@@ -8069,7 +8069,7 @@ let lib = import "lib.ncl" in
     apiVersion
       | std.contract.from_predicate (fun val => val == "admissionregistration.k8s.io/v1"),
   },
-  admissionregistration.k8s.io.v1.MutatingWebhookConfiguration = {
+  "admissionregistration.k8s.io".v1.MutatingWebhookConfiguration = {
     webhooks
       | (Array io.k8s.api.admissionregistration.v1.MutatingWebhook)
       | optional,

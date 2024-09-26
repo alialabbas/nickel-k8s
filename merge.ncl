@@ -73,8 +73,8 @@ let generated =
           if groupDef.group == "" then
             ""
           else
-            groupDef.group ++ "."
-        in group ++ groupDef.version ++ "." ++ groupDef.kind
+            groupDef.group
+        in "\"%{group}\"." ++ groupDef.version ++ "." ++ groupDef.kind
       in
       let paths = get_paths e.value in
       acc

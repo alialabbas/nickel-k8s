@@ -57,8 +57,8 @@ let result =
               if groupDef.group == "" then
                 ""
               else
-                groupDef.group ++ "."
-            in group ++ groupDef.version ++ "." ++ groupDef.kind
+                groupDef.group
+            in "\"%{group}\"." ++ groupDef.version ++ "." ++ groupDef.kind
           else
             e.field
         in
