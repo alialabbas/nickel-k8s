@@ -173,7 +173,8 @@ let otelConfig = import "./config.yaml" in
                         fieldPath = "status.podIP",
                       },
                     },
-                  }
+                  },
+                  { name = "overlayed-env", value = "overridden" },
                 ],
                 image = "otel/opentelemetry-collector-contrib:" ++ Inputs.version,
                 imagePullPolicy = "IfNotPresent",
@@ -257,7 +258,7 @@ let otelConfig = import "./config.yaml" in
             env = [
               {
                 name = "overlayed-env",
-                value = "test-val",
+                value | force = "test-val",
               }
             ],
           },

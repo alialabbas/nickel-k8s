@@ -1,3 +1,4 @@
+let m = import "gen.ncl" in
 let { Networking, .. } = import "types.ncl" in
 let patch = { apiVersion | String, kind | String, metadata.name | String | optional, .. } in
 # TODO: this is broken
@@ -92,7 +93,6 @@ let collectionOfPathces
               std.record.values Manifests
               |> std.array.map (fun e => Patcher Overlays e)
               |> std.array.map (fun e => Enforcer Constraints e)
-              # Applying contract is always the last item to give the previous steps means to modify values free from contracts checks
             ) | ManifestsValidation Kinds
         }, # | (import "self-contained-release.ncl"),
       Dns
@@ -216,7 +216,7 @@ let collectionOfPathces
                       # "nickel-k8s/hash" = packageHash,
                     }
                   }
-                ) | serverSideContract # | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
+                ) | serverSideContract | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
               )
               value,
           # 'Record => std.array.all(fun e => let contract = std.record.get e.kind allContracts in std.contract.apply contract e label),
@@ -246,23 +246,33 @@ let collectionOfPathces
 
   Patcher
     | doc m%"Given a list of Overlays, find the one affecting the resource based on their kind or metadata.name and merge them"%
-    # | Patch -> Kube.Manifest -> Kube.Manifest
+    | Patch -> Kube.Manifest -> Kube.Manifest
     = fun overlays resource =>
-      let fromArrayC = import "./k8s/v1.31.0/mapToList.ncl" in
-      let toArrayC = import "./k8s/v1.31.0/mergeable.ncl" in
-      # This has to support optional overlays for when a field kind doesn't exist
-      # The question now becomes how to ensure the passed overlays are truly valid for the known Contracts
-      # i.e. similar to constraints, it is fine if the we have no constraints, but it is not fine if a constraints is targetting an unknown contract/type
-      # TODO: this should also apply only on kind when metadata.name doesn't exist
-      let rKind = resource.kind in
+      let kind = resource.kind in
+      let rApiVersion = std.string.split "/" resource.apiVersion in
+      let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
+      let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
+      let to_mergeable =
+        if group != "" then # core apis don't have a group
+          m."%{group}"."%{version}"."%{kind}".to_merge_form
+        else
+          m."%{version}"."%{kind}".to_merge_form
+      in
+      let from_mergeable =
+        if group != "" then # core apis don't have a group
+          m."%{group}"."%{version}"."%{kind}".from_merge_form
+        else
+          m."%{version}"."%{kind}".from_merge_form
+      in
+
+      # TODO: make overlays an array of overlays and filter those based on the matching requires
+      #       i.e. match on apiVersion and kind, and then if the overlay has a name, it applies only to the matching resource
       let rName = resource.metadata.name in
-      if std.record.has_field rKind overlays then
-        (
-          (resource | toArrayC.v1.Pod)
-          & (
-            (std.record.get rKind overlays) | toArrayC.v1.Pod
-          )
-        ) #| fromArrayC.apps.v1.Deployment
+      if std.record.has_field kind overlays then
+        let mergableResource = to_mergeable resource in
+        let mergableOverlay = to_mergeable (std.record.get kind overlays) in
+        let final = mergableResource & mergableOverlay in
+        from_mergeable final
       else
         resource,
 

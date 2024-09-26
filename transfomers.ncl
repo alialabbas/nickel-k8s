@@ -33,7 +33,7 @@ let all = import "all.ncl" in
       },
   HeadlessServiceForWorkload
     | doc "Create a headless service matchings the pod template in the worload spec"
-    | all."apps/v1".Deployment -> all.v1.Service
+    | all.apps.v1.Deployment -> all.v1.Service
     = fun value =>
       let svc = ServiceFromDeployment value in
       svc
