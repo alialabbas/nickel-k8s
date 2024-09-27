@@ -265,5 +265,14 @@ let otelConfig = import "./config.yaml" in
         ]
       },
     },
+  ],
+  Constraints = [
+    {
+      apiVersion = "apps/v1",
+      kind = "Deployment",
+      spec = {
+        replicas | std.contract.from_predicate (fun val => val > 10),
+      },
+    },
   ]
 } | Release

@@ -52,9 +52,9 @@ let collectionOfPathces
       Constraints
         | doc "This is a not exported field, user of its parent contract can't evaluate the nickel program on its own, that program in itself is meaningless, if you are failing and looking here export to yaml or json, the consumer of these configs are expecting json/yaml"
         | not_exported
-        | { _ | Patch }
+        | Array Patch
         | default
-        = {},
+        = [],
       Kinds
         | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
         | not_exported
@@ -193,7 +193,7 @@ let collectionOfPathces
           let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
           let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
           let r = if group != "" then m."%{group}" else all in
-          if group != "" && !std.record.has_field group m then
+          if group != "" && !std.record.has_field group all then
             'Error { message = "group `%{value.apiVersion}` doesn't exist" }
           else if !std.record.has_field version r then
             'Error { message = "version `%{version}` in apiVersion is invalid" }
@@ -251,14 +251,16 @@ let collectionOfPathces
       in from_mergeable merged,
 
   Enforcer
-  # : forall a. { _ : { apiVersion | String, kind | String, ..} } -> { apiVersion: String, kind:  String; a } -> _
     | doc "Dynamically apply a contract on a list of resources"
-    | { .. } -> lib.k8s.Manifest -> lib.k8s.Manifest
+    | Array Patch -> lib.k8s.Manifest -> lib.k8s.Manifest
     = fun contraints resource =>
-      let rName = resource.kind in
-      if std.record.has_field rName contraints then
-        let contract = (std.record.get rName contraints) in
-        resource | std.contract.apply contract
-      else
-        resource,
+      std.array.fold_right
+        (fun e acc =>
+          if e.apiVersion == resource.apiVersion && e.kind == resource.kind then
+            acc | e
+          else
+            acc
+        )
+        resource
+        contraints,
 }
