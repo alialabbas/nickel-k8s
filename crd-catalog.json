@@ -2,13 +2,13 @@
   {
     "owner": "istio",
     "repo": "istio",
-    "rev": "master",
+    "rev": "refs/tags/1.23.2",
     "path": "manifests/charts/base/crds/crd-all.gen.yaml"
   },
   {
     "owner": "prometheus-operator",
     "repo": "prometheus-operator",
-    "rev": "master",
+    "rev": "refs/tags/v0.77.1",
     "path": "bundle.yaml"
   },
   {

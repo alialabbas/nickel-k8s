@@ -34,7 +34,7 @@ while read -r crd; do
 
 	log_info "Downloading crd for $repo"
 	if [ "$url" != "null" ]; then
-		# TODO: url could just be the uri path to the github repo and then the rest comes from here
+		# TODO: url is only for repos that doesn't have a single manifest and publish the aggregated version in their release
 		curl --silent -L "$url" -H "Accept: application/octet-stream" --output "$dir/crd.yaml"
 	else
 		curl --silent --output "$dir/crd.yaml" "https://raw.githubusercontent.com/$owner/$repo/$rev/$path"

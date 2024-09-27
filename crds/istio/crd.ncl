@@ -5,63 +5,6 @@ let lib = import "lib.ncl" in
   telemetry.istio.io.v1alpha1.telemetries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -361,63 +304,6 @@ let lib = import "lib.ncl" in
   telemetry.istio.io.v1.telemetries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -717,63 +603,6 @@ let lib = import "lib.ncl" in
   security.istio.io.v1beta1.requestauthentications = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -887,63 +716,6 @@ let lib = import "lib.ncl" in
   security.istio.io.v1.requestauthentications = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -1057,63 +829,6 @@ let lib = import "lib.ncl" in
   security.istio.io.v1beta1.peerauthentications = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -1153,63 +868,6 @@ let lib = import "lib.ncl" in
   security.istio.io.v1.peerauthentications = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -1249,63 +907,6 @@ let lib = import "lib.ncl" in
   security.istio.io.v1beta1.authorizationpolicies = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -1496,63 +1097,6 @@ let lib = import "lib.ncl" in
   security.istio.io.v1.authorizationpolicies = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -1743,63 +1287,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.workloadgroups = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -1966,63 +1453,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.workloadgroups = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -2189,63 +1619,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.workloadgroups = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -2412,63 +1785,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.workloadentries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -2502,63 +1818,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.workloadentries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -2592,63 +1851,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.workloadentries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -2682,63 +1884,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.virtualservices = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -3925,63 +3070,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.virtualservices = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -5168,63 +4256,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.virtualservices = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -6411,63 +5442,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.sidecars = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -6753,63 +5727,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.sidecars = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -7095,63 +6012,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.sidecars = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -7437,63 +6297,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.serviceentries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -7578,63 +6381,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.serviceentries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -7719,63 +6465,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.serviceentries = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -7860,63 +6549,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.proxyconfigs = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -7952,63 +6584,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.gateways = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -8100,63 +6675,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.gateways = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -8248,63 +6766,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.gateways = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -8396,63 +6857,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.envoyfilters = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -8695,63 +7099,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1beta1.destinationrules = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -10316,63 +8663,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1alpha3.destinationrules = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -11937,63 +10227,6 @@ let lib = import "lib.ncl" in
   networking.istio.io.v1.destinationrules = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
@@ -13558,63 +11791,6 @@ let lib = import "lib.ncl" in
   extensions.istio.io.v1alpha1.wasmplugins = {
     status
       | {
-        validationMessages
-          | (
-            Array {
-              type
-                | {
-                  name
-                    | String
-                    | optional,
-                  code
-                    | String
-                    | optional,
-                  ..
-                }
-                | optional,
-              level
-                | lib.enum.StringOrEnum [| '"INFO", '"WARNING", '"ERROR", '"UNKNOWN", |]
-                | optional,
-              documentationUrl
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
-        observedGeneration
-          | (
-            std.contract.any_of [
-              String,
-              std.number.Integer,
-            ]
-          )
-          | optional,
-        conditions
-          | (
-            Array {
-              type
-                | String
-                | optional,
-              status
-                | String
-                | optional,
-              reason
-                | String
-                | optional,
-              message
-                | String
-                | optional,
-              lastTransitionTime
-                | String
-                | optional,
-              lastProbeTime
-                | String
-                | optional,
-              ..
-            }
-          )
-          | optional,
         ..
       }
       | optional,
