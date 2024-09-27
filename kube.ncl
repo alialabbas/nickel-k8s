@@ -12,6 +12,24 @@ let collectionOfPathces
     else
       std.contract.blame label
   in
+# simple contract to ensure a patch/resource is of known group/version
+let ApiValid =
+  std.contract.custom (fun label value =>
+    let kind = value.kind in
+    let rApiVersion = std.string.split "/" value.apiVersion in
+    let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
+    let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
+    let r = if group != "" then m."%{group}" else all in
+    if group != "" && !std.record.has_field group all then
+      'Error { message = "group `%{value.apiVersion}` doesn't exist" }
+    else if !std.record.has_field version r then
+      'Error { message = "version `%{version}` in apiVersion is invalid" }
+    else if !std.record.has_field kind r."%{version}" then
+      'Error { message = "Invalid kind in Patch `%{kind}`" }
+    else
+      'Ok value
+  )
+in
 {
   Release
     | doc m%%"
@@ -183,27 +201,6 @@ let collectionOfPathces
     | doc m%"Given a list of Overlays, find the one affecting the resource based on their kind or metadata.name and merge them"%
     | Array Patch -> lib.k8s.Manifest -> lib.k8s.Manifest
     = fun overlays resource =>
-      # This looks like the duplicated code below it BUT IT IS NOT
-      # All the fields here needs be accessed by value wrapped in the contract for the diagnostic system to kick in
-      # point out exactly which overlay/resource is the offending one, aka invalid
-      let ApiValid = (
-        std.contract.custom (fun label value =>
-          let kind = value.kind in
-          let rApiVersion = std.string.split "/" value.apiVersion in
-          let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
-          let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
-          let r = if group != "" then m."%{group}" else all in
-          if group != "" && !std.record.has_field group all then
-            'Error { message = "group `%{value.apiVersion}` doesn't exist" }
-          else if !std.record.has_field version r then
-            'Error { message = "version `%{version}` in apiVersion is invalid" }
-          else if !std.record.has_field kind r."%{version}" then
-            'Error { message = "Invalid kind in Patch `%{kind}`" }
-          else
-            'Ok value
-        )
-      )
-      in
       let resource = resource | ApiValid in
 
       let kind = resource.kind in
@@ -256,6 +253,7 @@ let collectionOfPathces
     = fun contraints resource =>
       std.array.fold_right
         (fun e acc =>
+          let e = e | ApiValid in
           if e.apiVersion == resource.apiVersion && e.kind == resource.kind then
             acc | e
           else
