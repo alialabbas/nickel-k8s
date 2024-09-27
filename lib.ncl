@@ -393,6 +393,12 @@ let OnlyWhenInOrNotIn
   },
 
   records = {
+    NonEmpty =
+      std.contract.from_validator (match {
+        r if std.record.length r == 0 => 'Error { message = "Record can't be empty" },
+        _ => 'Ok,
+      }
+      ),
     # there needs to be an IsRecord contract that allow us to check if a contract is valid or not
     # I guess this means any record needs to be modeled using this IsRecord/JsonObject model
     # AnyOf can't work with lazy contrats, OneOf can't, Not can't
