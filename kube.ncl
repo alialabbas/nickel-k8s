@@ -49,23 +49,6 @@ in
               |> std.array.map (fun e => Enforcer Constraints e)
             ) | ManifestsValidation Kinds
         }, # | (import "self-contained-release.ncl"),
-      Dns
-        | doc "Kubernetes Deployments are loosely dependent, different deployments need addressable domain to other service. This object creates the default kubernetes dns entry for each service define in manifests"
-        =
-          let services =
-            Manifests
-            |> std.record.to_array
-            |> std.array.filter (fun e => e.value.kind == "Service")
-          in
-          services
-          |> std.array.map (fun e => e.value)
-          |> std.array.fold_right
-            (fun s acc =>
-              let domain = s.metadata.name ++ "." ++ s.metadata.namespace ++ ClusterDomain in
-              let r = std.array.fold_right (fun p acc => std.record.insert p.name (domain ++ ":" ++ std.to_string p.port) acc) {} s.spec.ports in
-              std.record.insert s.metadata.name r acc
-            )
-            {},
       Overlays | Array Patch | default = [],
       Constraints
         | doc "This is a not exported field, user of its parent contract can't evaluate the nickel program on its own, that program in itself is meaningless, if you are failing and looking here export to yaml or json, the consumer of these configs are expecting json/yaml"
@@ -94,7 +77,7 @@ in
         | Array Patch
         | default
         = [],
-      Constraints | { _ | Patch } | default = {},
+      Constraints | Array Patch | default = [],
 
       Kinds
         | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
@@ -112,12 +95,7 @@ in
               (
                 Releases
                 |> std.record.values
-                |> std.array.map (fun e =>
-                  e.Manifests
-                  |> std.record.values
-                  |> std.array.map (fun m => Patcher e.Overlays m)
-                  |> std.array.map (fun m => Enforcer e.Constraints m)
-                )
+                |> std.array.map (fun e => e.Package.items)
                 |> std.array.flatten
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
