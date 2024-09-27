@@ -246,8 +246,8 @@ let otelConfig = import "./config.yaml" in
       },
     },
   },
-  Overlays = {
-    Deployment = {
+  Overlays = [
+    {
       apiVersion = "apps/v1",
       kind = "Deployment",
       spec = {
@@ -265,5 +265,5 @@ let otelConfig = import "./config.yaml" in
         ]
       },
     },
-  },
+  ]
 } | Release

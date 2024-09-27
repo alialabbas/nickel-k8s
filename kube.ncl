@@ -48,7 +48,7 @@ let collectionOfPathces
               std.record.insert s.metadata.name r acc
             )
             {},
-      Overlays | { _ | Patch } | default = {},
+      Overlays | Array Patch | default = [],
       Constraints
         | doc "This is a not exported field, user of its parent contract can't evaluate the nickel program on its own, that program in itself is meaningless, if you are failing and looking here export to yaml or json, the consumer of these configs are expecting json/yaml"
         | not_exported
@@ -73,9 +73,9 @@ let collectionOfPathces
           Arbitrary Patches to apply to all resources in the computed environment.Overlays.
           If you need to target a specific Release use Overlays property in the orignal Release Config
         "%%
-        | { _ | Patch }
+        | Array Patch
         | default
-        = {},
+        = [],
       Constraints | { _ | Patch } | default = {},
 
       Kinds
@@ -169,7 +169,7 @@ let collectionOfPathces
         {},
   Patch
     | doc "describe a kubenretes patch that target a manfifest by kind + metadata.name"
-    = { apiVersion | String, kind | String, metadata.name | String | optional, .. },
+    = { apiVersion | String, kind | String, metadata | { name | String | optional, .. } | optional, .. },
 
   Constraints
     | doc "contraints are a collection of patches used to close the orignal contract of a resource"
@@ -181,8 +181,31 @@ let collectionOfPathces
 
   Patcher
     | doc m%"Given a list of Overlays, find the one affecting the resource based on their kind or metadata.name and merge them"%
-    | Patch -> lib.k8s.Manifest -> lib.k8s.Manifest
+    | Array Patch -> lib.k8s.Manifest -> lib.k8s.Manifest
     = fun overlays resource =>
+      # This looks like the duplicated code below it BUT IT IS NOT
+      # All the fields here needs be accessed by value wrapped in the contract for the diagnostic system to kick in
+      # point out exactly which overlay/resource is the offending one, aka invalid
+      let ApiValid = (
+        std.contract.custom (fun label value =>
+          let kind = value.kind in
+          let rApiVersion = std.string.split "/" value.apiVersion in
+          let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
+          let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
+          let r = if group != "" then m."%{group}" else all in
+          if group != "" && !std.record.has_field group m then
+            'Error { message = "group `%{value.apiVersion}` doesn't exist" }
+          else if !std.record.has_field version r then
+            'Error { message = "version `%{version}` in apiVersion is invalid" }
+          else if !std.record.has_field kind r."%{version}" then
+            'Error { message = "Invalid kind in Patch `%{kind}`" }
+          else
+            'Ok value
+        )
+      )
+      in
+      let resource = resource | ApiValid in
+
       let kind = resource.kind in
       let rApiVersion = std.string.split "/" resource.apiVersion in
       let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
@@ -202,16 +225,30 @@ let collectionOfPathces
           m."%{version}"."%{kind}".from_merge_form
       in
 
-      # TODO: make overlays an array of overlays and filter those based on the matching requires
-      #       i.e. match on apiVersion and kind, and then if the overlay has a name, it applies only to the matching resource
-      let rName = resource.metadata.name in
-      if std.record.has_field kind overlays then
-        let mergableResource = to_mergeable resource in
-        let mergableOverlay = to_mergeable (std.record.get kind overlays) in
-        let final = mergableResource & mergableOverlay in
-        from_mergeable final
-      else
-        resource,
+      let merged = (
+        std.array.fold_right
+          (fun e acc =>
+            let e = e | ApiValid in
+            let is_overlay_apply_to_resource = e.apiVersion == resource.apiVersion && e.kind == resource.kind in
+            let overlay_has_name = std.record.has_field "name" (std.record.get_or "metadata" {} e) in
+            let is_over_matching_name = e.metadata.name == resource.metadata.name in
+            e
+            |> match {
+              { metadata = { name }, .. } if is_over_matching_name && is_overlay_apply_to_resource => acc & (to_mergeable e),
+              # TODO: add label checking, the issue with matching on labels is how do you deal with injecting them
+              # i.e. match all deployment with a given label pair, then how do we also override all deployments to add once specific label
+              # This bigs the question around how to apply blanket manipulation on all data trivially
+              # I want to get a module and prefix all resources names because I am using it twice under two separate contexts
+              # name, labels, annotations, all of those could have a simple metadata input
+              { metadata = { labels }, .. } if is_overlay_apply_to_resource => acc & (to_mergeable e),
+              { ..rest } if !std.record.has_field "metadata" rest && is_overlay_apply_to_resource => acc & (to_mergeable e),
+              _ => acc,
+            }
+          )
+          (to_mergeable resource)
+          overlays
+      )
+      in from_mergeable merged,
 
   Enforcer
   # : forall a. { _ : { apiVersion | String, kind | String, ..} } -> { apiVersion: String, kind:  String; a } -> _
