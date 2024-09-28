@@ -176,7 +176,7 @@ let otelConfig = import "./config.yaml" in
                   },
                   { name = "overlayed-env", value = "overridden" },
                 ],
-                image = "otel/opentelemetry-collector-contrib:" ++ Inputs.version,
+                image | default = "otel/opentelemetry-collector-contrib:" ++ Inputs.version,
                 imagePullPolicy = "IfNotPresent",
                 name = "opentelemetry-collector",
                 ports = [
@@ -246,33 +246,4 @@ let otelConfig = import "./config.yaml" in
       },
     },
   },
-  Overlays = [
-    {
-      apiVersion = "apps/v1",
-      kind = "Deployment",
-      spec = {
-        replicas | force = 20,
-        template.spec.containers = [
-          {
-            name = "opentelemetry-collector",
-            env = [
-              {
-                name = "overlayed-env",
-                value | force = "test-val",
-              }
-            ],
-          },
-        ]
-      },
-    },
-  ],
-  Constraints = [
-    {
-      apiVersion = "apps/v1",
-      kind = "Deployment",
-      spec = {
-        replicas | std.contract.from_predicate (fun val => val > 10),
-      },
-    },
-  ]
 } | Release
