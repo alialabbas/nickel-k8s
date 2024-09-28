@@ -12,7 +12,21 @@ let collectionOfPathces
     else
       std.contract.blame label
   in
-let ResourceMetadataHandler | lib.k8s.Manifest -> { .. }  -> lib.k8s.Manifest
+let ResourceMetadataHandler | lib.k8s.Manifest -> { .. } -> lib.k8s.Manifest
+  = fun resource input =>
+    resource
+    & {
+      # The proprity here is import to allow us to avoid conflicts with default values
+      # TODO: reconsider adding the defautl namespace instead of just ignoring it. The latter would make it more clear
+      metadata = {
+        name = input.prefix ++ resource.metadata.name ++ input.suffix,
+        labels = input.labels,
+        annotations = input.annotations,
+      }
+    }
+    & (if input.namespace != "" then { metadata = { namespace | priority 2 = input.namespace } } else {})
+  in
+let EnvMetadataHandler | lib.k8s.Manifest -> { .. } -> lib.k8s.Manifest
   = fun resource input =>
     resource
     & {
@@ -20,9 +34,9 @@ let ResourceMetadataHandler | lib.k8s.Manifest -> { .. }  -> lib.k8s.Manifest
         name = input.prefix ++ resource.metadata.name ++ input.suffix,
         labels = input.labels,
         annotations = input.annotations,
-        namespace = input.namespace
       }
     }
+    & (if input.namespace != "" then { metadata.namespace | priority 1 = input.namespace } else {})
   in
 # simple contract to ensure a patch/resource is of known group/version
 let ApiValid =
@@ -42,6 +56,24 @@ let ApiValid =
       'Ok value
   )
 in
+let ModuleInputs
+  | doc "Inputs for manipulating common operation kubernetes resources"
+  = {
+    prefix | doc "Prefix all resources with the specified string" | String | default = "",
+    suffix | doc "Suffix all resources with the specified string" | default = "",
+    labels
+      | doc "Adds a static set of labels to all resources, only at the top level and not on embedded resources"
+      | lib.k8s.Labels
+      | default
+      = {},
+    annotations
+      | doc "Add a static set of annotations to all resources, only at the top level and not on embedded resource"
+      | lib.k8s.Annotations
+      | default
+      = {},
+    namespace | doc "The namespace for the release" | String | default = "default",
+  }
+  in
 {
   Release
     | doc m%"
@@ -59,22 +91,9 @@ in
             Inputs | schema | optional,
             ReleaseInputs
               | doc "Inputs for manipulating common operation kubernetes resources"
-              | {
-                prefix | doc "Prefix all resources with the specified string" | String | default = "",
-                suffix | doc "Suffix all resources with the specified string" | default = "",
-                labels
-                  | doc "Adds a static set of labels to all resources, only at the top level and not on embedded resources"
-                  | lib.k8s.Labels
-                  | default
-                  = {},
-                annotations
-                  | doc "Add a static set of annotations to all resources, only at the top level and not on embedded resource"
-                  | lib.k8s.Annotations
-                  | default
-                  = {},
-                namespace | doc "The namespace for the release" | String | default = "default",
-              }
-              | default = {},
+              | ModuleInputs
+              | default
+              = {},
             Manifests
               | { _ : lib.k8s.Manifest },
             Package
@@ -118,6 +137,12 @@ in
         = [],
       Constraints | Array Patch | default = [],
 
+      ReleaseInputs
+        | doc "Global Env Overrides that would apply to all resources, this is applied after the individual reslease overrides "
+        | ModuleInputs
+        | default
+        = {},
+
       Kinds
         | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
         | not_exported
@@ -136,6 +161,7 @@ in
                 |> std.record.values
                 |> std.array.map (fun e =>
                   # NOTE: Manifests is used because Contract Fields are carried over even when not defined
+                  # This would cause the next manifest validation to fail on many mutual exclusion tests
                   e.Manifests
                   |> std.record.values
                   |> std.array.map (fun m => ResourceMetadataHandler m e.ReleaseInputs)
@@ -143,6 +169,7 @@ in
                   |> std.array.map (fun m => Enforcer e.Constraints m)
                 )
                 |> std.array.flatten
+                |> std.array.map (fun m => EnvMetadataHandler m ReleaseInputs)
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
               ) | ManifestsValidation Kinds
