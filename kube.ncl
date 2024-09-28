@@ -164,7 +164,7 @@ let ModuleInputs
                   # This would cause the next manifest validation to fail on many mutual exclusion tests
                   e.Manifests
                   |> std.record.values
-                  |> std.array.map (fun m => ResourceMetadataHandler m e.ReleaseInputs)
+                  |> std.array.map (fun m => ResourceMetadataHandler e.ReleaseInputs m)
                   |> std.array.map (fun m => Patcher e.Overlays m)
                   |> std.array.map (fun m => Enforcer e.Constraints m)
                 )
