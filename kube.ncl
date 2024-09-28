@@ -13,13 +13,13 @@ let collectionOfPathces
       std.contract.blame label
   in
 let ResourceMetadataHandler | lib.k8s.Manifest -> { .. } -> lib.k8s.Manifest
-  = fun resource input =>
+  = fun input resource =>
     resource
     & {
       # The proprity here is import to allow us to avoid conflicts with default values
       # TODO: reconsider adding the defautl namespace instead of just ignoring it. The latter would make it more clear
       metadata = {
-        name = input.prefix ++ resource.metadata.name ++ input.suffix,
+        name | priority 2 = input.prefix ++ resource.metadata.name ++ input.suffix,
         labels = input.labels,
         annotations = input.annotations,
       }
@@ -27,7 +27,7 @@ let ResourceMetadataHandler | lib.k8s.Manifest -> { .. } -> lib.k8s.Manifest
     & (if input.namespace != "" then { metadata = { namespace | priority 2 = input.namespace } } else {})
   in
 let EnvMetadataHandler | lib.k8s.Manifest -> { .. } -> lib.k8s.Manifest
-  = fun resource input =>
+  = fun input resource =>
     resource
     & {
       metadata = {
@@ -102,7 +102,7 @@ let ModuleInputs
                 items =
                   (
                     std.record.values Manifests
-                    |> std.array.map (fun e => ResourceMetadataHandler e ReleaseInputs)
+                    |> std.array.map (fun e => ResourceMetadataHandler ReleaseInputs e)
                     |> std.array.map (fun e => Patcher Overlays e)
                     |> std.array.map (fun e => Enforcer Constraints e)
                   ) | ManifestsValidation Kinds
@@ -169,7 +169,7 @@ let ModuleInputs
                   |> std.array.map (fun m => Enforcer e.Constraints m)
                 )
                 |> std.array.flatten
-                |> std.array.map (fun m => EnvMetadataHandler m ReleaseInputs)
+                |> std.array.map (fun e => EnvMetadataHandler ReleaseInputs e )
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
               ) | ManifestsValidation Kinds
