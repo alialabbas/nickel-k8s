@@ -95,7 +95,13 @@ in
               (
                 Releases
                 |> std.record.values
-                |> std.array.map (fun e => e.Package.items)
+                |> std.array.map (fun e =>
+                  # NOTE: Manifests is used because Contract Fields are carried over even when not defined
+                  e.Manifests
+                  |> std.record.values
+                  |> std.array.map (fun m => Patcher e.Overlays m)
+                  |> std.array.map (fun m => Enforcer e.Constraints m)
+                )
                 |> std.array.flatten
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
@@ -132,7 +138,7 @@ in
                   else
                     allContracts."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
                 in
-                let serverSideContract =
+                let serverSideContract = # TODO: server side should be optional only when it exists
                   if std.array.length api_and_group == 1 then
                     serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
                   else
@@ -141,10 +147,13 @@ in
                 (
                   e
                   & {
-                    metadata.labels = {
-                      "kubernetes.io/managed-by" = "nickel-k8s",
-                      # TODO: annotation is more appropriate here
-                      # "nickel-k8s/hash" = packageHash,
+                    metadata = {
+                      labels = {
+                        "kubernetes.io/managed-by" = "nickel-k8s",
+                      },
+                      annotations = {
+                        "nickel-k8s/hash" = packageHash,
+                      }
                     }
                   }
                 ) | serverSideContract | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
@@ -167,14 +176,6 @@ in
     | doc "describe a kubenretes patch that target a manfifest by kind + metadata.name"
     = { apiVersion | String, kind | String, metadata | { name | String | optional, .. } | optional, .. },
 
-  Constraints
-    | doc "contraints are a collection of patches used to close the orignal contract of a resource"
-    = collectionOfPathces,
-
-  Overlays
-    | doc "an overlay is a collection of patches that describe to merge with a resource"
-    = { _ | lib.k8s.Manifest },
-
   Patcher
     | doc m%"Given a list of Overlays, find the one affecting the resource based on their kind or metadata.name and merge them"%
     | Array Patch -> lib.k8s.Manifest -> lib.k8s.Manifest
@@ -188,9 +189,17 @@ in
       let to_mergeable =
         if group != "" then
           # core apis don't have a group
-          m."%{group}"."%{version}"."%{kind}".to_merge_form
+          lib.records.get_value_at_path [group, version, kind] m
+          |> match {
+            'NotFound => fun value => value,
+            _ => m."%{group}"."%{version}"."%{kind}".to_merge_form,
+          }
         else
-          m."%{version}"."%{kind}".to_merge_form
+          lib.records.get_value_at_path [version, kind] m
+          |> match {
+            'NotFound => fun value => value,
+            _ => m."%{version}"."%{kind}".to_merge_form
+          }
       in
       let from_mergeable =
         if group != "" then
