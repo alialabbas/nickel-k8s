@@ -8,6 +8,10 @@ let ConfigData =
 in
 {
   v1 = {
+    Namespace = {
+      metadata | lib.k8s.ResourceMetadata,
+      ..
+    },
     Secret = {
       apiVersion | String | force = "v1",
       kind | String | force = "Secret",
@@ -18,7 +22,6 @@ in
       stringData | ConfigData | { _ : String } | optional,
       ..
     },
-
     ConfigMap = {
       apiVersion | String | force = "v1",
       kind | String | force = "ConfigMap",
