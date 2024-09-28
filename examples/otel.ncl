@@ -28,13 +28,14 @@ let commonLabels : String -> String -> { _ : String }
 
 let otelConfig = import "./config.yaml" in
 
+# Defining the schema, then passing it and having to define its input again kind doesn't make sense
+let InputSchema = {
+  version | String | default = "0.0.97",
+  releaseName | doc "release name controls metadata.name across all manifest" | String | default = "opentelemetry-collector",
+}
+in
 {
-  Inputs | not_exported
-    = {
-      version | String | default = "0.0.97",
-      namespace | String | default = "monitoring",
-      releaseName | doc "release name controls metadata.name across all manifest" | String | default = "opentelemetry-collector",
-    },
+  Inputs = InputSchema,
   Manifests = {
     serviceAccount = {
       apiVersion = "v1",
@@ -42,7 +43,6 @@ let otelConfig = import "./config.yaml" in
       metadata = {
         labels = commonLabels Inputs.releaseName Inputs.version,
         name = appName Inputs.releaseName,
-        namespace = Inputs.namespace,
       },
     },
     configMap = {
@@ -59,7 +59,6 @@ let otelConfig = import "./config.yaml" in
       metadata = {
         labels = commonLabels Inputs.releaseName Inputs.version,
         name = appName Inputs.releaseName,
-        namespace = Inputs.namespace,
       },
     },
     service =
@@ -69,7 +68,6 @@ let otelConfig = import "./config.yaml" in
         metadata = {
           labels = commonLabels Inputs.releaseName Inputs.version,
           name = appName Inputs.releaseName,
-          namespace = Inputs.namespace,
         },
         spec = {
           internalTrafficPolicy = "Cluster",
@@ -122,7 +120,6 @@ let otelConfig = import "./config.yaml" in
       metadata = {
         labels = commonLabels Inputs.releaseName Inputs.version,
         name = appName Inputs.releaseName,
-        namespace = Inputs.namespace,
       },
       spec = {
         replicas = 1,
@@ -155,7 +152,8 @@ let otelConfig = import "./config.yaml" in
         strategy = { type = "RollingUpdate", rollingUpdate.maxSurge = 10, rollingUpdate.maxUnavailable = 50 },
         template = {
           metadata = {
-            labels = commonLabels Inputs.releaseName Inputs.version,
+            # labels = commonLabels Inputs.releaseName Inputs.version,
+            labels = deployment.metadata.labels,
           },
           spec = {
             containers = [
@@ -246,4 +244,4 @@ let otelConfig = import "./config.yaml" in
       },
     },
   },
-} | Release
+} | Release InputSchema

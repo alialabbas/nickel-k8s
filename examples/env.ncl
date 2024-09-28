@@ -26,14 +26,24 @@ let p = import "../policies.ncl" in
       ..
     }
   ],
+  ReleaseInputs = {
+    namespace = "not-used", # this is not overriden because the release namespace is set for otel package
+    labels = {
+      "myorg.myteam/env" = "prod",
+    }
+  },
   Releases =
     {
+      # with name prefixing, this gets interesting.
+      # this inputs stuff should be after the overlays but before constraints
+      # constraints are generic so it would make sense to check for certain thing based on the label
       opentelemetry-collector =
         (import "otel.ncl")
         & {
           Constraints = [
             p.Deployment.ImageAllowed ["test"],
-            p.Deployment.RequestResourceSet,
+            p.Deployment.ResourceRequestsIsSet,
+            p.Deployment.ResourceLimitIsSet
           ],
           Overlays = [
             {
@@ -50,6 +60,10 @@ let p = import "../policies.ncl" in
                         cpu = "1",
                         memory = "10Gi",
                       },
+                      limits = {
+                        cpu = "1",
+                        memory = "20Gi",
+                      },
                     },
                   },
                 ]
@@ -59,6 +73,8 @@ let p = import "../policies.ncl" in
         },
       namespaces =
         {
+          # TODO: This still leaks left over values due to merging behaviors
+          Inputs = {} | {},
           Manifests = {
             monitoring = {
               apiVersion = "v1",
@@ -66,7 +82,7 @@ let p = import "../policies.ncl" in
               metadata.name = "monitoring"
             },
           },
-        } | k.Release,
+        } | k.Release {},
     }
     # This is explicitly loaded here to ensure we have the correct computation of variables all the time
     & (import "./versions.ncl")
