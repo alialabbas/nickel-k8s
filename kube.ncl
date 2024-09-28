@@ -32,43 +32,50 @@ let ApiValid =
 in
 {
   Release
-    | doc m%%"
+    | doc m%"
       Release is the core contract and the only contract that you need to apply to your config to ensure what you are producing is a valid set of kubernetes resources.
       This is an extensible contract which allows you to add CRDs, Compute Service DNS records, Apply Overlays and Constraints without breaking any of the kubernetes resources.
-    "%%
-    = {
-      Inputs | { .. } | optional, # This can't be validated by us, this is up to the user to decide how to use it or even better not use it
-      Manifests | { _ : lib.k8s.Manifest },
-      Package
-        | lib.k8s.List
-        = {
-          items =
-            (
-              std.record.values Manifests
-              |> std.array.map (fun e => Patcher Overlays e)
-              |> std.array.map (fun e => Enforcer Constraints e)
-            ) | ManifestsValidation Kinds
-        }, # | (import "self-contained-release.ncl"),
-      Overlays | Array Patch | default = [],
-      Constraints
-        | doc "This is a not exported field, user of its parent contract can't evaluate the nickel program on its own, that program in itself is meaningless, if you are failing and looking here export to yaml or json, the consumer of these configs are expecting json/yaml"
-        | not_exported
-        | Array Patch
-        | default
-        = [],
-      Kinds
-        | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
-        | not_exported
-        | { _ | lib.k8s.Manifest }
-        | default
-        = {},
-      ClusterDomain | not_exported | String | default = ".cluster.local",
-    },
+    "%
+    # NOTE: naked contract because we want to fail early and drop laziness when possible
+    = fun schema label value =>
+      let type = std.typeof schema in
+      if type != 'Record then
+        'Error { message = "schema should be a record, got `%{std.to_string type}`" }
+      else
+        value
+          | {
+            Inputs | schema | optional,
+            Manifests | { _ : lib.k8s.Manifest },
+            Package
+              | lib.k8s.List
+              = {
+                items =
+                  (
+                    std.record.values Manifests
+                    |> std.array.map (fun e => Patcher Overlays e)
+                    |> std.array.map (fun e => Enforcer Constraints e)
+                  ) | ManifestsValidation Kinds
+              }, # | (import "self-contained-release.ncl"),
+            Overlays | Array Patch | default = [],
+            Constraints
+              | doc "This is a not exported field, user of its parent contract can't evaluate the nickel program on its own, that program in itself is meaningless, if you are failing and looking here export to yaml or json, the consumer of these configs are expecting json/yaml"
+              | not_exported
+              | Array Patch
+              | default
+              = [],
+            Kinds
+              | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
+              | not_exported
+              | { _ | lib.k8s.Manifest }
+              | default
+              = {},
+          },
 
   Env
     | doc "Env represents a collection of releases. This is useful when managing a fleet of application or you want to manage several releases/packages as a single unit"
     = {
-      Releases | doc "Collection of the Releases, a Release is a collection of KubeResource" | { _ | Release },
+      # TODO: Release as the return contract from the function can be typed and reused here
+      Releases | doc "Collection of the Releases, a Release is a collection of KubeResource" | { _ | (Release { .. }) },
       Overlays
         | doc m%%"
           Arbitrary Patches to apply to all resources in the computed environment.Overlays.
@@ -109,6 +116,7 @@ in
           } | lib.k8s.List | (import "self-contained-release.ncl"),
     },
 
+  # TODO: should be a function and not a contract
   ManifestsValidation
     | doc m%%"
       Extensible contract that allows to augment the native k8 contracts and introduce your own type.
