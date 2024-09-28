@@ -263,7 +263,24 @@ let lib = import "lib.ncl" in
           spec.template.spec.containers | Container.ImageAllowed registries,
           ..
         },
-    RequestResourceSet
+    ResourceLimitIsSet
+      | doc "Ensure all Deployment have CPU and Memory Configured"
+      = {
+        apiVersion = "apps/v1",
+        kind = "Deployment",
+        spec.template.spec.containers
+          | Array {
+            resources.limits
+              | {
+                cpu | Dyn,
+                memory | Dyn,
+                ..
+              },
+            ..
+          },
+        ..
+      },
+    ResourceRequestsIsSet
       | doc "Ensure all Deployment have CPU and Memory Configured"
       = {
         apiVersion = "apps/v1",
@@ -280,6 +297,6 @@ let lib = import "lib.ncl" in
             ..
           },
         ..
-      }
+      },
   },
 }
