@@ -1,4 +1,9 @@
-# This should be ideally what can't be produced by a simple referential
+# Utilities to generate a common set of dependent resources
+# e.g. from a deployment/statefulset/daemonset, generate a mapping service
+# from service get an ingress object
+# from service get prometheus servicemonitor and so on
+let all = import "all.ncl" in
+
 let fromContainerPortToServicePort = fun p =>
   {
     name = p.name,
@@ -6,14 +11,13 @@ let fromContainerPortToServicePort = fun p =>
     protocol = p.protocol,
   }
 in
-let all = import "all.ncl" in
 {
   ServiceFromDeployment
     | doc "Create a ClusterIP service from the given deployment"
-    | all."apps/v1".Deployment -> all.v1.Service
+    | all.apps.v1.Deployment -> all.v1.Service
     = fun value =>
       {
-        metadata | default = value.metadata,
+        metadata = value.metadata,
         spec = {
           type = "ClusterIP",
           ports =

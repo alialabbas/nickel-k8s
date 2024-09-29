@@ -2,7 +2,7 @@
 # Auto Generated Contracts
 let lib = import "lib.ncl" in
 {
-  telemetry.istio.io.v1alpha1.telemetries = {
+  "telemetry.istio.io".v1alpha1.Telemetry = {
     status
       | {
         ..
@@ -301,7 +301,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  telemetry.istio.io.v1.telemetries = {
+  "telemetry.istio.io".v1.Telemetry = {
     status
       | {
         ..
@@ -600,7 +600,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  security.istio.io.v1beta1.requestauthentications = {
+  "security.istio.io".v1beta1.RequestAuthentication = {
     status
       | {
         ..
@@ -713,7 +713,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  security.istio.io.v1.requestauthentications = {
+  "security.istio.io".v1.RequestAuthentication = {
     status
       | {
         ..
@@ -826,7 +826,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  security.istio.io.v1beta1.peerauthentications = {
+  "security.istio.io".v1beta1.PeerAuthentication = {
     status
       | {
         ..
@@ -865,7 +865,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  security.istio.io.v1.peerauthentications = {
+  "security.istio.io".v1.PeerAuthentication = {
     status
       | {
         ..
@@ -904,7 +904,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  security.istio.io.v1beta1.authorizationpolicies = {
+  "security.istio.io".v1beta1.AuthorizationPolicy = {
     status
       | {
         ..
@@ -1094,7 +1094,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  security.istio.io.v1.authorizationpolicies = {
+  "security.istio.io".v1.AuthorizationPolicy = {
     status
       | {
         ..
@@ -1284,7 +1284,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.workloadgroups = {
+  "networking.istio.io".v1beta1.WorkloadGroup = {
     status
       | {
         ..
@@ -1450,7 +1450,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.workloadgroups = {
+  "networking.istio.io".v1alpha3.WorkloadGroup = {
     status
       | {
         ..
@@ -1616,7 +1616,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1.workloadgroups = {
+  "networking.istio.io".v1.WorkloadGroup = {
     status
       | {
         ..
@@ -1782,7 +1782,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.workloadentries = {
+  "networking.istio.io".v1beta1.WorkloadEntry = {
     status
       | {
         ..
@@ -1815,7 +1815,7 @@ let lib = import "lib.ncl" in
       },
     ..
   },
-  networking.istio.io.v1alpha3.workloadentries = {
+  "networking.istio.io".v1alpha3.WorkloadEntry = {
     status
       | {
         ..
@@ -1848,7 +1848,7 @@ let lib = import "lib.ncl" in
       },
     ..
   },
-  networking.istio.io.v1.workloadentries = {
+  "networking.istio.io".v1.WorkloadEntry = {
     status
       | {
         ..
@@ -1881,7 +1881,7 @@ let lib = import "lib.ncl" in
       },
     ..
   },
-  networking.istio.io.v1beta1.virtualservices = {
+  "networking.istio.io".v1beta1.VirtualService = {
     status
       | {
         ..
@@ -3067,7 +3067,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.virtualservices = {
+  "networking.istio.io".v1alpha3.VirtualService = {
     status
       | {
         ..
@@ -4253,7 +4253,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1.virtualservices = {
+  "networking.istio.io".v1.VirtualService = {
     status
       | {
         ..
@@ -5439,7 +5439,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.sidecars = {
+  "networking.istio.io".v1beta1.Sidecar = {
     status
       | {
         ..
@@ -5724,7 +5724,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.sidecars = {
+  "networking.istio.io".v1alpha3.Sidecar = {
     status
       | {
         ..
@@ -6009,7 +6009,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1.sidecars = {
+  "networking.istio.io".v1.Sidecar = {
     status
       | {
         ..
@@ -6294,7 +6294,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.serviceentries = {
+  "networking.istio.io".v1beta1.ServiceEntry = {
     status
       | {
         ..
@@ -6378,7 +6378,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.serviceentries = {
+  "networking.istio.io".v1alpha3.ServiceEntry = {
     status
       | {
         ..
@@ -6462,7 +6462,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1.serviceentries = {
+  "networking.istio.io".v1.ServiceEntry = {
     status
       | {
         ..
@@ -6546,7 +6546,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.proxyconfigs = {
+  "networking.istio.io".v1beta1.ProxyConfig = {
     status
       | {
         ..
@@ -6581,7 +6581,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.gateways = {
+  "networking.istio.io".v1beta1.Gateway = {
     status
       | {
         ..
@@ -6672,7 +6672,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.gateways = {
+  "networking.istio.io".v1alpha3.Gateway = {
     status
       | {
         ..
@@ -6763,7 +6763,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1.gateways = {
+  "networking.istio.io".v1.Gateway = {
     status
       | {
         ..
@@ -6854,7 +6854,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.envoyfilters = {
+  "networking.istio.io".v1alpha3.EnvoyFilter = {
     status
       | {
         ..
@@ -7096,7 +7096,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1beta1.destinationrules = {
+  "networking.istio.io".v1beta1.DestinationRule = {
     status
       | {
         ..
@@ -8660,7 +8660,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1alpha3.destinationrules = {
+  "networking.istio.io".v1alpha3.DestinationRule = {
     status
       | {
         ..
@@ -10224,7 +10224,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  networking.istio.io.v1.destinationrules = {
+  "networking.istio.io".v1.DestinationRule = {
     status
       | {
         ..
@@ -11788,7 +11788,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  extensions.istio.io.v1alpha1.wasmplugins = {
+  "extensions.istio.io".v1alpha1.WasmPlugin = {
     status
       | {
         ..

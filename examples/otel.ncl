@@ -1,37 +1,17 @@
 let { Release, .. } = import "../kube.ncl" in
 let { ValidateServiceMatchPod, PortCheck, .. } = import "../release-validations.ncl" in
-
-let baseName = "opentelemetry-collector" in
-let appName : String -> String
-  = fun releaseName =>
-    if releaseName != "" && releaseName != baseName then
-      releaseName ++ "-" ++ baseName
-    else
-      baseName
-  in
-
-let commonLabels : String -> String -> { _ : String }
-  = fun releaseName version =>
-    let baseLabels = {
-      "app.kubernetes.io/name" = baseName,
-      "app.kubernetes.io/version" = version,
-    }
-    in
-    if releaseName != "" then
-      baseLabels
-      & {
-        "app.kubernetes.io/instance" = releaseName,
-      } | { _ : String }
-    else
-      baseLabels | { _ : String }
-  in
+let t = import "../transfomers.ncl" in
 
 let otelConfig = import "./config.yaml" in
+let getReceiverPort : String -> Number
+  = fun r =>
+    let parts = std.string.split ":" r in
+    std.array.last parts |> std.string.to_number
+  in
 
 # Defining the schema, then passing it and having to define its input again kind doesn't make sense
 let InputSchema = {
   version | String | default = "0.0.97",
-  releaseName | doc "release name controls metadata.name across all manifest" | String | default = "opentelemetry-collector",
 }
 in
 {
@@ -41,8 +21,11 @@ in
       apiVersion = "v1",
       kind = "ServiceAccount",
       metadata = {
-        labels = commonLabels Inputs.releaseName Inputs.version,
-        name = appName Inputs.releaseName,
+        labels = {
+          "app.kubernetes.io/name" = name,
+          "app.kubernetes.io/version" = Inputs.version,
+        },
+        name = "opentelemetry-collector",
       },
     },
     configMap = {
@@ -57,102 +40,27 @@ in
             ),
       },
       metadata = {
-        labels = commonLabels Inputs.releaseName Inputs.version,
-        name = appName Inputs.releaseName,
+        labels = serviceAccount.metadata.labels,
+        name = serviceAccount.metadata.name,
       },
     },
-    service =
-      {
-        apiVersion | force = "v1",
-        kind = "Service",
-        metadata = {
-          labels = commonLabels Inputs.releaseName Inputs.version,
-          name = appName Inputs.releaseName,
-        },
-        spec = {
-          internalTrafficPolicy = "Cluster",
-          ports = [
-            {
-              name = "jaeger-compact",
-              port = 6831,
-              protocol = "UDP",
-              targetPort = 6831,
-            },
-            {
-              name = "jaeger-grpc",
-              port = 14250,
-              protocol = "TCP",
-              targetPort = 14250,
-            },
-            {
-              name = "jaeger-thrift",
-              port = 14268,
-              protocol = "TCP",
-              targetPort = 14268,
-            },
-            {
-              appProtocol = "grpc",
-              name = "otlp",
-              port = 4317,
-              protocol = "TCP",
-              targetPort = 4317,
-            },
-            {
-              name = "otlp-http",
-              port = 4319,
-              protocol = "TCP",
-              targetPort = 4318,
-            },
-            {
-              name = "zipkin",
-              port = 9411,
-              protocol = "TCP",
-              targetPort = 9411,
-            },
-          ],
-          selector = commonLabels Inputs.releaseName Inputs.version,
-          type = "ClusterIP",
-        },
-      } | ValidateServiceMatchPod deployment.spec.template | PortCheck deployment.spec.template.spec,
+    service = t.ServiceFromDeployment deployment,
     deployment = {
       apiVersion = "apps/v1",
       kind = "Deployment",
       metadata = {
-        labels = commonLabels Inputs.releaseName Inputs.version,
-        name = appName Inputs.releaseName,
+        labels = serviceAccount.metadata.labels,
+        name = serviceAccount.metadata.name,
       },
       spec = {
         replicas = 1,
         revisionHistoryLimit = 10,
         selector = {
-          matchLabels = commonLabels Inputs.releaseName Inputs.version,
-          # TODO: nothing in kube really check the correctness of these expressions.
-          # Logical testing should maybe out of concern here
-          matchExpressions = [
-            {
-              key = "app.kubernetes.io/namesss",
-              operator = "DoesNotExist"
-            },
-            {
-              key = "app.kubernetes.io/name",
-              operator = "Exists",
-            },
-            {
-              key = "app.kubernetes.io/version",
-              operator = "In",
-              values = [Inputs.version, "invalid"]
-            },
-            {
-              key = "app.kubernetes.io/version",
-              operator = "NotIn",
-              values = ["invalid"],
-            },
-          ]
+          matchLabels = serviceAccount.metadata.labels,
         },
         strategy = { type = "RollingUpdate", rollingUpdate.maxSurge = 10, rollingUpdate.maxUnavailable = 50 },
         template = {
           metadata = {
-            # labels = commonLabels Inputs.releaseName Inputs.version,
             labels = deployment.metadata.labels,
           },
           spec = {
@@ -179,52 +87,55 @@ in
                 name = "opentelemetry-collector",
                 ports = [
                   {
-                    containerPort = 6831,
+                    containerPort = getReceiverPort otelConfig.receivers.jaeger.protocols.thrift_compact.endpoint,
                     name = "jaeger-compact",
                     protocol = "UDP",
                   },
                   {
-                    containerPort = 14250,
+                    containerPort = getReceiverPort otelConfig.receivers.jaeger.protocols.grpc.endpoint,
                     name = "jaeger-grpc",
                     protocol = "TCP",
                   },
                   {
-                    containerPort = 14268,
+                    containerPort = getReceiverPort otelConfig.receivers.jaeger.protocols.thrift_http.endpoint,
                     name = "jaeger-thrift",
                     protocol = "TCP",
                   },
                   {
-                    containerPort = 4317,
+                    containerPort = getReceiverPort otelConfig.receivers.otlp.protocols.grpc.endpoint,
                     name = "otlp",
                     protocol = "TCP",
                   },
                   {
-                    containerPort = 4318,
+                    containerPort = getReceiverPort otelConfig.receivers.otlp.protocols.http.endpoint,
                     name = "otlp-http",
                     protocol = "TCP",
                   },
                   {
-                    containerPort = 9411,
+                    containerPort = getReceiverPort otelConfig.receivers.zipkin.endpoint,
                     name = "zipkin",
                     protocol = "TCP",
                   }
                 ],
-                livenessProbe = { httpGet = { path = otelConfig.extensions.health_check.path, port = 13133, }, },
+                livenessProbe = {
+                  httpGet = {
+                    path = otelConfig.extensions.health_check.path,
+                    port = getReceiverPort otelConfig.extensions.health_check.endpoint,
+                  },
+                },
                 readinessProbe = livenessProbe,
                 securityContext = {},
                 volumeMounts = [
                   {
                     mountPath = "/conf",
-                    # TODO: this is a domain logic that I don't think it is possible to capture in a generic test approach
-                    # Only way is to really just separate how these stuff work
-                    name = appName Inputs.releaseName,
+                    name = serviceAccount.metadata.name,
                   }
                 ],
               }
             ],
             hostNetwork = false,
             securityContext = {},
-            serviceAccountName = appName Inputs.releaseName,
+            serviceAccountName = serviceAccount.metadata.name,
             volumes = [
               {
                 configMap = {
@@ -234,14 +145,28 @@ in
                       path = "relay.yaml",
                     },
                   ],
-                  name = appName Inputs.releaseName,
+                  name = serviceAccount.metadata.name,
                 },
-                name = appName Inputs.releaseName,
+                name = serviceAccount.metadata.name,
               }
             ],
           },
         },
       },
     },
+    svcMonitor = {
+      apiVersion = "monitoring.coreos.com/v1",
+      kind = "ServiceMonitors",
+      metadata = {
+        labels = { serviceMonitorSelector = "prometheus", },
+        name = "prometheus",
+        namespace = "prometheus",
+      },
+      spec = {
+        endpoints = [{ interval = "30s", path = "/metrics", targetPort = 9090, }],
+        namespaceSelector = { matchNames = ["prometheus"], },
+        selector = { matchLabels = { operated-prometheus = "true", }, },
+      },
+    }
   },
 } | Release InputSchema

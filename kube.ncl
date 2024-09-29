@@ -1,5 +1,5 @@
 let m = import "./k8s/v1.31.0/merge.ncl" in
-let all = (import "./k8s/v1.31.0/k8s.ncl") in
+let all = (import "./k8s/v1.31.0/k8s.ncl") & (import "./crds/all.ncl") in
 let lib = import "lib.ncl" in
 let patch = { apiVersion | String, kind | String, metadata.name | String | optional, .. } in
 # TODO: this is broken
@@ -39,13 +39,14 @@ let EnvMetadataHandler | lib.k8s.Manifest -> { .. } -> lib.k8s.Manifest
     & (if input.namespace != "" then { metadata.namespace | priority 1 = input.namespace } else {})
   in
 # simple contract to ensure a patch/resource is of known group/version
+# TODO: started losing context again, what is going on?
 let ApiValid =
   std.contract.custom (fun label value =>
     let kind = value.kind in
     let rApiVersion = std.string.split "/" value.apiVersion in
     let group = if std.array.length rApiVersion > 1 then std.array.at 0 rApiVersion else "" in
     let version = if std.array.length rApiVersion > 1 then std.array.at 1 rApiVersion else std.array.first rApiVersion in
-    let r = if group != "" then m."%{group}" else all in
+    let r = if group != "" then all."%{group}" else all in
     if group != "" && !std.record.has_field group all then
       'Error { message = "group `%{value.apiVersion}` doesn't exist" }
     else if !std.record.has_field version r then
@@ -169,7 +170,7 @@ let ModuleInputs
                   |> std.array.map (fun m => Enforcer e.Constraints m)
                 )
                 |> std.array.flatten
-                |> std.array.map (fun e => EnvMetadataHandler ReleaseInputs e )
+                |> std.array.map (fun e => EnvMetadataHandler ReleaseInputs e)
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
               ) | ManifestsValidation Kinds
@@ -210,7 +211,11 @@ let ModuleInputs
                   if std.array.length api_and_group == 1 then
                     serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
                   else
-                    serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
+                    lib.records.get_value_at_path [(std.array.at 0 api_and_group), (std.array.at 1 api_and_group), e.kind] serverSide
+                    |> match {
+                      'NotFound => Dyn,
+                      _ => serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}",
+                    }
                 in
                 (
                   e
@@ -272,7 +277,11 @@ let ModuleInputs
       let from_mergeable =
         if group != "" then
           # core apis don't have a group
-          m."%{group}"."%{version}"."%{kind}".from_merge_form
+          lib.records.get_value_at_path [group, version, kind] m
+          |> match {
+            'NotFound => fun value => value,
+            _ => m."%{group}"."%{version}"."%{kind}".from_merge_form,
+          }
         else
           m."%{version}"."%{kind}".from_merge_form
       in

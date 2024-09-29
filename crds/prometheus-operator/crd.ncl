@@ -2,7 +2,7 @@
 # Auto Generated Contracts
 let lib = import "lib.ncl" in
 {
-  monitoring.coreos.com.v1.thanosrulers = {
+  "monitoring.coreos.com".v1.ThanosRuler = {
     status
       | {
         updatedReplicas
@@ -3800,7 +3800,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1.servicemonitors = {
+  "monitoring.coreos.com".v1.ServiceMonitor = {
     spec
       | {
         targetLimit
@@ -4343,7 +4343,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1alpha1.scrapeconfigs = {
+  "monitoring.coreos.com".v1alpha1.ScrapeConfig = {
     spec
       | {
         trackTimestampsStaleness
@@ -10475,7 +10475,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1.prometheusrules = {
+  "monitoring.coreos.com".v1.PrometheusRule = {
     spec
       | {
         groups
@@ -10541,7 +10541,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1.prometheuses = {
+  "monitoring.coreos.com".v1.Prometheus = {
     status
       | {
         updatedReplicas
@@ -16570,7 +16570,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1alpha1.prometheusagents = {
+  "monitoring.coreos.com".v1alpha1.PrometheusAgent = {
     status
       | {
         updatedReplicas
@@ -21508,7 +21508,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1.probes = {
+  "monitoring.coreos.com".v1.Probe = {
     spec
       | {
         tlsConfig
@@ -22044,7 +22044,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1.podmonitors = {
+  "monitoring.coreos.com".v1.PodMonitor = {
     spec
       | {
         targetLimit
@@ -22573,7 +22573,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1.alertmanagers = {
+  "monitoring.coreos.com".v1.Alertmanager = {
     status
       | {
         updatedReplicas
@@ -26707,7 +26707,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  monitoring.coreos.com.v1alpha1.alertmanagerconfigs = {
+  "monitoring.coreos.com".v1alpha1.AlertmanagerConfig = {
     spec
       | {
         route

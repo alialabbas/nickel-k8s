@@ -2,7 +2,7 @@
 # Auto Generated Contracts
 let lib = import "lib.ncl" in
 {
-  keda.sh.v1alpha1.triggerauthentications = {
+  "keda.sh".v1alpha1.TriggerAuthentication = {
     status
       | {
         scaledobjects
@@ -402,7 +402,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  keda.sh.v1alpha1.scaledobjects = {
+  "keda.sh".v1alpha1.ScaledObject = {
     status
       | {
         scaleTargetKind
@@ -647,7 +647,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  keda.sh.v1alpha1.scaledjobs = {
+  "keda.sh".v1alpha1.ScaledJob = {
     status
       | {
         lastActiveTime
@@ -4582,7 +4582,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  keda.sh.v1alpha1.clustertriggerauthentications = {
+  "keda.sh".v1alpha1.ClusterTriggerAuthentication = {
     status
       | {
         scaledobjects
@@ -4982,7 +4982,7 @@ let lib = import "lib.ncl" in
       | optional,
     ..
   },
-  eventing.keda.sh.v1alpha1.cloudeventsources = {
+  "eventing.keda.sh".v1alpha1.CloudEventSource = {
     status
       | {
         conditions
