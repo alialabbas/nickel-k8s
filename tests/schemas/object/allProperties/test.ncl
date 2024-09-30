@@ -9,4 +9,5 @@ std.test.assert_all
       }
       in (val | contract) == val
     ),
+    ({} | contract) == {},
   ]

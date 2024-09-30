@@ -195,8 +195,8 @@ let Converters = {
         else if std.record.has_field "enum" prop then
           std.array.fold_right
             (
-              # We need to check the empty array here and escape the quotes to get '"" as a tag
-              fun e acc => acc ++ " '\"%{e}\", "
+            # We need to check the empty array here and escape the quotes to get '"" as a tag
+            fun e acc => acc ++ " '\"%{e}\", "
             )
             "lib.enum.StringOrEnum [| "
             prop.enum
@@ -234,9 +234,8 @@ let Converters = {
       defs
       |> std.record.to_array
       |> std.array.fold_right
-        (
-          fun e acc =>
-            std.trace "generated definition for %{e.field}" acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
+        (fun e acc =>
+          std.trace "generated definition for %{e.field}" acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
         )
         m%"let rec _definitions =
       {"%
@@ -275,10 +274,9 @@ let Converters = {
       let propertiesSchema =
         if schema.properties != {} then
           std.array.fold_right
-            (
-              fun e acc =>
-                let isRequired = std.array.elem e.field schema.required in
-                acc ++ "\n" ++ "%{SanitizedName e.field} \n | %{(SchemaToNickel e.value noLazy)}" ++ (if isRequired then "," else "| optional,")
+            (fun e acc =>
+              let isRequired = std.array.elem e.field schema.required in
+              acc ++ "\n" ++ "%{SanitizedName e.field} \n | %{(SchemaToNickel e.value noLazy)}" ++ (if isRequired then "," else "| optional,")
             )
             m%"{"%
             (std.record.to_array schema.properties)
@@ -291,10 +289,9 @@ let Converters = {
       let nonLazyProperties =
         if schema.properties != {} then
           std.array.fold_right
-            (
-              fun e acc =>
-                let isRequired = std.array.elem e.field schema.required in
-                acc ++ "\n" ++ "%{SanitizedName e.field} \n = { contract = %{(SchemaToNickel e.value noLazy)}" ++ ", \n optional = %{std.to_string isRequired} },"
+            (fun e acc =>
+              let isRequired = if schema.required == [] then true else std.array.elem e.field schema.required in
+              acc ++ "\n" ++ "%{SanitizedName e.field} \n = { contract = %{(SchemaToNickel e.value noLazy)}" ++ ", \n optional = %{std.to_string isRequired} },"
             )
             m%"{"%
             (std.record.to_array schema.properties)
@@ -319,7 +316,7 @@ let Converters = {
         }
         # TODO: this probably should be here as long as additional properties is bool
         # TODO: remove this oneOf condition later on
-        if !std.record.has_field "additionalProperties" schema
+        if (!std.record.has_field "additionalProperties" schema || (std.record.has_field "additionalProperties" schema && std.typeof schema.additionalProperties == 'Bool))
           && schema.patternProperties == {}
           && !noLazy => std.trace "prop only" propertiesSchema,
         _ => std.trace "modeling json object" "lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
@@ -401,8 +398,7 @@ let Converters = {
       (
         std.record.to_array schema
         |> std.array.fold_right
-          (
-            fun e acc => acc ++ e.field ++ "=" ++ (PrintConstValue e.value) ++ ",\n"
+          (fun e acc => acc ++ e.field ++ "=" ++ (PrintConstValue e.value) ++ ",\n"
           )
           "{"
       )

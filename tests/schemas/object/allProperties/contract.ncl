@@ -4,7 +4,7 @@ lib.records.JsonObject
   {
     rank = {
       contract = Number,
-      optional = false
+      optional = true
     },
   }
   {
