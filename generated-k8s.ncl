@@ -4,6 +4,7 @@ let rec jsonSchema =
   (import "schema.ncl")
   & {
     DefaultAdditionalProperties = false,
+    # override ref since we don't are evaluating all the defs inside a swagger and not a schema
     GetRef = fun ref =>
       let ref = std.string.split "/" ref in
       ref
@@ -15,7 +16,7 @@ let rec jsonSchema =
 in
 {
   # TODO: schema typing here PLEASE
-  Input | default = {}, # | { definitions | { _ | Dyn }, .. } | default = { definitions = {}, },
+  Input | { .. }, # | { definitions | { _ | Dyn }, .. } | default = { definitions = {}, },
   Output =
     let k8sSchema =
       # Kubernetes schema is so bad, this IntOrString is not really a string or int but rather just a string
@@ -36,8 +37,8 @@ in
               ],
             }
           # can't use dot notations here else the type checker would complain
-          (std.record.get_or "definitions" {} Input)
-            # Input.definitions
+            (std.record.get_or "definitions" {} Input)
+          # Input.definitions
         )
         Input
     in

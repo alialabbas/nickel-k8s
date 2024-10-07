@@ -1,18 +1,3 @@
-# TODO: add back description generation with an option flag, have to escape some magic already mind as well include the description
-# TODO: need to start including the lib because complex schemas will not be convertable otherwise
-# TODO: can't use contract changing "|" inside of anyOf and allOf and so on, probably better to wrap everything with all_of
-# TODO: handling complex arrays with items and properties and one of and any of and so on
-# TOOD: regex is not the issue, the issue the escape of the regex to this language that needs to be handled correctly
-# TODO: Look ahead and back regex. Would never work if we keep those all the time.
-# TODO: format: are those really standard or just a bunch of magic people create and use their own
-# TODO: most likely need a wrapper around basic contracts, i.e. Number only or something simple that is not wrapped inside OneOf relations
-# TODO: do we really need to declare json enums with nickel tag/enum. We are checking for value in something which is simple to do. It is more an optimization to allow the lang to do its own thing rather than relying on dictionaries
-# TODO: double check pattern matcher implemention and make sure it works correctly
-# TODO: check additional properties modifier and see if it makes sense to have it modified by the caller and not the system
-# TODO: general print cleanup to only do compelx expression when we really have to
-# BUG: ContractA | ContractB should this fail if the additional value in A is not defined in B
-# This bug means we will always need to check the subschema first then the super
-# TODO: big schema contract to avoid mistyping and faulty schemas in tests
 let Nullable | doc m%"Apply the Contract to an array and allow it to also be assigned as null"%
   = fun contract =>
     fun label value =>
@@ -115,16 +100,6 @@ let Converters = {
           ""
       in
 
-      # let oneOf =
-      #   # basically oneOf here could have a type or the type could be inferred from the core schema
-      #   # here we force it to normalize the flow
-      #   if std.record.has_field "oneOf" prop then
-      #     let mutated = std.array.map (fun e => e & { type = "number" }) prop.oneOf in
-      #     "," ++ OneOf mutated
-      #   else
-      #     ""
-      # in
-
       # NOTE: ranged is dynamically generated, it looks like NumberSchema but IT IS NOT
       # Draf4 and Draft7 of JsonScheam allow exlusiveX to be bool and the latter allows it to set the value.
       # Here we always want the value to come only mimumum and exlucisveX is just a bool decided the range to use
@@ -181,7 +156,7 @@ let Converters = {
           ""
       in
       let pattern =
-        let escapeString = fun str => std.array.fold_right(fun e acc => if e == "\\" then e ++ "\\" ++ acc else e ++ acc) "" (std.string.characters str) in
+        let escapeString = fun str => std.array.fold_right (fun e acc => if e == "\\" then e ++ "\\" ++ acc else e ++ acc) "" (std.string.characters str) in
         if std.record.has_field "pattern" prop then
           m%", lib.strings.Regex "%{escapeString prop.pattern}""% # TODO: RAW STRINGS
         else
@@ -411,73 +386,71 @@ let Converters = {
       'Record => recordAsString,
     },
 
-  # basically the options are;
-  # 1. we unpack the boolean predicate here first before we generate the contract
-  # 2. this means an extra matther before and after and we need, is there precedence order for these
-  # 3. rather than adding the pipe ourselves without knowing what schemas to generate, we should create an array that we append
-  # is the current schema always possible to pipe its properties with multiple contracts
-  SchemaToNickel = fun schema lazy =>
-    let definitions = std.record.get_or "definitions" (std.record.get_or "defs" schema {}) schema in
-    let oneOf = if std.record.has_field "oneOf" schema && std.record.has_field "type" schema then (OneOf schema.oneOf) else "" in
-    let allOf = if std.record.has_field "allOf" schema && std.record.has_field "type" schema then (AllOf schema.allOf) else "" in
-    let anyOf = if std.record.has_field "anyOf" schema && std.record.has_field "type" schema then (AnyOf schema.anyOf) else "" in
-    let isComplex =
-      lazy
-      || std.record.has_field "oneOf" schema
-      # || std.record.has_field "not" schema
-      || std.record.has_field "anyOf" schema
-      || std.record.has_field "allOf" schema
-    in
-    let schemaStr = (
-      # BUG: {$ref} is impossible to use in pattern matching
-      if std.record.has_field "$ref" schema then
-        GetRef schema."$ref"
-      else
-        schema
-        |> match {
-          {} => "Dyn",
-          { type = "string", enum, ..rest } => StringConversion schema,
-          { enum, ..rest } => Enum enum,
-          { const, ..rest } => "std.contract.from_predicate(fun val => val == %{PrintConstValue const})",
-          { type = "string", ..rest } => StringConversion schema,
-          { type = "number", ..rest } => IntConversion schema,
-          { type = "integer", ..rest } => IntConversion schema,
-          { type = "boolean", ..rest } => "Bool",
-          { type = "array", ..rest } => ArrayConversion schema,
-          { type = "object" } => "{ .. }",
-          { type = "object", description | String } => "{ .. }",
-          { type = "object", ..rest } =>  ObjectConversion schema lazy,
-          { type = "null", ..rest } => "std.contract.from_predicate(fun val => val == null)", # BUG: treesitter no handling this
-          # TODO: need a way to only generate anyOf and such if and only if we had a complex schema
-          { oneOf, ..rest } => OneOf schema.oneOf,
-          { allOf, ..rest } => AllOf schema.allOf,
-          { anyOf, ..rest } => AnyOf schema.anyOf,
-          { not, ..rest } => "(std.contract.not %{SchemaToNickel schema.not false})",
-          { type, ..rest } if std.typeof type == '"Array" => type |> std.array.map (fun e => { type = "%{e}" }) |> OneOf,
-          _ => ObjectConversion schema lazy,
-        }
-    )
-    in
-    let defs =
-      if std.record.has_field "definitions" schema then
-        GenerateDefinitions schema.definitions
-      else
-        ""
-    in
-    let convertedSchema = (std.array.filter (fun e => e != "") [schemaStr, oneOf, anyOf, allOf]) in
-    defs
-    # BUG: std.contract.any_of | std.contract.not on basic types yields incorrect result
-    # TODO: optimize this to not print out paranthesis on a single expression
-    # TODO/BUG: what happens when we do the following { basic record } | myContract, this fails in complex jsonObject with optionality
-    # basically somehow aggregating the contract seems to fail
-    ++ (
-      if std.array.length convertedSchema > 1 then
-        "(std.contract.all_of ["
-        ++ (std.string.join ",\n" convertedSchema)
-        ++ "])"
-      else
-        schemaStr
-    ),
+  SchemaToNickel
+    | doc m%"
+      Convert a json schema to a nickel string that can be exported using `nickel export -f raw`.
+      `lazy` controls the type of contracts generated for Records. By design those are lazy and in some cases like in allOf and OneOf expressions
+      reocrds need to be non-lazy to be able to check if the a schema predicate is satisfied or not.
+      Passing a false will force all records to be non-lazy including simple ones that could be represented as a simple nickel record contract.
+    "%
+    = fun schema lazy =>
+      let definitions = std.record.get_or "definitions" (std.record.get_or "defs" schema {}) schema in
+      let oneOf = if std.record.has_field "oneOf" schema && std.record.has_field "type" schema then (OneOf schema.oneOf) else "" in
+      let allOf = if std.record.has_field "allOf" schema && std.record.has_field "type" schema then (AllOf schema.allOf) else "" in
+      let anyOf = if std.record.has_field "anyOf" schema && std.record.has_field "type" schema then (AnyOf schema.anyOf) else "" in
+      let isComplex =
+        lazy
+        || std.record.has_field "oneOf" schema
+        # || std.record.has_field "not" schema
+        || std.record.has_field "anyOf" schema
+        || std.record.has_field "allOf" schema
+      in
+      let schemaStr = (
+        # BUG: {$ref} is impossible to use in pattern matching
+        if std.record.has_field "$ref" schema then
+          GetRef schema."$ref"
+        else
+          schema
+          |> match {
+            {} => "Dyn",
+            { type = "string", enum, ..rest } => StringConversion schema,
+            { enum, ..rest } => Enum enum,
+            { const, ..rest } => "std.contract.from_predicate(fun val => val == %{PrintConstValue const})",
+            { type = "string", ..rest } => StringConversion schema,
+            { type = "number", ..rest } => IntConversion schema,
+            { type = "integer", ..rest } => IntConversion schema,
+            { type = "boolean", ..rest } => "Bool",
+            { type = "array", ..rest } => ArrayConversion schema,
+            { type = "object" } => "{ .. }",
+            { type = "object", description | String } => "{ .. }",
+            { type = "object", ..rest } => ObjectConversion schema lazy,
+            { type = "null", ..rest } => "std.contract.from_predicate(fun val => val == null)", # BUG: treesitter no handling this
+            # TODO: need a way to only generate anyOf and such if and only if we had a complex schema
+            { oneOf, ..rest } => OneOf schema.oneOf,
+            { allOf, ..rest } => AllOf schema.allOf,
+            { anyOf, ..rest } => AnyOf schema.anyOf,
+            { not, ..rest } => "(std.contract.not %{SchemaToNickel schema.not false})",
+            { type, ..rest } if std.typeof type == '"Array" => type |> std.array.map (fun e => { type = "%{e}" }) |> OneOf,
+            _ => ObjectConversion schema lazy,
+          }
+      )
+      in
+      let defs =
+        if std.record.has_field "definitions" schema then
+          GenerateDefinitions schema.definitions
+        else
+          ""
+      in
+      let convertedSchema = (std.array.filter (fun e => e != "") [schemaStr, oneOf, anyOf, allOf]) in
+      defs
+      ++ (
+        if std.array.length convertedSchema > 1 then
+          "(std.contract.all_of ["
+          ++ (std.string.join ",\n" convertedSchema)
+          ++ "])"
+        else
+          schemaStr
+      ),
 
   GetRef
     | (String -> String)
