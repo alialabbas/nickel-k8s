@@ -181,8 +181,9 @@ let Converters = {
           ""
       in
       let pattern =
+        let escapeString = fun str => std.array.fold_right(fun e acc => if e == "\\" then e ++ "\\" ++ acc else e ++ acc) "" (std.string.characters str) in
         if std.record.has_field "pattern" prop then
-          m%", lib.strings.Regex "%{prop.pattern}""% # TODO: RAW STRINGS
+          m%", lib.strings.Regex "%{escapeString prop.pattern}""% # TODO: RAW STRINGS
         else
           ""
       in
@@ -225,8 +226,7 @@ let Converters = {
     if !std.array.elem field keywords && std.string.is_match "^[a-zA-Z][a-zA-Z0-9-_]+$" field then
       field
     else
-      # TODO: RAW STRINGS
-      std.trace "escaping field %{field}" m%""%{field}""%,
+      m%""%{field}""%,
 
   # Gets the internal definitions in a schema and population a nickel type string for each
   GenerateDefinitions = fun defs =>
@@ -235,7 +235,7 @@ let Converters = {
       |> std.record.to_array
       |> std.array.fold_right
         (fun e acc =>
-          std.trace "generated definition for %{e.field}" acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
+          acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
         )
         m%"let rec _definitions =
       {"%
@@ -318,8 +318,8 @@ let Converters = {
         # TODO: remove this oneOf condition later on
         if (!std.record.has_field "additionalProperties" schema || (std.record.has_field "additionalProperties" schema && std.typeof schema.additionalProperties == 'Bool))
           && schema.patternProperties == {}
-          && !noLazy => std.trace "prop only" propertiesSchema,
-        _ => std.trace "modeling json object" "lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
+          && !noLazy => propertiesSchema,
+        _ => "lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
       },
 
   ArrayConversion | Schemas.ArraySchema -> String
@@ -446,7 +446,7 @@ let Converters = {
           { type = "array", ..rest } => ArrayConversion schema,
           { type = "object" } => "{ .. }",
           { type = "object", description | String } => "{ .. }",
-          { type = "object", ..rest } => std.trace "Handling Object" ObjectConversion schema lazy,
+          { type = "object", ..rest } =>  ObjectConversion schema lazy,
           { type = "null", ..rest } => "std.contract.from_predicate(fun val => val == null)", # BUG: treesitter no handling this
           # TODO: need a way to only generate anyOf and such if and only if we had a complex schema
           { oneOf, ..rest } => OneOf schema.oneOf,
@@ -454,7 +454,7 @@ let Converters = {
           { anyOf, ..rest } => AnyOf schema.anyOf,
           { not, ..rest } => "(std.contract.not %{SchemaToNickel schema.not false})",
           { type, ..rest } if std.typeof type == '"Array" => type |> std.array.map (fun e => { type = "%{e}" }) |> OneOf,
-          _ => std.trace "unmatched pattern, defaulting to object" ObjectConversion schema lazy,
+          _ => ObjectConversion schema lazy,
         }
     )
     in

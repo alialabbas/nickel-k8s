@@ -154,19 +154,19 @@ in
         },
       },
     },
-    svcMonitor = {
-      apiVersion = "monitoring.coreos.com/v1",
-      kind = "ServiceMonitors",
-      metadata = {
-        labels = { serviceMonitorSelector = "prometheus", },
-        name = "prometheus",
-        namespace = "prometheus",
-      },
-      spec = {
-        endpoints = [{ interval = "30s", path = "/metrics", targetPort = 9090, }],
-        namespaceSelector = { matchNames = ["prometheus"], },
-        selector = { matchLabels = { operated-prometheus = "true", }, },
-      },
-    }
+    # svcMonitor = {
+    #   apiVersion = "monitoring.coreos.com/v1",
+    #   kind = "ServiceMonitors",
+    #   metadata = {
+    #     labels = { serviceMonitorSelector = "prometheus", },
+    #     name = "prometheus",
+    #     namespace = "prometheus",
+    #   },
+    #   spec = {
+    #     endpoints = [{ interval = "30s", path = "/metrics", targetPort = 9090, }],
+    #     namespaceSelector = { matchNames = ["prometheus"], },
+    #     selector = { matchLabels = { operated-prometheus = "true", }, },
+    #   },
+    # }
   },
 } | Release InputSchema

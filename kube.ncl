@@ -1,5 +1,5 @@
-let m = import "./k8s/v1.31.0/merge.ncl" in
-let all = (import "./k8s/v1.31.0/k8s.ncl") & (import "./crds/all.ncl") in
+let m = import "merged-k8s.ncl" in
+let all = (import "k8s.ncl") & (import "crds.ncl") in
 let lib = import "lib.ncl" in
 let patch = { apiVersion | String, kind | String, metadata.name | String | optional, .. } in
 # TODO: this is broken
@@ -106,7 +106,7 @@ let ModuleInputs
                     |> std.array.map (fun e => ResourceMetadataHandler ReleaseInputs e)
                     |> std.array.map (fun e => Patcher Overlays e)
                     |> std.array.map (fun e => Enforcer Constraints e)
-                  ) | ManifestsValidation Kinds
+                  ) | ManifestsValidation
               }, # | (import "self-contained-release.ncl"),
             Overlays | Array Patch | default = [],
             Constraints
@@ -115,12 +115,14 @@ let ModuleInputs
               | Array Patch
               | default
               = [],
-            Kinds
-              | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
-              | not_exported
-              | { _ | lib.k8s.Manifest }
+            k8s_version
+              | doc "k8s version to test against"
+              | String,
+            crds
+              | doc "crds to generate their definitions and link to the template"
+              | Array { url | String, version | String, name | String }
               | default
-              = {},
+              = [],
           },
 
   Env
@@ -183,58 +185,53 @@ let ModuleInputs
       Extensible contract that allows to augment the native k8 contracts and introduce your own type.
       This is already included in both Release and Env and user not expecting to use this unless they are creating their own contracts."%%
     | { _ | lib.k8s.Manifest } -> Dyn -> Dyn
-    = fun extensions label value =>
+    = fun label value =>
       # Operational hash to make it easier to find stale resources and delete them
       let packageHash = std.hash 'Sha256 (std.serialize 'Yaml value) in
-      let extensions = extensions | ApiGroups in
       let serverSide = (import "all.ncl") in
-      let allContracts = all & extensions in
       # how contracts are groked will need to change.
       # find schemaContract, find the server one and then do std.contract.Sequence here
-      if extensions |> std.record.to_array |> std.array.any (fun e => std.record.has_field e.field all) then
-        std.contract.blame_with_message "Can't override a core contract in the library" label
-      else
-        let type = std.typeof value in
-        type
-        |> match {
-          'Array =>
-            std.array.map
-              (fun e =>
-                let api_and_group = std.string.split "/" e.apiVersion in
-                let clientSideContract =
-                  if std.array.length api_and_group == 1 then
-                    allContracts."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
-                  else
-                    allContracts."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
-                in
-                let serverSideContract = # TODO: server side should be optional only when it exists
-                  if std.array.length api_and_group == 1 then
-                    serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
-                  else
-                    lib.records.get_value_at_path [(std.array.at 0 api_and_group), (std.array.at 1 api_and_group), e.kind] serverSide
-                    |> match {
-                      'NotFound => Dyn,
-                      _ => serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}",
-                    }
-                in
-                (
-                  e
-                  & {
-                    metadata = {
-                      labels = {
-                        "kubernetes.io/managed-by" = "nickel-k8s",
-                      },
-                      annotations = {
-                        "nickel-k8s/hash" = packageHash,
-                      }
+      let type = std.typeof value in
+      type
+      |> match {
+        'Array =>
+          std.array.map
+            (fun e =>
+              let api_and_group = std.string.split "/" e.apiVersion in
+              let clientSideContract =
+                if std.array.length api_and_group == 1 then
+                  all."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
+                else
+                  all."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}"
+              in
+              let serverSideContract = # TODO: server side should be optional only when it exists
+                if std.array.length api_and_group == 1 then
+                  serverSide."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
+                else
+                  lib.records.get_value_at_path [(std.array.at 0 api_and_group), (std.array.at 1 api_and_group), e.kind] serverSide
+                  |> match {
+                    'NotFound => Dyn,
+                    _ => serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}",
+                  }
+              in
+              (
+                e
+                & {
+                  metadata = {
+                    labels = {
+                      "kubernetes.io/managed-by" = "nickel-k8s",
+                    },
+                    annotations = {
+                      "nickel-k8s/hash" = packageHash,
                     }
                   }
-                ) | serverSideContract | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
-              )
-              value,
-          # 'Record => std.array.all(fun e => let contract = std.record.get e.kind allContracts in std.contract.apply contract e label),
-          _ => std.contract.blame_with_message "Have you applied this to the wrong type, this work only with Array KubeResources or {_ : KubeResource }" label
-        },
+                }
+              ) | serverSideContract | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
+            )
+            value,
+        # 'Record => std.array.all(fun e => let contract = std.record.get e.kind allContracts in std.contract.apply contract e label),
+        _ => std.contract.blame_with_message "Have you applied this to the wrong type, this work only with Array KubeResources or {_ : KubeResource }" label
+      },
 
   ApiGroups | doc "contract to convert { _ : Kube.Resource} to { _ : Kube.Resource } grouped by apiGroup"
     = fun label value =>

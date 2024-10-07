@@ -455,7 +455,7 @@ let OnlyWhenInOrNotIn
                       if std.typeof e.value == 'Record then
                         std.contract.check (IsRecord contract."%{e.field}") label e.value
                         |> match {
-                          'Ok v => std.trace "record" ('Ok v),
+                          'Ok v => ('Ok v),
                           'Error val => std.trace "here" ('Error val),
                         }
                       else
