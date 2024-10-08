@@ -25,7 +25,7 @@ generate_and_run_tests() {
 			# generate the contract used in test
 			GENERATED_FILE_NAME="${dir}/contract.ncl"
 			echo "Generating contract at $GENERATED_FILE_NAME"
-			nickel export -f raw tester.ncl -I "${dir}" | nickel format >"$GENERATED_FILE_NAME"
+			nickel export -f raw json-schema-generator.ncl --field Output -- Input="import \"$dir/schema.json\""| nickel format >"$GENERATED_FILE_NAME"
 
 			# format and run the test
 			TESTFILE="$dir/test.ncl"
