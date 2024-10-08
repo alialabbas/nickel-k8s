@@ -9,7 +9,7 @@ let Nullable | doc m%"Apply the Contract to an array and allow it to also be ass
 
 let escape_string = fun str => std.string.replace "\"" "'" str |> std.string.replace "\\" "\\\\" in
 
-let json_schema = {
+let rec JsonSchema = {
   type
     | std.enum.TagOrString
     | [|
@@ -84,6 +84,11 @@ let json_schema = {
   patternProperties | { _ | { .. } } | default = {},
   # TODO: this need special contract, bool or schema
   additionalProperties | Dyn | optional,
+
+  oneOf | Array JsonSchema | optional,
+  anyOf | Array JsonSchema | optional,
+  allOf | Array JsonSchema | optional,
+  not | JsonSchema | optional,
   ..
 }
 in
@@ -170,7 +175,7 @@ in
 
 let Converters = {
 
-  IntConversion | Schemas.NumberSchema -> String
+  int_handler | Schemas.NumberSchema -> String
     = fun prop =>
       let multiple =
         if std.record.has_field "multipleOf" prop then
@@ -220,7 +225,7 @@ let Converters = {
       else
         baseType,
 
-  StringConversion | Schemas.StringSchema -> String
+  stirng_handler | Schemas.StringSchema -> String
     = fun prop =>
       let minLen =
         if std.record.has_field "minLength" prop then
@@ -283,19 +288,19 @@ let Converters = {
       m%""%{field}""%,
 
   # Gets the internal definitions in a schema and population a nickel type string for each
-  GenerateDefinitions = fun defs =>
+  definitions_handler = fun defs =>
     let result =
       defs
       |> std.record.to_array
       |> std.array.fold_right
         (fun e acc =>
-          acc ++ "%{SanitizedName e.field} \n = %{SchemaToNickel e.value false},\n"
+          acc ++ "%{SanitizedName e.field} \n = %{json_schema_to_nickel e.value false},\n"
         )
         m%"let rec _definitions =
       {"%
     in result ++ "\n} in\n ",
 
-  ObjectConversion
+  object_handler
     | doc m%"
         Generate a contract equivalent of a json schema. noLazy is a context to force the contract to be a non-lazy record evaluation
         This flag is necessary when we evaluate schemas inside of a oneOf subschema
@@ -310,7 +315,7 @@ let Converters = {
       let additionalPropertiesSchema = std.record.get_or "additionalProperties" true schema in
       let additionalPropertiesSchema =
         if std.typeof additionalPropertiesSchema != '"Bool" then
-          SchemaToNickel schema.additionalProperties noLazy
+          json_schema_to_nickel schema.additionalProperties noLazy
         else
           std.to_string isOpen
       in
@@ -319,7 +324,7 @@ let Converters = {
         (
           schema.patternProperties
           |> std.record.to_array
-          |> std.array.fold_right (fun e acc => acc ++ "%{(SanitizedName e.field)} = %{SchemaToNickel e.value noLazy},\n") "{ "
+          |> std.array.fold_right (fun e acc => acc ++ "%{(SanitizedName e.field)} = %{json_schema_to_nickel e.value noLazy},\n") "{ "
         )
         ++ " }"
       in
@@ -329,7 +334,7 @@ let Converters = {
           std.array.fold_right
             (fun e acc =>
               let isRequired = std.array.elem e.field schema.required in
-              acc ++ "\n" ++ "%{SanitizedName e.field} \n %{get_doc_string_metadata e.value} | %{(SchemaToNickel e.value noLazy)}" ++ (if isRequired then "," else "| optional,")
+              acc ++ "\n" ++ "%{SanitizedName e.field} \n %{doc_handler e.value} | %{(json_schema_to_nickel e.value noLazy)}" ++ (if isRequired then "," else "| optional,")
             )
             m%"{"%
             (std.record.to_array schema.properties)
@@ -344,7 +349,7 @@ let Converters = {
           std.array.fold_right
             (fun e acc =>
               let isRequired = if schema.required == [] then true else std.array.elem e.field schema.required in
-              acc ++ "\n" ++ "%{SanitizedName e.field} \n = { contract = %{(SchemaToNickel e.value noLazy)}" ++ ", \n optional = %{std.to_string isRequired} },"
+              acc ++ "\n" ++ "%{SanitizedName e.field} \n = { contract = %{(json_schema_to_nickel e.value noLazy)}" ++ ", \n optional = %{std.to_string isRequired} },"
             )
             m%"{"%
             (std.record.to_array schema.properties)
@@ -375,7 +380,7 @@ let Converters = {
         _ => "lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
       },
 
-  ArrayConversion | Schemas.ArraySchema -> String
+  array_handler | Schemas.ArraySchema -> String
     = fun schema =>
       # What is the best way to make sure we don't want a type.
       # items false means nothing when it is by itself so not gonna bother with that corner case
@@ -387,8 +392,8 @@ let Converters = {
         let items = std.typeof (std.record.get_or "items" false schema) in
         items
         |> match {
-          '"Bool" => SchemaToNickel {} false, # TODO: Technically this will yield wrong type when there is only type array and items is false but it doesn't make sense to have an empty array as value from a schema
-          '"Record" => SchemaToNickel schema.items false,
+          '"Bool" => json_schema_to_nickel {} false, # TODO: Technically this will yield wrong type when there is only type array and items is false but it doesn't make sense to have an empty array as value from a schema
+          '"Record" => json_schema_to_nickel schema.items false,
         }
       in
       let arrayLength =
@@ -421,47 +426,49 @@ let Converters = {
           |> match {
             false => "'Exact",
             true => "('AdditionalItems Dyn)",
-            { ..rest } => "( 'AdditionalItems " ++ (SchemaToNickel schema.items false) ++ ")",
+            { ..rest } => "( 'AdditionalItems " ++ (json_schema_to_nickel schema.items false) ++ ")",
           }
         in
         if std.record.has_field "prefixItems" schema then
-          std.array.fold_right (fun subSchema acc => acc ++ (SchemaToNickel subSchema false) ++ ",") " | Arrays.Tuple [ " schema.prefixItems ++ "] " ++ tupleType
+          std.array.fold_right (fun subSchema acc => acc ++ (json_schema_to_nickel subSchema false) ++ ",") " | Arrays.Tuple [ " schema.prefixItems ++ "] " ++ tupleType
         else
           ""
       in
       "(Array %{arrayType}" ++ ")" ++ arrayLength ++ tupleContract ++ setContract,
   # tupleContract
 
-  options = {
-    include_docs
-      | doc m%"
+  options
+    | doc "Options to control certain behvaiors of the code generation notably doc generations and closing converted schemas contract by default"
+    = {
+      include_docs
+        | doc m%"
         Whether to include docs in the generated records.
         NOTE: this is only used when it makes sense, in non-lazy records docs are completely ignored.
       "%
-      | Bool
-      | default
-      = true,
-    default_additional_properties
-      | doc "simple flag to control the default schema bevaior, useful when generating many defintions and want to explicitly not allow the bad schema to accept more than it should like the k8 definitions"
-      | Bool
-      | default
-      = true,
-  },
+        | Bool
+        | default
+        = true,
+      default_additional_properties
+        | doc "simple flag to control the default schema bevaior, useful when generating many defintions and want to explicitly not allow the bad schema to accept more than it should like the k8 definitions"
+        | Bool
+        | default
+        = true,
+    },
 
   # NOTE: contract defaulted method to allow customization by external user if they want to handle it differently, this now is done only for k8s
   # TODO: Expirement with a toggle to control the prefix for generation. This could be useful
 
-  OneOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(lib.contracts.OneOf [ " schema ++ "])",
-  AnyOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(std.contract.any_of[ " schema ++ "])",
-  AllOf = fun schema => std.array.fold_right (fun e acc => acc ++ SchemaToNickel e true ++ ",\n") "(std.contract.all_of[ " schema ++ "])",
-  Enum = fun schema => std.array.fold_right (fun e acc => acc ++ (PrintConstValue e) ++ ",\n") "lib.enum.ArrayEnum [ " schema ++ "]",
+  one_of_handler = fun schema => std.array.fold_right (fun e acc => acc ++ json_schema_to_nickel e true ++ ",\n") "(lib.contracts.OneOf [ " schema ++ "])",
+  any_of_handler = fun schema => std.array.fold_right (fun e acc => acc ++ json_schema_to_nickel e true ++ ",\n") "(std.contract.any_of[ " schema ++ "])",
+  all_of_handler = fun schema => std.array.fold_right (fun e acc => acc ++ json_schema_to_nickel e true ++ ",\n") "(std.contract.all_of[ " schema ++ "])",
+  enum_handler = fun schema => std.array.fold_right (fun e acc => acc ++ (print_const_value e) ++ ",\n") "lib.enum.ArrayEnum [ " schema ++ "]",
 
-  PrintConstValue = fun schema =>
+  print_const_value = fun schema =>
     let recordAsString =
       (
         std.record.to_array schema
         |> std.array.fold_right
-          (fun e acc => acc ++ e.field ++ "=" ++ (PrintConstValue e.value) ++ ",\n"
+          (fun e acc => acc ++ e.field ++ "=" ++ (print_const_value e.value) ++ ",\n"
           )
           "{"
       )
@@ -474,28 +481,28 @@ let Converters = {
       'Record => recordAsString,
     },
 
-  get_doc_string_metadata
+  doc_handler
     | Dyn -> String
     | default
     = fun obj =>
       if options.include_docs && std.record.has_field "description" obj then
-        m%"| doc "%{std.string.replace "\"" "'" obj.description |> std.string.replace "\\" "\\\\"}""%
+        m%"| doc "%{escape_string obj.description}""%
       else
         "",
 
-  SchemaToNickel
+  json_schema_to_nickel
     | doc m%"
       Convert a json schema to a nickel string that can be exported using `nickel export -f raw`.
       `lazy` controls the type of contracts generated for Records. By design those are lazy and in some cases like in allOf and OneOf expressions
       reocrds need to be non-lazy to be able to check if the a schema predicate is satisfied or not.
       Passing a false will force all records to be non-lazy including simple ones that could be represented as a simple nickel record contract.
     "%
-    | json_schema -> Bool -> String
+    | JsonSchema -> Bool -> String
     = fun schema lazy =>
       let definitions = std.record.get_or "definitions" (std.record.get_or "defs" schema {}) schema in
-      let oneOf = if std.record.has_field "oneOf" schema && std.record.has_field "type" schema then (OneOf schema.oneOf) else "" in
-      let allOf = if std.record.has_field "allOf" schema && std.record.has_field "type" schema then (AllOf schema.allOf) else "" in
-      let anyOf = if std.record.has_field "anyOf" schema && std.record.has_field "type" schema then (AnyOf schema.anyOf) else "" in
+      let oneOf = if std.record.has_field "oneOf" schema && std.record.has_field "type" schema then (one_of_handler schema.oneOf) else "" in
+      let allOf = if std.record.has_field "allOf" schema && std.record.has_field "type" schema then (all_of_handler schema.allOf) else "" in
+      let anyOf = if std.record.has_field "anyOf" schema && std.record.has_field "type" schema then (any_of_handler schema.anyOf) else "" in
       let isComplex =
         lazy
         || std.record.has_field "oneOf" schema
@@ -506,37 +513,37 @@ let Converters = {
       let schemaStr = (
         # BUG: {$ref} is impossible to use in pattern matching
         if std.record.has_field "$ref" schema then
-          GetRef schema."$ref"
+          ref_handler schema."$ref"
         else
           schema
           |> match {
-            { type = 'string, enum, ..rest } => StringConversion schema,
-            { enum, ..rest } => Enum enum,
-            { const, ..rest } => "std.contract.from_predicate(fun val => val == %{PrintConstValue const})",
-            { type = 'string, ..rest } => StringConversion schema,
-            { type = 'number, ..rest } => IntConversion schema,
-            { type = 'integer, ..rest } => IntConversion schema,
+            { type = 'string, enum, ..rest } => stirng_handler schema,
+            { enum, ..rest } => enum_handler enum,
+            { const, ..rest } => "std.contract.from_predicate(fun val => val == %{print_const_value const})",
+            { type = 'string, ..rest } => stirng_handler schema,
+            { type = 'number, ..rest } => int_handler schema,
+            { type = 'integer, ..rest } => int_handler schema,
             { type = 'boolean, ..rest } => "Bool",
-            { type = 'array, ..rest } => ArrayConversion schema,
-            { type = 'object, ..rest } => ObjectConversion schema lazy,
+            { type = 'array, ..rest } => array_handler schema,
+            { type = 'object, ..rest } => object_handler schema lazy,
             { type = 'null, ..rest } => "std.contract.from_predicate(fun val => val == null)", # BUG: treesitter no handling this
             # TODO: need a way to only generate anyOf and such if and only if we had a complex schema
-            { oneOf, ..rest } => OneOf schema.oneOf,
-            { allOf, ..rest } => AllOf schema.allOf,
-            { anyOf, ..rest } => AnyOf schema.anyOf,
-            { not, ..rest } => "(std.contract.not %{SchemaToNickel schema.not false})",
-            { type, ..rest } if std.typeof type == '"Array" => type |> std.array.map (fun e => { type = "%{e}" }) |> OneOf,
+            { oneOf, ..rest } => one_of_handler schema.oneOf,
+            { allOf, ..rest } => all_of_handler schema.allOf,
+            { anyOf, ..rest } => any_of_handler schema.anyOf,
+            { not, ..rest } => "(std.contract.not %{json_schema_to_nickel schema.not false})",
+            { type, ..rest } if std.typeof type == '"Array" => type |> std.array.map (fun e => { type = "%{e}" }) |> one_of_handler,
             # TODO: What is the exact expecation when a type is missing
             # where we assume the user just want an object but technically it could be a mix of int schema + obj schema
             # Should those be evaluated based on those type and it is the type is a union of all or what
             { ..rest } if !std.record.has_field "type" rest && std.record.length rest == 0 => "Dyn",
-            _ => ObjectConversion schema lazy,
+            _ => object_handler schema lazy,
           }
       )
       in
       let defs =
         if std.record.has_field "definitions" schema then
-          GenerateDefinitions schema.definitions
+          definitions_handler schema.definitions
         else
           ""
       in
@@ -551,7 +558,7 @@ let Converters = {
           schemaStr
       ),
 
-  GetRef
+  ref_handler
     | (String -> String)
     | default
     = fun ref =>

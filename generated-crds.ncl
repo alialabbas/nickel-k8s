@@ -6,7 +6,7 @@ in
     =
       std.typeof Input
       |> match {
-        'Record => let version = std.array.first Input.spec.versions in jsonSchema.SchemaToNickel version.schema.openAPIV3Schema false,
+        'Record => let version = std.array.first Input.spec.versions in jsonSchema.json_schema_to_nickel version.schema.openAPIV3Schema false,
         'Array =>
           (
             Input
@@ -18,10 +18,8 @@ in
                 let versions = std.array.first e.spec.versions in
                 std.array.fold_right
                   (fun e acc =>
-                    # let field = "%{group}.%{e.name}.%{kind}" in
-                    # e.name is the version of the api we producing here, single crd can define multiple schemas/versions
                     let field = "\"%{group}\"." ++ e.name ++ "." ++ kind in
-                    acc ++ "%{field} \n = %{jsonSchema.SchemaToNickel (versions.schema.openAPIV3Schema) false},\n"
+                    acc ++ "%{field} \n = %{jsonSchema.json_schema_to_nickel (versions.schema.openAPIV3Schema) false},\n"
                   )
                   acc
                   e.spec.versions
