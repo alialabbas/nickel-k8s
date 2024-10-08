@@ -11,8 +11,6 @@
 
 set -e -o pipefail
 
-source lib.sh
-
 generate_and_run_tests() {
 
 	# base case when we are passing a file
@@ -27,11 +25,7 @@ generate_and_run_tests() {
 			# generate the contract used in test
 			GENERATED_FILE_NAME="${dir}/contract.ncl"
 			echo "Generating contract at $GENERATED_FILE_NAME"
-			result=$(nickel eval tester.ncl -I "${dir}" 2>/dev/null)
-			echo "${result:1:-1}" >"$GENERATED_FILE_NAME"
-
-			# Fix some escaped special characters
-			raw_string "$result" "$GENERATED_FILE_NAME"
+			nickel export -f raw tester.ncl -I "${dir}" | nickel format >"$GENERATED_FILE_NAME"
 
 			# format and run the test
 			TESTFILE="$dir/test.ncl"

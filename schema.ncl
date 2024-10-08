@@ -7,6 +7,84 @@ let Nullable | doc m%"Apply the Contract to an array and allow it to also be ass
         std.contract.apply (contract) label value
   in
 
+let JsonSchema = {
+  type
+    | std.enum.TagOrString
+    | [|
+      'number,
+      'integer,
+      'array,
+      'string,
+      'object,
+      'boolean,
+      'null
+    |]
+    | optional,
+  markdownDescription | String | default = "",
+  description | String | default = "",
+
+  # Integer/Number Props
+  minimum | Nullable Number | optional,
+  maximum | Nullable Number | optional,
+  exclusiveMaximum | std.contract.any_of [ Number, Bool ] | optional,
+  exclusiveMinimum | std.contract.any_of [ Number, Bool ] | optional,
+  multipleOf | Number | optional,
+
+  # Array Props
+  items | std.contract.any_of [ Bool, { .. }] | optional, # TODO: make a schema contract
+  prefixItems | Array { .. } | optional, # Schema contract please
+  contains | { .. } | optional,
+  minContains | std.number.PosNat | optional,
+  maxContains | std.number.PosNat | optional,
+  minItems | std.number.Nat | optional,
+  maxItems | std.number.PosNat | optional,
+  uniqueness | Bool | optional,
+
+  # String Props
+  minLength | std.number.Integer | optional,
+  maxLength | std.number.Integer | optional,
+  pattern | String | optional,
+  # TODO: format is abused by json schemas, convert this to just a a simple array check
+  format
+    | std.enum.TagOrString
+    | [|
+      'date-time,
+      'time,
+      'date,
+      'duration,
+      'email,
+      'idn-hostname,
+      'ipv4,
+      'ipv6,
+      'uuid,
+      'uri,
+      'uri-reference,
+      'iri,
+      'iri-referemce,
+      'uri-template,
+      'json-pointer,
+      'relative-json-pointer,
+      'regex,
+      'uint64,
+      'int64,
+      'int32,
+      'byte,
+      'binary,
+      'string,
+      'url,
+      'int-or-string
+    |]
+    | optional,
+
+  # Object Props
+  required | Array String | default = [],
+  properties | { _ | { .. } } | default = {},
+  patternProperties | { _ | { .. } } | default = {},
+  # TODO: this need special contract, bool or schema
+  additionalProperties | Dyn | optional,
+  ..
+}
+in
 let Schemas = {
   NumberSchema = {
     type | std.enum.TagOrString | [| 'number, 'integer |],
@@ -83,7 +161,6 @@ let Schemas = {
     patternProperties | { _ | { .. } } | default = {},
     # TODO: this need special contract, bool or schema
     additionalProperties | Dyn | optional,
-    isEmptyObject | Bool = properties == {} && patternProperties == {} && std.typeof additionalProperties == 'Bool,
     ..
   },
 }
@@ -393,6 +470,7 @@ let Converters = {
       reocrds need to be non-lazy to be able to check if the a schema predicate is satisfied or not.
       Passing a false will force all records to be non-lazy including simple ones that could be represented as a simple nickel record contract.
     "%
+    | JsonSchema -> Bool -> String
     = fun schema lazy =>
       let definitions = std.record.get_or "definitions" (std.record.get_or "defs" schema {}) schema in
       let oneOf = if std.record.has_field "oneOf" schema && std.record.has_field "type" schema then (OneOf schema.oneOf) else "" in
@@ -412,25 +490,26 @@ let Converters = {
         else
           schema
           |> match {
-            {} => "Dyn",
-            { type = "string", enum, ..rest } => StringConversion schema,
+            { type = 'string, enum, ..rest } => StringConversion schema,
             { enum, ..rest } => Enum enum,
             { const, ..rest } => "std.contract.from_predicate(fun val => val == %{PrintConstValue const})",
-            { type = "string", ..rest } => StringConversion schema,
-            { type = "number", ..rest } => IntConversion schema,
-            { type = "integer", ..rest } => IntConversion schema,
-            { type = "boolean", ..rest } => "Bool",
-            { type = "array", ..rest } => ArrayConversion schema,
-            { type = "object" } => "{ .. }",
-            { type = "object", description | String } => "{ .. }",
-            { type = "object", ..rest } => ObjectConversion schema lazy,
-            { type = "null", ..rest } => "std.contract.from_predicate(fun val => val == null)", # BUG: treesitter no handling this
+            { type = 'string, ..rest } => StringConversion schema,
+            { type = 'number, ..rest } => IntConversion schema,
+            { type = 'integer, ..rest } => IntConversion schema,
+            { type = 'boolean, ..rest } => "Bool",
+            { type = 'array, ..rest } => ArrayConversion schema,
+            { type = 'object, ..rest } => ObjectConversion schema lazy,
+            { type = 'null, ..rest } => "std.contract.from_predicate(fun val => val == null)", # BUG: treesitter no handling this
             # TODO: need a way to only generate anyOf and such if and only if we had a complex schema
             { oneOf, ..rest } => OneOf schema.oneOf,
             { allOf, ..rest } => AllOf schema.allOf,
             { anyOf, ..rest } => AnyOf schema.anyOf,
             { not, ..rest } => "(std.contract.not %{SchemaToNickel schema.not false})",
             { type, ..rest } if std.typeof type == '"Array" => type |> std.array.map (fun e => { type = "%{e}" }) |> OneOf,
+            # TODO: What is the exact expecation when a type is missing
+            # where we assume the user just want an object but technically it could be a mix of int schema + obj schema
+            # Should those be evaluated based on those type and it is the type is a union of all or what
+            { ..rest } if !std.record.has_field "type" rest && std.record.length rest == 0 => "Dyn",
             _ => ObjectConversion schema lazy,
           }
       )

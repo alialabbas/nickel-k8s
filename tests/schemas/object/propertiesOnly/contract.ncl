@@ -5,7 +5,9 @@ in
     | String
     | optional,
   object
-    | { .. }
+    | {
+      ..
+    }
     | optional,
   number
     | Number
