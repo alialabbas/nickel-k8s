@@ -3,7 +3,10 @@
 let rec jsonSchema =
   (import "schema.ncl")
   & {
-    DefaultAdditionalProperties = false,
+    options = {
+      default_additional_properties = false,
+      include_docs = true,
+    },
     # override ref since we don't are evaluating all the defs inside a swagger and not a schema
     GetRef = fun ref =>
       let ref = std.string.split "/" ref in

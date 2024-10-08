@@ -5,6 +5,7 @@ in
     std.contract.all_of [
       {
         regex
+          | doc "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax)."
           | String
           | optional,
         prefix

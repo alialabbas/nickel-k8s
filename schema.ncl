@@ -7,7 +7,9 @@ let Nullable | doc m%"Apply the Contract to an array and allow it to also be ass
         std.contract.apply (contract) label value
   in
 
-let JsonSchema = {
+let escape_string = fun str => std.string.replace "\"" "'" str |> std.string.replace "\\" "\\\\" in
+
+let json_schema = {
   type
     | std.enum.TagOrString
     | [|
@@ -298,13 +300,12 @@ let Converters = {
         Generate a contract equivalent of a json schema. noLazy is a context to force the contract to be a non-lazy record evaluation
         This flag is necessary when we evaluate schemas inside of a oneOf subschema
       "%
-    # : Dyn -> Bool -> String
     | Schemas.ObjectSchema -> Bool -> String
     = fun schema noLazy =>
       # Get additionalProperties and force it to be true or false only for the use of contracct closure
-      let isOpen = std.record.get_or "additionalProperties" DefaultAdditionalProperties schema in
+      let isOpen = std.record.get_or "additionalProperties" options.default_additional_properties schema in
       # Default json schema behavior is to allow additional properties on missing properties
-      let isOpen = if std.typeof isOpen == '"Bool" then isOpen else DefaultAdditionalProperties in
+      let isOpen = if std.typeof isOpen == '"Bool" then isOpen else options.default_additional_properties in
 
       let additionalPropertiesSchema = std.record.get_or "additionalProperties" true schema in
       let additionalPropertiesSchema =
@@ -328,7 +329,7 @@ let Converters = {
           std.array.fold_right
             (fun e acc =>
               let isRequired = std.array.elem e.field schema.required in
-              acc ++ "\n" ++ "%{SanitizedName e.field} \n | %{(SchemaToNickel e.value noLazy)}" ++ (if isRequired then "," else "| optional,")
+              acc ++ "\n" ++ "%{SanitizedName e.field} \n %{get_doc_string_metadata e.value} | %{(SchemaToNickel e.value noLazy)}" ++ (if isRequired then "," else "| optional,")
             )
             m%"{"%
             (std.record.to_array schema.properties)
@@ -431,11 +432,21 @@ let Converters = {
       "(Array %{arrayType}" ++ ")" ++ arrayLength ++ tupleContract ++ setContract,
   # tupleContract
 
-  DefaultAdditionalProperties
-    | doc "simple flag to control the default schema bevaior, useful when generating many defintions and want to explicitly not allow the bad schema to accept more than it should like the k8 definitions"
-    | Bool
-    | default
-    = true,
+  options = {
+    include_docs
+      | doc m%"
+        Whether to include docs in the generated records.
+        NOTE: this is only used when it makes sense, in non-lazy records docs are completely ignored.
+      "%
+      | Bool
+      | default
+      = true,
+    default_additional_properties
+      | doc "simple flag to control the default schema bevaior, useful when generating many defintions and want to explicitly not allow the bad schema to accept more than it should like the k8 definitions"
+      | Bool
+      | default
+      = true,
+  },
 
   # NOTE: contract defaulted method to allow customization by external user if they want to handle it differently, this now is done only for k8s
   # TODO: Expirement with a toggle to control the prefix for generation. This could be useful
@@ -463,6 +474,15 @@ let Converters = {
       'Record => recordAsString,
     },
 
+  get_doc_string_metadata
+    | Dyn -> String
+    | default
+    = fun obj =>
+      if options.include_docs && std.record.has_field "description" obj then
+        m%"| doc "%{std.string.replace "\"" "'" obj.description |> std.string.replace "\\" "\\\\"}""%
+      else
+        "",
+
   SchemaToNickel
     | doc m%"
       Convert a json schema to a nickel string that can be exported using `nickel export -f raw`.
@@ -470,7 +490,7 @@ let Converters = {
       reocrds need to be non-lazy to be able to check if the a schema predicate is satisfied or not.
       Passing a false will force all records to be non-lazy including simple ones that could be represented as a simple nickel record contract.
     "%
-    | JsonSchema -> Bool -> String
+    | json_schema -> Bool -> String
     = fun schema lazy =>
       let definitions = std.record.get_or "definitions" (std.record.get_or "defs" schema {}) schema in
       let oneOf = if std.record.has_field "oneOf" schema && std.record.has_field "type" schema then (OneOf schema.oneOf) else "" in
