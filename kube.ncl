@@ -186,11 +186,7 @@ let ModuleInputs
       This is already included in both Release and Env and user not expecting to use this unless they are creating their own contracts."%%
     | { _ | lib.k8s.Manifest } -> Dyn -> Dyn
     = fun label value =>
-      # Operational hash to make it easier to find stale resources and delete them
-      let packageHash = std.hash 'Sha256 (std.serialize 'Yaml value) in
       let serverSide = (import "all.ncl") in
-      # how contracts are groked will need to change.
-      # find schemaContract, find the server one and then do std.contract.Sequence here
       let type = std.typeof value in
       type
       |> match {
@@ -199,6 +195,7 @@ let ModuleInputs
             (fun e =>
               let api_and_group = std.string.split "/" e.apiVersion in
               let clientSideContract =
+                # TODO: this part is used a lot, need a wrapper around it
                 if std.array.length api_and_group == 1 then
                   all."%{(std.array.at 0 api_and_group)}"."%{e.kind}"
                 else
@@ -214,19 +211,7 @@ let ModuleInputs
                     _ => serverSide."%{(std.array.at 0 api_and_group)}"."%{(std.array.at 1 api_and_group)}"."%{e.kind}",
                   }
               in
-              (
-                e
-                & {
-                  metadata = {
-                    labels = {
-                      "kubernetes.io/managed-by" = "nickel-k8s",
-                    },
-                    annotations = {
-                      "nickel-k8s/hash" = packageHash,
-                    }
-                  }
-                }
-              ) | serverSideContract | clientSideContract #| allContracts."%{e.apiVersion}"."%{e.kind}"
+              e | serverSideContract | clientSideContract
             )
             value,
         # 'Record => std.array.all(fun e => let contract = std.record.get e.kind allContracts in std.contract.apply contract e label),
