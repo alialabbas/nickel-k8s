@@ -145,14 +145,16 @@ let ModuleInputs
         | ModuleInputs
         | default
         = {},
-
-      Kinds
-        | doc "Exnteded kinds outside of the native k8 resources, adding a native k8 resource here will fail cause a failure when validating the contract"
-        | not_exported
-        | { _ | lib.k8s.Manifest }
+      k8s_version
+        | doc "k8s version to test against"
+        | String,
+      crds
+        | doc "crds to generate their definitions and link to the template"
+        | Array { url | String, version | String, name | String }
         | default
-        = {},
-      Env
+        = [],
+
+      Package
         | doc m%%"
           Env is a computed field which applies all overlays/patches from the original included release.
           It also applying environment specific overlays and patches"%%
@@ -175,7 +177,7 @@ let ModuleInputs
                 |> std.array.map (fun e => EnvMetadataHandler ReleaseInputs e)
                 |> std.array.map (fun e => Patcher Overlays e)
                 |> std.array.map (fun e => Enforcer Constraints e)
-              ) | ManifestsValidation Kinds
+              ) | ManifestsValidation
           } | lib.k8s.List | (import "self-contained-release.ncl"),
     },
 
