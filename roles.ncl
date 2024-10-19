@@ -56,7 +56,6 @@ in
       apiVersion = "rbac.authorization.k8s.io/v1",
       kind = "Role",
       metadata | lib.k8s.ResourceMetadata,
-      aggregationRule | lib.k8s.LabelSelector | optional,
       rules | Array PolicyRule | optional,
       ..
     },
