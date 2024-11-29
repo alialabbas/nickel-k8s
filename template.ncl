@@ -12,7 +12,7 @@ let templateToMergable
     let result = value in
     %{
     let aggregator
-      : { field :String, value : String, nested : Array { field : String, value: String, nested: Dyn }} -> String -> String
+      : { field : String, value : String, nested : Array { field : String, value: String, nested: Dyn }} -> String -> String
       = fun e acc =>
       let parentPath = std.string.split "." e.field |> std.array.map(fun e => "\"%{e}\"") in
       let paramName = std.array.last parentPath in
@@ -22,7 +22,7 @@ let templateToMergable
         let val_map =
           val
           |> match {
-            'Found val => lib.k8s.from_list_to_map "name" val,
+            'Found val => lib.k8s.from_list_to_map "%{e.value}" val,
             _ => val
           }
         in
@@ -108,7 +108,7 @@ let templateFromMergable
         let val_map =
           val
           |> match {
-            'Found val => lib.k8s.from_map_to_list "name" val,
+            'Found val => lib.k8s.from_map_to_list "%{e.value}" val,
             _ => val
           }
         in

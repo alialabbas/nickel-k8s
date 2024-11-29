@@ -231,6 +231,7 @@ in
 let Resources = {
   requests | { cpu | lib.k8s.Resource | optional, memory | lib.k8s.Resource | optional, } | optional,
   limits | { cpu | lib.k8s.Resource | optional, memory | lib.k8s.Resource | optional, } | optional,
+  ..
 }
 in
 # TODO: a lot of these are dependent on pod.spec.os, is this just unset or actually validated and erred --- Need checking
@@ -301,9 +302,10 @@ in
 
 let _podAffinityTerm = {
   labelSelector | lib.k8s.LabelSelector | optional,
-  namespaceSelecor | lib.k8s.LabelSelector | optional,
+  namespaceSelector | lib.k8s.LabelSelector | optional,
   namespaces | Array lib.k8s.Name | optional,
   topologyKey | std.string.NonEmpty,
+  ..
 }
 in
 
@@ -408,7 +410,7 @@ let _affinity = {
   podAffinity
     | {
       preferredDuringSchedulingIgnoredDuringExecution
-        | Array { podAffinityTerm | _podAffinityTerm, weight | lib.numbers.InRange 0 100 }
+        | Array { podAffinityTerm | _podAffinityTerm, weight | lib.numbers.InRange 0 true 100 true }
         | optional,
       requiredDuringSchedulingIgnoredDuringExecution | Array _podAffinityTerm | optional,
     }
@@ -416,7 +418,7 @@ let _affinity = {
   podAntiAffinity
     | {
       preferredDuringSchedulingIgnoredDuringExecution
-        | Array { podAffinityTerm | _podAffinityTerm, weight | lib.numbers.InRange 0 100 }
+        | Array { podAffinityTerm | _podAffinityTerm, weight | lib.numbers.InRange 0 true 100 true }
         | optional,
       requiredDuringSchedulingIgnoredDuringExecution | Array _podAffinityTerm | optional,
     }
@@ -426,9 +428,9 @@ in
 # TODO: probably should check the whole record using a pattern match, when { os = "linux" } => and no match is ignored
 let onlyLinux
   | doc "predicate to allow certain podspec config to only be available from a specific pod.spec.os.name"
-  = fun val => std.contract.from_predicate (fun ignoredRecord => val == null || val.name == 'linux)
+  = fun val => std.contract.from_predicate (fun ignoredRecord => val == null || val.name == "linux")
   in
-let onlyWindows = fun val => std.contract.from_predicate (fun ignoredRecord => val == null || val.name == 'windows) in
+let onlyWindows = fun val => std.contract.from_predicate (fun ignoredRecord => val == null || val.name == "windows") in
 let podSpec = {
   activeDeadlineSeconds | std.number.PosNat | optional,
   affinity | _affinity | optional,
@@ -462,31 +464,34 @@ let podSpec = {
   nodeSelector | lib.k8s.Labels | optional, # TODO: basic selector thingy
   restartPolicy | std.enum.TagOrString | [| 'Always, 'OnFailure, 'Never |] | optional,
   os
-    | { name | std.enum.TagOrString | [| 'linux, 'windows |], }
+    | { name | lib.enum.StringOrEnum [| 'linux, 'windows |], }
     | optional,
   preemptionPolicy | std.enum.TagOrString | [| 'Never, 'PreemptLowerPriority |] | optional,
 
   securityContext
     | {
-      fsGroup | onlyLinux os | Number | optional,
+      fsGroup
+      # | onlyLinux os
+        | Number
+        | optional,
       fsGroupChangePolicy
-        | onlyLinux os
+      # | onlyLinux os
         | std.enum.TagOrString
         | [| '"OnRootMismatch", '"Always" |] # not windows check
         | optional,
 
       runAsGroup
-        | onlyLinux os
+      # | onlyLinux os
         | Number
         | optional,
 
       runAsUser
-        | onlyLinux os
+      # | onlyLinux os
         | Number
         | optional,
 
       seLinuxOptions
-        | onlyLinux os
+      # | onlyLinux os
         | {
           level | String | optional,
           role | String | optional,
@@ -496,7 +501,7 @@ let podSpec = {
         | optional,
 
       seccompProfile
-        | onlyLinux os
+      # | onlyLinux os
         | {
           localhostProfile | String | optional,
           type | String
@@ -504,7 +509,7 @@ let podSpec = {
         | optional, # seccompProfile
 
       windowsOptions
-        | onlyWindows os
+      # | onlyWindows os
         | {
           gmsaCredentialSpec | String,
           gmsaCredentialSpecName | String,
