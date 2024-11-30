@@ -1,3 +1,4 @@
+let lib = import "lib.ncl" in
 let Nullable | doc m%"Apply the Contract to an array and allow it to also be assigned as null"%
   = fun contract =>
     fun label value =>
@@ -9,88 +10,103 @@ let Nullable | doc m%"Apply the Contract to an array and allow it to also be ass
 
 let escape_string = fun str => std.string.replace "\"" "'" str |> std.string.replace "\\" "\\\\" in
 
-let rec JsonSchema = {
-  type
-    | std.enum.TagOrString
-    | [|
-      'number,
-      'integer,
-      'array,
-      'string,
-      'object,
-      'boolean,
-      'null
-    |]
-    | optional,
-  markdownDescription | String | default = "",
-  description | String | default = "",
+let rec JsonSchema =
+  let SchemaType =
+    std.contract.custom (fun label value =>
+      let _types = [|
+        'number,
+        'integer,
+        'array,
+        'string,
+        'object,
+        'boolean,
+        'null
+      |]
+      in
+      std.typeof value
+      |> match {
+        'Array => 'Ok (value | Array (lib.enum.StringOrEnum _types) | lib.arrays.IsSet),
+        'String => 'Ok (value | std.enum.TagOrString | _types),
+        _ =>
+          'Error {
+            message = "Expected either an array or string, got %{std.to_string (std.typeof value)}"
+          }
+      }
+    )
+  in
+  {
+    type
+      | SchemaType
+      | optional,
+    markdownDescription | String | default = "",
+    description | String | default = "",
 
-  # Integer/Number Props
-  minimum | Nullable Number | optional,
-  maximum | Nullable Number | optional,
-  exclusiveMaximum | std.contract.any_of [ Number, Bool ] | optional,
-  exclusiveMinimum | std.contract.any_of [ Number, Bool ] | optional,
-  multipleOf | Number | optional,
+    # Integer/Number Props
+    minimum | Nullable Number | optional,
+    maximum | Nullable Number | optional,
+    exclusiveMaximum | std.contract.any_of [ Number, Bool ] | optional,
+    exclusiveMinimum | std.contract.any_of [ Number, Bool ] | optional,
+    multipleOf | Number | optional,
 
-  # Array Props
-  items | std.contract.any_of [ Bool, { .. }] | optional, # TODO: make a schema contract
-  prefixItems | Array { .. } | optional, # Schema contract please
-  contains | { .. } | optional,
-  minContains | std.number.PosNat | optional,
-  maxContains | std.number.PosNat | optional,
-  minItems | std.number.Nat | optional,
-  maxItems | std.number.PosNat | optional,
-  uniqueness | Bool | optional,
+    # Array Props
+    items | std.contract.any_of [ Bool, { .. }] | optional, # TODO: make a schema contract
+    prefixItems | Array { .. } | optional, # Schema contract please
+    contains | { .. } | optional,
+    minContains | std.number.PosNat | optional,
+    maxContains | std.number.PosNat | optional,
+    minItems | std.number.Nat | optional,
+    maxItems | std.number.PosNat | optional,
+    uniqueness | Bool | optional,
 
-  # String Props
-  minLength | std.number.Integer | optional,
-  maxLength | std.number.Integer | optional,
-  pattern | String | optional,
-  # TODO: format is abused by json schemas, convert this to just a a simple array check
-  format
-    | std.enum.TagOrString
-    | [|
-      'date-time,
-      'time,
-      'date,
-      'duration,
-      'email,
-      'idn-hostname,
-      'ipv4,
-      'ipv6,
-      'uuid,
-      'uri,
-      'uri-reference,
-      'iri,
-      'iri-referemce,
-      'uri-template,
-      'json-pointer,
-      'relative-json-pointer,
-      'regex,
-      'uint64,
-      'int64,
-      'int32,
-      'byte,
-      'binary,
-      'string,
-      'url,
-      'int-or-string
-    |]
-    | optional,
+    # String Props
+    minLength | std.number.Integer | optional,
+    maxLength | std.number.Integer | optional,
+    pattern | String | optional,
+    # TODO: format is abused by json schemas, convert this to just a a simple array check
+    format
+      | std.enum.TagOrString
+      | [|
+        'date-time,
+        'time,
+        'date,
+        'duration,
+        'email,
+        'idn-hostname,
+        'ipv4,
+        'ipv6,
+        'uuid,
+        'uri,
+        'uri-reference,
+        'iri,
+        'iri-referemce,
+        'uri-template,
+        'json-pointer,
+        'relative-json-pointer,
+        'regex,
+        'uint64,
+        'int64,
+        'int32,
+        'byte,
+        'binary,
+        'string,
+        'url,
+        'int-or-string
+      |]
+      | optional,
 
-  # Object Props
-  required | Array String | default = [],
-  properties | { _ | { .. } } | default = {},
-  patternProperties | { _ | { .. } } | default = {},
-  # TODO: this need special contract, bool or schema
-  additionalProperties | Dyn | optional,
+    # Object Props
+    required | Array String | default = [],
+    properties | { _ | { .. } } | default = {},
+    patternProperties | { _ | { .. } } | default = {},
+    # TODO: this need special contract, bool or schema
+    additionalProperties | Dyn | optional,
 
-  oneOf | Array JsonSchema | optional,
-  anyOf | Array JsonSchema | optional,
-  allOf | Array JsonSchema | optional,
-  not | JsonSchema | optional,
-  ..
-}
+    oneOf | Array JsonSchema | optional,
+    anyOf | Array JsonSchema | optional,
+    allOf | Array JsonSchema | optional,
+    not | JsonSchema | optional,
+    ..
+  }
 in
 let Schemas = {
   NumberSchema = {
@@ -377,7 +393,7 @@ let Converters = {
         if (!std.record.has_field "additionalProperties" schema || (std.record.has_field "additionalProperties" schema && std.typeof schema.additionalProperties == 'Bool))
           && schema.patternProperties == {}
           && !noLazy => propertiesSchema,
-        _ => "lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema}"
+        _ => "(lib.records.JsonObject %{nonLazyProperties}\n %{patternPropertiesSchema} %{additionalPropertiesSchema})"
       },
 
   array_handler | Schemas.ArraySchema -> String
@@ -517,6 +533,15 @@ let Converters = {
         else
           schema
           |> match {
+            # Represent a multi-type schema as an AnyOf Contract
+            { ..rest } if std.record.has_field "type" rest && std.typeof rest.type == 'Array =>
+              (
+                std.array.fold_right
+                  (fun e acc => acc ++ (json_schema_to_nickel (rest & { type | force = e }) false) ++ ",\n")
+                  "lib.contracts.OneOf [ "
+                  rest.type
+              )
+              ++ "]",
             { type = 'string, enum, ..rest } => stirng_handler schema,
             { enum, ..rest } => enum_handler enum,
             { const, ..rest } => "std.contract.from_predicate(fun val => val == %{print_const_value const})",
