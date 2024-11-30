@@ -18,45 +18,57 @@ in
       },
       (
         lib.contracts.OneOf [
-          lib.records.JsonObject
-            {
-              regex = { contract = Dyn, optional = false, },
-            }
-            {}
-            true,
-          lib.records.JsonObject
-            {
-              prefix = { contract = Dyn, optional = false, },
-            }
-            {}
-            true,
-          lib.records.JsonObject
-            {
-              exact = { contract = Dyn, optional = false, },
-            }
-            {}
-            true,
+          (
+            lib.records.JsonObject
+              {
+                regex = { contract = Dyn, optional = false, },
+              }
+              {}
+              true
+          ),
+          (
+            lib.records.JsonObject
+              {
+                prefix = { contract = Dyn, optional = false, },
+              }
+              {}
+              true
+          ),
+          (
+            lib.records.JsonObject
+              {
+                exact = { contract = Dyn, optional = false, },
+              }
+              {}
+              true
+          ),
           (
             std.contract.not (
               std.contract.any_of [
-                lib.records.JsonObject
-                  {
-                    regex = { contract = Dyn, optional = false, },
-                  }
-                  {}
-                  true,
-                lib.records.JsonObject
-                  {
-                    prefix = { contract = Dyn, optional = false, },
-                  }
-                  {}
-                  true,
-                lib.records.JsonObject
-                  {
-                    exact = { contract = Dyn, optional = false, },
-                  }
-                  {}
-                  true,
+                (
+                  lib.records.JsonObject
+                    {
+                      regex = { contract = Dyn, optional = false, },
+                    }
+                    {}
+                    true
+                ),
+                (
+                  lib.records.JsonObject
+                    {
+                      prefix = { contract = Dyn, optional = false, },
+                    }
+                    {}
+                    true
+                ),
+                (
+                  lib.records.JsonObject
+                    {
+                      exact = { contract = Dyn, optional = false, },
+                    }
+                    {}
+                    true
+                ),
               ]
             )
           ),

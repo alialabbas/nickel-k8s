@@ -1,0 +1,8 @@
+{
+  "type": [
+    "string",
+    "integer"
+  ],
+  "maximum": 20,
+  "maxLength": 10
+}
