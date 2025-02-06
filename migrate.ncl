@@ -14,7 +14,3 @@ let all =
     {}
 in
 { Manifests = all }
-# Here we use the extended release to allow add our type with an open ended schema to make the migration process easy until the user fully type their custom CRD
-# an auto generated contract from the CRD would definitely help to make this even better since it would at least give the bare bone work and then boom
-# they just add what they add later or modify what is modified
-  # | (import "kube.ncl").Release

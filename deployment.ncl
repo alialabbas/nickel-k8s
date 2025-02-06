@@ -14,118 +14,91 @@ in
 # also, maybe not pass template and instead internal contracts would have labels only
 # The outer here is just a realization of the contract, i.e. we leave this to the caller to decide how to wrap the contract.
 # now what is left is just cleaning up the contract
-let rec SelectorValidatorContract = fun template label value =>
-  let podLabels = template.metadata.labels |> std.record.to_array in
-  let matchLabelsContract = fun label value =>
-    let errMsg = podLabels |> std.array.fold_right (fun e acc => m%"{ %{e.field} = %{e.value} }"% ++ " " ++ acc) "" in
-    let matchSelectors = value.matchLabels |> std.record.to_array in
-    if matchSelectors
-    |> std.array.all (fun e =>
-      if !std.array.elem e podLabels then
-        std.contract.blame_with_message "matchLabel should match at least one of the following [%{errMsg}]" label
+let SelectorValidatorContract = fun template =>
+  std.contract.custom (fun label value =>
+    let podLabels = template.metadata.labels |> std.record.to_array in
+    let Labels = lib.enum.ArrayEnum podLabels in
+
+    let MatchLabelContract =
+      std.contract.custom (fun label value =>
+        let errMsg = podLabels |> std.array.fold_right (fun e acc => m%"{ %{e.field} = %{e.value} }"% ++ " " ++ acc) "" in
+        let label = std.contract.label.with_message "matchLabel should match at least one of the following [%{errMsg}]" label in
+        let matchSelectors =
+          value.matchLabels
+          |> std.record.to_array
+          |> std.array.map (fun e =>
+            std.contract.apply Labels label e
+          )
+          |> std.record.from_array
+        in
+        'Ok matchSelectors
+      )
+    in
+
+    let matchExpressionContract = fun label value =>
+      let expressions = value.matchExpressions in
+      let existErrMsg =
+        podLabels
+        |> std.array.fold_right
+          (fun e acc => e.field ++ " " ++ acc
+          )
+          ""
+      in
+      let inErrorMsg =
+        podLabels
+        |> std.array.fold_right
+          (fun e acc => m%"{ %{e.field} = %{e.value} }"% ++ " " ++ acc
+          )
+          ""
+      in
+      if !(
+        expressions
+        |> std.array.all (fun expr =>
+          expr.operator
+          |> match {
+            "In" =>
+              # key should be in labels and one of the listed values should match the label value
+              # somehow, somehow, values here is a function
+              if !std.array.any (fun v => std.array.elem { field = expr.key, value = v } podLabels) expr.values then
+                std.contract.blame_with_message "In Expression need to match one of the following [%{inErrorMsg}]" label
+              else
+                true,
+            "NotIn" =>
+              # Key not matching is fine, but if the key matches, we need to get the value out and check we are not excluding a value listed in the original label set
+              let podLabels = template.metadata.labels in
+              if (std.record.has_field expr.key podLabels) && (std.array.elem (std.record.get expr.key podLabels) expr.values) then
+                std.contract.blame_with_message m%"NotIn expression can't exclude value from the pod labels"% label
+              else
+                true,
+            "Exists" =>
+              if !std.array.any (fun e => e.field == expr.key) podLabels then
+                std.contract.blame_with_message m%"PodLabels doesn't have label key %{expr.key}, only one of the following are possible [%{existErrMsg}]"% label
+              else
+                true,
+            "DoesNotExist" =>
+              if std.array.any (fun e => e.field == expr.key) podLabels then
+                std.contract.blame_with_message m%"DoesNotExist can't use %{expr.key}, since this is one of the pod template values [%{existErrMsg}] and the workload won't be able to selecto the created pods"% label
+              else
+                true,
+            _ => std.contract.blame_with_message m%"Invalid operator %{expr.operator}"%,
+          }
+        )
+      ) then
+        std.contract.blame_with_message "Uncaught error, shuold never reach this point" label
       else
-        true
-    ) then
-      value
-    else
-      std.contract.blame label
-  in
-
-  let matchExpressionContract = fun label value =>
-    let expressions = value.matchExpressions in
-    let existErrMsg =
-      podLabels
-      |> std.array.fold_right
-        (fun e acc => e.field ++ " " ++ acc
-        )
-        ""
+        value
     in
-    let inErrorMsg =
-      podLabels
-      |> std.array.fold_right
-        (fun e acc => m%"{ %{e.field} = %{e.value} }"% ++ " " ++ acc
-        )
-        ""
-    in
-    if !(
-      expressions
-      |> std.array.all (fun expr =>
-        expr.operator
-        |> match {
-          "In" =>
-            # key should be in labels and one of the listed values should match the label value
-            # somehow, somehow, values here is a function
-            if !std.array.any (fun v => std.array.elem { field = expr.key, value = v } podLabels) expr.values then
-              std.contract.blame_with_message "In Expression need to match one of the following [%{inErrorMsg}]" label
-            else
-              true,
-          "NotIn" =>
-            # Key not matching is fine, but if the key matches, we need to get the value out and check we are not excluding a value listed in the original label set
-            let podLabels = template.metadata.labels in
-            if (std.record.has_field expr.key podLabels) && (std.array.elem (std.record.get expr.key podLabels) expr.values) then
-              std.contract.blame_with_message m%"NotIn expression can't exclude value from the pod labels"% label
-            else
-              true,
-          "Exists" =>
-            if !std.array.any (fun e => e.field == expr.key) podLabels then
-              std.contract.blame_with_message m%"PodLabels doesn't have label key %{expr.key}, only one of the following are possible [%{existErrMsg}]"% label
-            else
-              true,
-          "DoesNotExist" =>
-            if std.array.any (fun e => e.field == expr.key) podLabels then
-              std.contract.blame_with_message m%"DoesNotExist can't use %{expr.key}, since this is one of the pod template values [%{existErrMsg}] and the workload won't be able to selecto the created pods"% label
-            else
-              true,
-          _ => std.contract.blame_with_message m%"Invalid operator %{expr.operator}"%,
-        }
-      )
-    ) then
-      std.contract.blame_with_message "Uncaught error, shuold never reach this point" label
-    else
-      value
-  in
 
-  value
-  |> match {
-    { matchExpressions } => std.contract.apply matchExpressionContract label value,
-    { matchLabels } => std.contract.apply matchLabelsContract label value,
-    { matchExpressions, matchLabels } => std.contract.apply (std.contract.Sequence [matchLabelsContract, matchExpressionContract]) label value,
-    _ => std.contract.blame_with_message "No matching selector found" label,
-  }
+    value
+    |> match {
+      { matchExpressions } => std.contract.apply matchExpressionContract label value,
+      { matchLabels } => 'Ok (value | MatchLabelContract),
+      { matchExpressions, matchLabels } => std.contract.apply (std.contract.Sequence [MatchLabelContract, matchExpressionContract]) label value,
+      _ => std.contract.blame_with_message "No matching selector found" label,
+    }
+  )
 in
 
-let fieldRefContract =
-  let validFieldRefs = [
-    "metadata.name",
-    "metadata.namespace",
-    "metadata.labels",
-    "metadata.annotations",
-    "spec.nodeName",
-    "spec.serviceAccountName",
-    "status.hostIP",
-    "status.podIP",
-    "status.podIPs",
-  ]
-  in
-  fun label val =>
-    if (
-      (
-        std.is_string val
-        && std.string.is_match "^metadata\\.(labels|annotations)\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" val
-      )
-      || std.array.elem val validFieldRefs
-    ) then
-      val
-    else
-      std.contract.blame_with_message "invalid metadata.labels or metadata.annotations name" label
-in
-let ResourceRefs = [|
-  '"limits.cpu",
-  '"limits.memory",
-  '"requests.cpu",
-  '"requests.memory"
-|]
-in
 let AllPreds = fun preds =>
   std.contract.from_predicate (fun record => std.array.fold_right (fun pred acc => pred record && acc) true preds)
 in
@@ -145,70 +118,124 @@ let OnlyOneOf # this will be higher order func called on the reocrd
           0
           fields == 1
     )
-  in
-let Env = fun label env =>
-  env
-  |> match {
-    { name, value } => env | { name | String, value | String },
-    { name, valueFrom } =>
-      env.valueFrom
-      |> match {
-        { resourceFieldRef } =>
-          env
-            | {
-              name | String,
-              valueFrom
-                | {
-                  resourceFieldRef
-                    | {
-                      containerName | lib.k8s.Name | optional,
-                      quantity | String | optional,
-                      resource | std.enum.TagOrString | ResourceRefs
-                    }
-                }
-            },
-        { secretKeyRef } =>
-          env
-            | {
-              name | String,
-              valueFrom
-                | {
-                  secretKeyRef
-                    | {
-                      key | String,
-                      name | lib.k8s.Name,
-                      "optional" | Bool | optional,
-                    }
-                }
-            },
-        { configMapKeyRef } =>
-          env
-            | {
-              valueFrom
-                | {
-                  configMapKeyRef
-                    | {
-                      key | String,
-                      name | lib.k8s.Name,
-                      "optional" | Bool | optional,
-                    }
-                }
-            },
-        { fieldRef } =>
-          env
-            | {
-              name | String,
-              valueFrom
-                | {
-                  fieldRef | { fieldPath | fieldRefContract, apiVersion | String | optional, }
-                }
-            },
-        _ =>
-          std.contract.blame label,
-      },
-    _ => std.contract.blame label,
-  }
 in
+let Env =
+  let fieldRefContract =
+    let validFieldRefs = [
+      "metadata.name",
+      "metadata.namespace",
+      "metadata.labels",
+      "metadata.annotations",
+      "spec.nodeName",
+      "spec.serviceAccountName",
+      "status.hostIP",
+      "status.podIP",
+      "status.podIPs",
+    ]
+    in
+    std.contract.from_validator (fun val =>
+      if (
+        (
+          std.is_string val
+          && std.string.is_match "^metadata\\.(labels|annotations)\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" val
+        )
+        || std.array.elem val validFieldRefs
+      ) then
+        'Ok
+      else
+        'Error { message = "invalid metadata.labels or metadata.annotations name" }
+    )
+  in
+  let ResourceRefs = [|
+    '"limits.cpu",
+    '"limits.memory",
+    '"requests.cpu",
+    '"requests.memory"
+  |]
+  in
+  std.contract.custom (fun label env =>
+    let
+      with_delayed_value_check =
+        let label_msg = std.contract.label.with_message "Invalid Env" label in
+        std.contract.apply { name | String, value | String } label_msg env,
+      with_delayed_resourceref_check =
+        let label_msg = std.contract.label.with_message "Invalid valueFrom env with resourceFieldRef" label in
+        std.contract.apply
+          {
+            name | String,
+            valueFrom
+              | {
+                resourceFieldRef
+                  | {
+                    containerName | lib.k8s.Name | optional,
+                    quantity | String | optional,
+                    resource | std.enum.TagOrString | ResourceRefs
+                  }
+              }
+          }
+          label_msg
+          env,
+      with_delayed_secretKeyRef_check =
+        std.contract.apply
+          {
+            name | String,
+            valueFrom
+              | {
+                secretKeyRef
+                  | {
+                    key | String,
+                    name | lib.k8s.Name,
+                    optional | Bool | optional,
+                  }
+              }
+          }
+          label
+          env,
+      with_delayed_configMapKeyRef_check =
+        std.contract.apply
+          {
+            valueFrom
+              | {
+                configMapKeyRef
+                  | {
+                    key | String,
+                    name | lib.k8s.Name,
+                    "optional" | Bool | optional,
+                  }
+              }
+          }
+          label
+          env,
+      with_delayed_fieldRef_check =
+        std.contract.apply
+          {
+            name | String,
+            valueFrom
+              | {
+                fieldRef | { fieldPath | fieldRefContract, apiVersion | String | optional, }
+              }
+          }
+          label
+          env,
+    in
+
+    env
+    |> match {
+      { name, value } => 'Ok with_delayed_value_check,
+      { name, valueFrom } =>
+        env.valueFrom
+        |> match {
+          { resourceFieldRef } => 'Ok with_delayed_resourceref_check,
+          { secretKeyRef } => 'Ok with_delayed_secretKeyRef_check,
+          { configMapKeyRef } => 'Ok with_delayed_configMapKeyRef_check,
+          { fieldRef } => 'Ok with_delayed_fieldRef_check,
+          _ => 'Error { message = "Invalid valueFrom source valid sources are `resourceFieldRef`, `secretKeyRef`, `configMapKeyRef` or `fieldRef`" },
+        },
+      _ => 'Error { message = "Invalid Env source, either `value` or `valueFrom`" },
+    }
+  )
+in
+
 let EnvFrom = {
   configMapRef | { name | lib.k8s.Name, .. } | optional,
   secretRef | { name | lib.k8s.Name, .. } | optional,
@@ -429,7 +456,7 @@ in
 let onlyLinux
   | doc "predicate to allow certain podspec config to only be available from a specific pod.spec.os.name"
   = fun val => std.contract.from_predicate (fun ignoredRecord => val == null || val.name == "linux")
-  in
+in
 let onlyWindows = fun val => std.contract.from_predicate (fun ignoredRecord => val == null || val.name == "windows") in
 let podSpec = {
   activeDeadlineSeconds | std.number.PosNat | optional,
@@ -462,11 +489,11 @@ let podSpec = {
   hostAliases | Array { hostnames | Array String, ip | String } | optional,
   initContainers | Array ContainerSpec | optional,
   nodeSelector | lib.k8s.Labels | optional, # TODO: basic selector thingy
-  restartPolicy | std.enum.TagOrString | [| 'Always, 'OnFailure, 'Never |] | optional,
+  restartPolicy | lib.enum.StringOrEnum [| 'Always, 'OnFailure, 'Never |] | optional,
   os
     | { name | lib.enum.StringOrEnum [| 'linux, 'windows |], }
     | optional,
-  preemptionPolicy | std.enum.TagOrString | [| 'Never, 'PreemptLowerPriority |] | optional,
+  preemptionPolicy | lib.enum.StringOrEnum [| 'Never, 'PreemptLowerPriority |] | optional,
 
   securityContext
     | {
@@ -582,9 +609,9 @@ in
       | {
         minReadySeconds | std.number.PosNat | optional,
         progressDeadlineSeconds | std.number.PosNat | optional,
-        replicas | std.number.PosNat | optional,
+        replicas | std.number.Nat | optional,
         revisionHistoryLimit | std.number.PosNat | optional,
-        selector | lib.k8s.WorkloadSelector | SelectorValidatorContract template,
+        selector | lib.k8s.WorkloadSelector, #| SelectorValidatorContract template,
         strategy
           | {
             type | lib.enum.StringOrEnum [| 'RollingUpdate, 'Recreate |] | optional,
@@ -616,10 +643,10 @@ in
       | {
         minReadySeconds | std.number.PosNat | optional,
         ordinals | { start | std.number.PosNat } | optional,
-        replicas | std.number.PosNat | optional,
+        replicas | std.number.Nat | optional,
         revisionHistoryLimit | std.number.PosNat | optional,
         podManagementPolicy | lib.enum.StringOrEnum [| 'Parallel, 'OrderedReady |] | optional,
-        selector | lib.k8s.WorkloadSelector | SelectorValidatorContract template,
+        selector | lib.k8s.WorkloadSelector, #| SelectorValidatorContract template,
         serviceName | lib.k8s.Name,
         template = {
           metadata | lib.k8s.Metadata,
@@ -717,7 +744,8 @@ in
     metadata | lib.k8s.ResourceMetadata,
     spec
       | {
-        selector | lib.k8s.WorkloadSelector | SelectorValidatorContract template,
+        # TODO: SelectorValidatorContract is too rigid for a base overlay, this should only be part of the self-contained checks
+        selector | lib.k8s.WorkloadSelector, # | SelectorValidatorContract template,
         updateStrategy | { .. } | optional,
         template | { spec | podSpec, metadata | lib.k8s.Metadata | optional },
       },

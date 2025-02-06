@@ -1,4 +1,7 @@
 let { Release, .. } = import "../kube.ncl" in
+let s = import "../nickel-schema.ncl" in
+let k8s = import "./k8s-v1.31.0-swagger.json" in
+let k8s = s.k8s_schemas k8s in
 let { ValidateServiceMatchPod, PortCheck, .. } = import "../release-validations.ncl" in
 let t = import "../transfomers.ncl" in
 
@@ -36,7 +39,7 @@ in
           std.serialize
             'Yaml
             (
-              (import "./config.yaml") | (import "./otelconfig.ncl")
+              (import "config.yaml") # | (import "otelconfig.ncl")
             ),
       },
       metadata = {
@@ -154,19 +157,19 @@ in
         },
       },
     },
-    # svcMonitor = {
-    #   apiVersion = "monitoring.coreos.com/v1",
-    #   kind = "ServiceMonitors",
-    #   metadata = {
-    #     labels = { serviceMonitorSelector = "prometheus", },
-    #     name = "prometheus",
-    #     namespace = "prometheus",
-    #   },
-    #   spec = {
-    #     endpoints = [{ interval = "30s", path = "/metrics", targetPort = 9090, }],
-    #     namespaceSelector = { matchNames = ["prometheus"], },
-    #     selector = { matchLabels = { operated-prometheus = "true", }, },
-    #   },
-    # }
+    svcMonitor = {
+      apiVersion = "monitoring.coreos.com/v1",
+      kind = "ServiceMonitor",
+      metadata = {
+        labels = { serviceMonitorSelector = "prometheus", },
+        name = "prometheus",
+        namespace = "prometheus",
+      },
+      spec = {
+        endpoints = [{ interval = "30s", path = "/metrics", targetPort = 9090, }],
+        namespaceSelector = { matchNames = ["prometheus"], },
+        selector = { matchLabels = { operated-prometheus = "true", }, },
+      },
+    }
   },
-} | Release InputSchema
+}  | Release InputSchema

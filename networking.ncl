@@ -1,19 +1,11 @@
 let lib = import "lib.ncl" in
-let portOrProtocol = fun label value =>
-  std.typeof value
-  |> match {
-    'String => value | lib.k8s.Name,
-    'Number => value | lib.networking.Port,
-    _ => std.contract.blame_with_message "expected a port number or a protocol name" label,
-  }
-in
 let svcPort = {
   appProtocol | lib.k8s.Name | optional,
   name | lib.k8s.Name | optional, # Only on singular svcPort
   nodePort | lib.networking.Port | optional,
   port | lib.networking.Port | optional,
   protocol | lib.enum.StringOrEnum [| 'TCP, 'STCP, 'UDP |] | optional,
-  targetPort | portOrProtocol | optional,
+  targetPort | lib.k8s.PortOrName | optional,
 }
 in
 {
@@ -40,7 +32,6 @@ in
           publishNotReadyAddresses | Bool | optional,
           selector | lib.k8s.Labels | optional,
           sessionAffinity | lib.enum.StringOrEnum [| 'ClientIP, 'None |] | optional,
-          sessionAffinityConfig | { .. } | optional, # TODO: close this contract
           type | lib.enum.StringOrEnum [| 'ClusterIP, 'ExternalName, 'NodePort, 'LoadBalancer |] | optional,
           loadBalancerClass | String | optional,
           healthCheckNodePort | std.number.Integer | optional,

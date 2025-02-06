@@ -5,19 +5,21 @@ let validLabel
       "^[a-zA-Z0-9]([-_/\\.a-zA-Z0-9]*[a-zA-Z0-9]\\/?[a-zA-Z0-9]*[a-zA-Z0-9]?)?$"
     # "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
       str
-  in
+in
 let OnlyWhenInOrNotIn
   | doc "Selector values need to be empty if the operator is Exist or DoesNotExist, and In or NotIn, values can't be empty"
-  = fun operator label value =>
-    operator
-    |> match {
-      "In" => value,
-      "NotIn" => value,
-      "Exists" => std.contract.blame_with_message "Exists and DoesNotExist can't have values defined" label,
-      "DoesNotExist" => std.contract.blame_with_message "Exists and DoesNotExist can't have values defined" label,
-      _ => std.contract.blame_with_message m%"Unkown Operator %{std.to_string operator}"% label,
-    }
-  in
+  = fun operator =>
+    std.contract.from_validator (fun value =>
+      operator
+      |> match {
+        "In" => 'Ok,
+        "NotIn" => 'Ok,
+        "Exists" => 'Error { message = "Exists and DoesNotExist can't have values defined" },
+        "DoesNotExist" => 'Error { message = "Exists and DoesNotExist can't have values defined" },
+        _ => 'Error { message = "Unkown Operator %{std.to_string operator}" },
+      }
+    )
+in
 {
   k8s
     | doc m%"
@@ -34,8 +36,7 @@ let OnlyWhenInOrNotIn
         = std.contract.from_predicate (fun name => std.string.is_match "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" name),
 
       Resource
-        | doc m%"
-          Kubernetes compute resource, cpu and memory
+        | doc m%" Kubernetes compute resource, cpu and memory
           ```nickel
           1000  | Resource
           ```
@@ -49,13 +50,19 @@ let OnlyWhenInOrNotIn
 
       PortOrName
         | doc "Define a port either by standard port range a port name like http, grpc, etc."
-        = fun label port =>
-          std.typeof port
-          |> match {
-            'String => port | Name,
-            'Number => port | networking.Port,
-            _ => std.contract.blame_with_message "Expected either a port name or port number, got neither" label,
-          },
+        =
+          std.contract.custom (fun label port =>
+            let
+              port_name_check = std.contract.apply Name label port,
+              port_number_check = std.contract.apply networking.Port label port,
+            in
+            std.typeof port
+            |> match {
+              'String => 'Ok port_name_check,
+              'Number => 'Ok port_number_check,
+              _ => 'Error { message = "Expected either a port name or port number, got neither" },
+            }
+          ),
 
       Manifest
         | doc m%"KubeResrouce requires apiVersion, kind and metadata.name"%
@@ -113,12 +120,14 @@ let OnlyWhenInOrNotIn
             Similar to LabelSelector except that it is enforcing the minimal required properties for when a selector object used in workload
             e.g deploymentspec.selector requires matchExpressions or matchLabels to be specified
           "%
-        = fun label value =>
-          if std.is_record value
-          && (std.record.has_field "matchLabels" value || std.record.has_field "matchExpressions" value) then
-            value | LabelSelector
-          else
-            std.contract.blame_with_message "Invalid Selector" label,
+        =
+          std.contract.custom (fun label value =>
+            if std.is_record value
+            && (std.record.has_field "matchLabels" value || std.record.has_field "matchExpressions" value) then
+              'Ok (value | LabelSelector)
+            else
+              'Error { message = "Need to define at least `matchLabels` or `matchExpressions`" }
+          ),
 
       to_bytes
         | doc "Convert Request/Limits to total bytes"
@@ -202,6 +211,50 @@ let OnlyWhenInOrNotIn
     },
 
   contracts = {
+
+    ArrayOf
+      | doc m%"
+          Non-Lazy implementation of `Array` Contract. Useful in cases when a result is expected to be immediately available like in std.contract.any and such.
+          ```nickel
+          [1,2,3,4] | ArrayOf Number
+          ```
+      "%
+      = fun element =>
+        std.contract.custom (fun label value =>
+          # TODO: restructure this to allow us to extract error messages more than just than the offending values
+          # maybe since it is an array we should just do, value at i with error E
+          let failedContracts =
+            value
+            |> std.array.fold_right
+              (fun e acc =>
+                std.contract.check
+                  element
+                  label
+                  e
+                |> match {
+                  'Ok _ => acc,
+                  'Error v => [e] @ acc
+                }
+              )
+              []
+          in
+          std.typeof value
+          |> match {
+            'Array =>
+              if std.array.length failedContracts == 0 then
+                'Ok value
+              else
+                'Error {
+                  message = "Some array elements don't match their contract\noffending values:\n%{std.serialize 'Json failedContracts}",
+                  notes = []
+                },
+            t =>
+              'Error {
+                message = "Expected an array, got %{std.to_string t}"
+              },
+          }
+        ),
+
     IsContract
       | doc m%"
       Utility test method to check if a value is valid against a contract. Doesn't work with records and arrays since those are lazy by design.
@@ -214,56 +267,107 @@ let OnlyWhenInOrNotIn
             'Error _ => 'Ok false
           }
         ),
+
+    "Bool" =
+      std.contract.from_validator (fun value =>
+        let type = std.typeof value in
+        if type != 'Bool then
+          'Error { message = "Expected a `Bool`, got `%{std.to_string type}`" }
+        else
+          'Ok
+      ),
+
+    "Number" =
+      std.contract.from_validator (fun value =>
+        let type = std.typeof value in
+        if type != 'Number then
+          'Error { message = "Expected a number, got %{std.to_string type}" }
+        else
+          'Ok
+      ),
+
+    "String" =
+      std.contract.from_validator (fun value =>
+        let type = std.typeof value in
+        if type != 'String then
+          'Error { message = "Expected a string, got %{std.to_string type}" }
+        else
+          'Ok
+      ),
+    Equal
+      | doc "Equality Contract"
+      = fun equal =>
+        std.contract.custom (fun label value =>
+          if value == equal then
+            'Ok value
+          else
+            # TODO: stringify records here
+            'Error { message = "Expected value to be equal to %{std.to_string (std.serialize 'Json equal)}" }
+        ),
+
     # TODO: check this contract failing, thinking the value is function
     AnyOf
       | doc "Contract for checking if an array has a specific length, min, max or both"
       | Array Dyn -> Dyn
       = fun contracts =>
         std.contract.custom (fun label value =>
-          let validations =
+          let checks =
             std.array.fold_right
               (fun c acc =>
-                # std.contract.check (std.contract.from_predicate (fun value => (value | c) == value)) label value
-                std.contract.check c label value
-                |> match {
-                  'Ok val => acc @ ['Ok val],
-                  'Error _ => acc,
-                }
+                acc @ [std.contract.check c label value]
               )
               []
               contracts
-            |> std.array.filter (fun e => e |> match { 'Ok _ => true, _ => false })
           in
+          let errors =
+            std.array.fold_right
+              (fun e acc =>
+                e
+                |> match {
+                  'Error err if std.record.has_field "message" err => acc @ [err.message],
+                  _ => acc
+                }
+              )
+              []
+              checks
+          in
+          let validations = checks |> std.array.filter (fun e => e |> match { 'Ok _ => true, _ => false }) in
           let len = std.array.length validations in
           if len == 0 then
-            'Error { message = "Didn't match any of the applied contracts" }
+            'Error { message = "Didn't match any of the applied contracts", notes = errors }
           else
             'Ok value
         ),
+
     OneOf
       | doc "Contract for checking if an array has a specific length, min, max or both"
       | Array Dyn -> Dyn
       = fun contracts =>
         std.contract.custom (fun label value =>
-          let validations =
+          let checks =
             std.array.fold_right
               (fun c acc =>
-                # std.contract.check (std.contract.from_predicate (fun value => (value | c) == value)) label value
-                std.contract.check c label value
-                |> match {
-                  'Ok val => acc @ ['Ok val],
-                  'Error _ => acc,
-                }
+                acc @ [std.contract.check c label value]
               )
               []
               contracts
-            |> std.array.filter (fun e => e |> match { 'Ok _ => true, _ => false })
           in
+          let errors =
+            std.array.fold_right
+              (fun e acc =>
+                e
+                |> match {
+                  'Error err if std.record.has_field "message" err => acc @ [err.message],
+                  _ => acc
+                }
+              )
+              []
+              checks
+          in
+          let validations = checks |> std.array.filter (fun e => e |> match { 'Ok _ => true, _ => false }) in
           let len = std.array.length validations in
-          if len == 0 then
-            'Error { message = "Didn't match any of the applied contracts" }
-          else if len > 1 then
-            'Error { message = "matched against %{std.to_string len} contracts" }
+          if len != 1 then
+            'Error { message = "OneOf matched against %{std.to_string len} contracts\n%{std.serialize 'Json errors}", notes = errors }
           else
             'Ok value
         ),
@@ -380,13 +484,12 @@ let OnlyWhenInOrNotIn
               v
           ),
 
-      DateTime | doc "Simple ISO-8601 DateTime regex, doesn't check for leap years"
-        =
-          std.contract.from_predicate (fun v =>
-            std.string.is_match
-              "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$"
-              v
-          ),
+      DateTime | doc "Simple ISO-8601 DateTime regex, doesn't check for leap years" =
+        std.contract.from_predicate (fun v =>
+          std.string.is_match
+            "^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$"
+            v
+        ),
 
       Duration | doc "e.g P3D, P3Y" = std.contract.from_predicate (fun v => std.string.is_match "^P\\d+(D|M|Y)$" v),
     },
@@ -399,6 +502,26 @@ let OnlyWhenInOrNotIn
         _ => 'Ok,
       }
       ),
+    MutualExclusive
+      | doc "enforce mutual exclusion on a set of record fields"
+      = fun fields =>
+        std.contract.custom (fun label record =>
+          let declared_fields = std.record.fields record in
+          let found =
+            std.array.fold_right
+              (fun field acc => if (std.record.has_field field record) then acc + 1 else acc)
+              0
+              fields
+          in
+          if found != 1 then
+            let errMsg =
+              fields
+              |> std.array.fold_right (fun field acc => acc ++ " " ++ field) "The following fields are mutually exclusive:"
+            in
+            'Error { message = errMsg }
+          else
+            'Ok record
+        ),
     # there needs to be an IsRecord contract that allow us to check if a contract is valid or not
     # I guess this means any record needs to be modeled using this IsRecord/JsonObject model
     # AnyOf can't work with lazy contrats, OneOf can't, Not can't
@@ -456,13 +579,13 @@ let OnlyWhenInOrNotIn
                         std.contract.check (IsRecord contract."%{e.field}") label e.value
                         |> match {
                           'Ok v => ('Ok v),
-                          'Error val => std.trace "here" ('Error val),
+                          'Error val => ('Error val),
                         }
                       else
                         std.contract.check contract."%{e.field}" label e.value
                         |> match {
-                          'Ok v => std.trace "ok normla" ('Ok v),
-                          'Error val => std.trace "inhere" ('Error val),
+                          'Ok v => ('Ok v),
+                          'Error val => ('Error val),
                         }
                     )
                     'None,
@@ -477,6 +600,7 @@ let OnlyWhenInOrNotIn
               'Ok _ => 'Ok value,
             }
         ),
+
     JsonObject
       | doc m%"
           Represent a json record using standard json schema model for objects.
@@ -485,9 +609,10 @@ let OnlyWhenInOrNotIn
       : { _ : { optional : Bool, contract : Dyn } } -> { _ : Dyn } -> Dyn -> Dyn
       = fun properties patternProperties additionalProperties =>
         let contract = fun label value =>
+          # Edge Case: When no properties and patterns are set but additional is true, we will need to pass values as is
           # we first check pattern properties
           let result
-            : { checked : Array String, failed : Array String }
+            : { checked : Array String, failed : Array String, object : { _ : Dyn } }
             =
               # TODO: while this work, this can't report an aggregation of all errors when any of the contracts are records, including an error in the main one
               # If this is needed, it is possible to validate the required part and the optional part of each manually and aggregate that in the final result
@@ -506,7 +631,11 @@ let OnlyWhenInOrNotIn
                               std.contract.check p.value label e.value
                               |> match {
                                 'Ok val => "",
-                                'Error val => ("Property %{e.field} matches %{p.field} but doesn't match its contract:\n\t" ++ (std.record.get_or "message" "" val)) | String,
+                                'Error val =>
+                                  (
+                                    "Property %{e.field} matches %{p.field} but doesn't match its contract:\n\t"
+                                    ++ (std.record.get_or "message" "" val)
+                                  ) | String,
                               }
                           in
                           # TODO: this could be written in a better way by contrcut
@@ -523,33 +652,56 @@ let OnlyWhenInOrNotIn
                             else
                               acc.failed
                           in
-                          { checked = newResult, failed = newFailures }
+                          let patternProperties = p.value in # Just to make naming easier to read when looking at `nickel eval`
+                          { checked = newResult, failed = newFailures, object = { "%{e.field}" | patternProperties = e.value } }
                         else
                           acc
                       )
                       acc
                   )
-                  { checked = [], failed = [] }
+                  { checked = [], failed = [], object = {} }
               in
               result
-            in
+          in
 
           # here we want to go over the defined properties and apply their IsContract
           # NOTE: while this look like a root level check only, each field contract could be yet another invocation to JsonObject
-          let result =
+          let result #: { checked : Array String, failed : Array String, object : { _ : Dyn} }
+          =
             std.record.to_array properties
             |> std.array.fold_right
               (fun e acc =>
                 if !std.record.has_field e.field value && !e.value.optional then
-                  { checked = acc.checked, failed = acc.failed @ ["Missing required field `%{e.field}`"] }
+                  {
+                    checked = acc.checked,
+                    failed = acc.failed @ ["Missing required field `%{e.field}`"],
+                    object = acc.object
+                  }
                 else if !std.record.has_field e.field value && e.value.optional then
-                  acc # missing an optional propertie, nothing to do here
+                  # missing an optional propertie, nothing to do here
+                  acc
                 else
                   std.contract.check e.value.contract label value."%{e.field}"
                   |> match {
-                    'Ok _ => { checked = acc.checked @ [e.field], failed = acc.failed },
+                    'Ok _ =>
+                      {
+                        checked = acc.checked @ [e.field],
+                        failed = acc.failed,
+                        object =
+                          let propertyContract = e.value.contract in
+                          let c : { _ : Dyn } = { "%{e.field}" | propertyContract = (value."%{e.field}") } in
+                          (
+                            c
+                            & acc.object
+                          ) | { _ | Dyn }
+                      },
                     # TODO: better error messaging
-                    'Error val => { checked = acc.checked, failed = acc.failed @ ["%{e.field} doesn't match its specified contract"] },
+                    'Error val =>
+                      {
+                        checked = acc.checked,
+                        failed = acc.failed @ ["`%{e.field}` doesn't match its specified contract\n" ++ "%{(std.record.get_or "message" "" val) | String }"],
+                        object = acc.object
+                      },
                   }
               )
               result
@@ -557,29 +709,54 @@ let OnlyWhenInOrNotIn
 
           # get the remaining properties and inject them
           let result =
-            if std.typeof additionalProperties == 'Bool then
-              result
-            else
-              std.record.to_array value
-              # TODO: most likely a lot of this contract validation logic could be in a helper method referenced in many places
-              |> std.array.fold_right
-                (fun e acc =>
-                  if std.array.elem (e.field | Dyn) (result.checked | Array Dyn) then
-                    acc
-                    # NOTE: not obvious, but record contracts are lazying evaluated, meanging we need to apply them or
-                    # the user wraps then in std.contract.custom and apply what we do here themselves
-                  else if std.typeof additionalProperties == 'Record then
-                    if (e.value | additionalProperties) == e.value then { checked = acc.checked, failed = acc.failed } else { checked = acc.checked, failed = acc.failed @ ["additional properties doesn't conform to its record contract"] }
-                  else
-                    std.contract.check additionalProperties label e.value
-                    |> match {
-                      'Ok _ => { checked = acc.checked @ [e.field], failed = acc.failed },
-                      'Error _ => { checked = acc.checked, failed = acc.failed @ ["`%{e.field}` fails to match additional properties contract"] }
+            std.record.to_array value
+            # TODO: most likely a lot of this contract validation logic could be in a helper method referenced in many places
+            |> std.array.fold_right
+              (fun e acc =>
+                # Skip what was already checked
+                if std.array.elem (e.field | Dyn) (result.checked | Array Dyn) then
+                  acc
+                  # NOTE: not obvious, but record contracts are lazying evaluated, meanging we need to apply them or
+                  # the user wraps then in std.contract.custom and apply what we do here themselves
+                  # TODO: remove me, this shouldn't happen
+                else if std.typeof additionalProperties == 'Record then
+                  if (e.value | additionalProperties) == e.value then
+                    {
+                      checked = acc.checked,
+                      failed = acc.failed,
+                      object = acc.object,
                     }
-                )
-                result
+                  else
+                    {
+                      checked = acc.checked,
+                      failed = acc.failed @ ["additional properties doesn't conform to its record contract"],
+                      object = acc.object
+                    }
+                else if std.typeof additionalProperties == 'Bool then
+                  {
+                    checked = acc.checked @ [e.field],
+                    failed = acc.failed,
+                    object = (acc.object & { "%{e.field}" = e.value }) | { _ | Dyn },
+                  }
+                else
+                  std.contract.check additionalProperties label e.value
+                  |> match {
+                    'Ok _ =>
+                      {
+                        checked = acc.checked @ [e.field],
+                        failed = acc.failed,
+                        object = (acc.object & { "%{e.field}" | additionalProperties = e.value }) | { _ | Dyn }
+                      },
+                    'Error _ =>
+                      {
+                        checked = acc.checked,
+                        failed = acc.failed @ ["`%{e.field}` fails to match additional properties contract"],
+                        object = acc.object
+                      }
+                  }
+              )
+              result
           in
-
           let remainingProperties =
             std.record.fields value
             |> std.array.fold_right (fun e acc => if !std.array.elem (e | Dyn) (result.checked | Array Dyn) then acc @ [e] else acc) []
@@ -590,14 +767,14 @@ let OnlyWhenInOrNotIn
           if type != 'Record then
             'Error { message = "expected a record, got `%{std.string.from_enum type}`", notes = [] }
           else if std.array.length result.failed != 0 then
-            'Error { message = "failed inside the contract", notes = result.failed }
+            'Error { message = (result.failed |> std.array.fold_right (fun e acc => "%{e}\n%{acc}") ""), notes = result.failed }
           else if (std.typeof additionalProperties == '"Bool")
           && additionalProperties == false
           && std.array.length remainingProperties > 0 then
-            'Error { message = "record doesn't allow unchecked fields", notes = remainingProperties }
+            'Error { message = "record doesn't allow unchecked fields" ++ (std.serialize 'Json remainingProperties) | String, notes = remainingProperties }
           else
             # NOTE: this approach is not great and doesn't work well with merging contracts
-            'Ok value
+            'Ok result.object
         in
         std.contract.custom contract | Dyn,
 
@@ -619,6 +796,10 @@ let OnlyWhenInOrNotIn
         get_value_at_path leftOverPath value."%{head}"
       else
         'Found value."%{head}",
+
+    get_value_at_path_or_default = fun path default_val value =>
+      let val = get_value_at_path path value in
+      val |> match { 'Found v => v, 'NotFound => default_val },
 
     update_value_at_path
       | doc "Update a value at a given path"
@@ -646,17 +827,40 @@ let OnlyWhenInOrNotIn
 
     MinRange
       | doc "Enforce a lower bound on a number"
-      # | Number -> Bool -> Dyn
-      = fun min minInclusive => std.contract.from_predicate (fun val => if minInclusive then val >= min else val > min),
+      | Number -> Dyn
+      = fun min minInclusive =>
+        std.contract.custom (fun label value =>
+          if minInclusive && value >= min then
+            'Ok value
+          else if value > min then
+            'Ok value
+          else
+            'Error { message = "`%{std.to_string value}` should be greater than `%{std.to_string min}`" }
+        ),
 
     MaxRange
       | doc "Enforce an upper bound on a number"
-      # | Number -> Bool -> Dyn
-      = fun max maxInclusive => std.contract.from_predicate (fun val => if maxInclusive then val <= max else val < max),
+      | Number -> Dyn
+      = fun min maxInclusive =>
+        std.contract.custom (fun label value =>
+          if maxInclusive && value <= min then
+            'Ok value
+          else if value < min then
+            'Ok value
+          else
+            'Error { message = "`%{std.to_string value}` should be less than `%{std.to_string min}`" }
+        ),
+
     MultipleOf
       | doc "JsonSchema multipleOf, i.e. multipleOf 10 will work for 150 but not 1"
-      # | Number -> Bool -> Dyn
-      = fun multiple => std.contract.from_predicate (fun val => val % multiple == 0),
+      | Number -> Dyn
+      = fun multiple =>
+        std.contract.custom (fun label value =>
+          if value % multiple == 0 then
+            'Ok value
+          else
+            'Error { message = "`%{std.to_string value}` should be a multiple of `%{std.to_string multiple}`" }
+        ),
 
     Percentage
       | doc "Custom type that can be represented as number, e.g. 10 or percentage 23%"
@@ -692,18 +896,39 @@ let OnlyWhenInOrNotIn
   },
 
   strings = {
+
     MinLength
       | doc "Ensure a string is of a minimum range"
-      # | Number -> Bool -> Dyn
-      = fun min => std.contract.from_predicate (fun val => std.string.length val >= min),
+      | Number -> Dyn
+      = fun min =>
+        std.contract.custom (fun label value =>
+          if std.string.length value < min then
+            'Error { message = "string needs to at least have %{std.to_string min} characters" }
+          else
+            'Ok value
+        ),
+
     MaxLength
       | doc "Ensure a string of a maxmimum length"
-      # | Number -> Bool -> Dyn
-      = fun max => std.contract.from_predicate (fun val => std.string.length val <= max),
+      | Number -> Dyn
+      = fun max =>
+        std.contract.custom (fun label value =>
+          if std.string.length value > max then
+            'Error { message = "string can only have at most %{std.to_string max} characters" }
+          else
+            'Ok value
+        ),
     Regex
       | doc "Contract matching a string value against a regex"
-      # | String -> Bool -> Dyn
-      = fun regex => std.contract.from_predicate (fun val => std.string.is_match regex val),
+      | String -> Dyn
+      = fun regex =>
+        std.contract.custom (fun label value =>
+          if std.string.is_match regex value then
+            'Ok value
+          else
+            'Error { message = "`%{value}` doesn't match regex `%{regex}`" }
+        ),
+    # = fun regex => std.contract.from_predicate (fun val => std.string.is_match regex val),
     join
       | doc "join array of string on character ignore empty strings"
       : String -> Array String -> String
@@ -726,7 +951,7 @@ let OnlyWhenInOrNotIn
           std.array.elem value elements
           |> match {
             true => 'Ok value,
-            false => 'Error { message = "Enum doesn't match expected enum values" ++ (std.serialize 'Json elements) }
+            false => 'Error { message = "Enum doesn't match expected enum values", notes = [(std.serialize 'Json elements)] }
           }
         ),
     StringOrEnum
@@ -754,14 +979,18 @@ let OnlyWhenInOrNotIn
       | { min | std.number.PosNat | optional, max | std.number.PosNat | optional } -> Dyn
       = fun MinAndMax =>
         std.contract.custom (fun label value =>
-          MinAndMax
-          |> match {
-            {} => 'Ok value,
-            { min } if std.array.length value >= min => 'Ok value,
-            { max } if std.array.length value <= max => 'Ok value,
-            { min, max } if std.array.length value >= min && std.array.length value <= max => 'Ok value,
-            _ => 'Error { message = "Array doesn't satisfy the given constraints Min: %{std.to_string (std.record.get_or "min" "0" MinAndMax)}, Max: %{std.to_string (std.record.get_or "max" "+inf" MinAndMax)}" },
-          }
+          let t = std.typeof value in
+          if t != 'Array then
+            'Error { message = "Expected an Array, got %{std.to_string t}" }
+          else
+            MinAndMax
+            |> match {
+              {} => 'Ok value,
+              { min } if std.array.length value >= min => 'Ok value,
+              { max } if std.array.length value <= max => 'Ok value,
+              { min, max } if std.array.length value >= min && std.array.length value <= max => 'Ok value,
+              _ => 'Error { message = "Array doesn't satisfy the given constraints Min: %{std.to_string (std.record.get_or "min" "0" MinAndMax)}, Max: %{std.to_string (std.record.get_or "max" "+inf" MinAndMax)}" },
+            }
         ),
     Tuple # TODO: this is missing items check to make sure the types of the additional items
       | doc "JsonSchema Array Tuple validation. Checks if every index of in the array matches a given schema"
@@ -851,41 +1080,34 @@ let OnlyWhenInOrNotIn
     | doc m%"Collection of networking related types, ports, ipv4, etc"%
     = {
       Port
-        | doc "Valid port number between 0 to 65535"
+        | doc m%"
+            Valid port number between 0 to 65535
+
+            ```nickel
+            1234 | Port
+            ```
+        "%
         = numbers.InRange 0 true 65535 true,
 
-      # Works but lacks any check around max number of bits calculated
-      # how do we go about that
-      # each fragment should be considered for the total count
-      # another option is to tranform the value before the validation
-      # add the missing zeros this is might not be simple
-      # we have to add for the total missing segments basically
-      # once we have filled the missing pieces, we can do that
-      #IPv6
-      #  | doc "Contract ensuring the string is a valid ipv6 representation"
-      #  =
-      #    std.contract.custom
-      #      (
-      #        fun label value =>
-      #          if std.string.find_all "::" value |> std.array.length > 1 || std.string.find_all ":::" value |> std.array.length > 0 then
-      #            'Error {
-      #              message = "%{value} is a not a valid ipv6"
-      #            }
-      #          else
-      #            'Ok (
-      #              std.string.split ":" value
-      #              |> std.array.filter (fun e => e != "")
-      #              |> std.array.fold_right
-      #                (
-      #                  fun e acc =>
-      #                    if std.string.is_match "[0-9a-f]" e then
-      #                      true
-      #                    else
-      #                      std.contract.blame_with_message "%{value} is not a valid ipv6" label
-      #                )
-      #                false
-      #            )
-      #      ),
+      IPv6
+        | doc "Contract ensuring the string is a valid ipv6 representation"
+        =
+          std.contract.custom (fun label value =>
+            if std.string.find_all "::" value |> std.array.length > 1 || std.string.find_all ":::" value |> std.array.length > 0 then
+              'Error {
+                message = "%{value} is a not a valid ipv6"
+              }
+            else
+              let result =
+                std.string.split ":" value
+                |> std.array.filter (fun e => e != "")
+                |> std.array.all (fun e => std.string.is_match "^[0-9a-fA-F]{1,4}$" e)
+              in
+              if result then
+                'Ok value
+              else
+                'Error { message = "%{value} is not a valid ipv6" }
+          ),
       IPv4
         | doc "IPv4 address"
         =

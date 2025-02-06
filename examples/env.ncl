@@ -85,6 +85,9 @@ let p = import "../policies.ncl" in
         } | k.Release {},
     }
     # This is explicitly loaded here to ensure we have the correct computation of variables all the time
-    & (import "./versions.ncl")
+    & (import "./versions.ncl"),
+
+  k8s_schema = import "./k8s-v1.31.0-swagger.json",
+  crds = import "./stripped-down-crds.yaml",
 }
   | k.Env

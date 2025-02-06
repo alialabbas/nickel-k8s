@@ -1,4 +1,4 @@
-let lib = import "lib.ncl" in
+let lib = import "../lib.ncl" in
 let oneOfTests = [
   1 | lib.contracts.IsContract (lib.contracts.OneOf [ Number, String, Bool ]),
   "string" | lib.contracts.IsContract (lib.contracts.OneOf [ Number, String, Bool ]),

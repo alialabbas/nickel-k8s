@@ -1,9 +1,4 @@
-# These are a list of validate the user can pick from and apply to their releases manually.
-# These can't make any assumption on the type of package they are creating, a package could be a list of configuration
-# Or it could just a deployment with no service, configmap or whatever. Hence the user will need to annotate these themslves
 let dbgMsg = fun items => items |> std.array.fold_right (fun e acc => (std.to_string e) ++ " " ++ acc) "" in
-# let { PodSpec, .. } = import "podspec.ncl" in
-# TODO: This can be in types/pods and not exposed in the final all.ncl
 let PodOrPodTemplate
   | doc m%%"Contract representing a podspec in a workload (deployment, stateulfset, etc) or a Pod Manifest
             This is unsafe when exporting and only used to to allow passing a contracted object of either of those types
