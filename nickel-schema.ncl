@@ -59,6 +59,7 @@ let rec JsonSchema =
       |> match {
         'Array => 'Ok (value | Array (lib.enum.StringOrEnum _types) | lib.arrays.IsSet),
         'String => 'Ok (value | std.enum.TagOrString | _types),
+        'Enum => 'Ok (value | _types),
         _ =>
           'Error {
             message = "Expected either an array or string, got %{std.to_string (std.typeof value)}"
@@ -178,7 +179,7 @@ let rec JsonSchema =
     )
   in
   CoreSchema
-  # std.contract.all_of [CoreSchema, ExtensionKeywordCheck]
+# std.contract.all_of [CoreSchema, ExtensionKeywordCheck]
 in
 let Schemas = {
   # TODO: exclusiveX when Boolean should only be allowed when there is a min or max,

@@ -606,62 +606,58 @@ in
           Represent a json record using standard json schema model for objects.
           Only use this when you want to code generation json schemas since most likely the code would look cleaner if you write your contract by hand.
         "%
-      : { _ : { optional : Bool, contract : Dyn } } -> { _ : Dyn } -> Dyn -> Dyn
       = fun properties patternProperties additionalProperties =>
         let contract = fun label value =>
           # Edge Case: When no properties and patterns are set but additional is true, we will need to pass values as is
           # we first check pattern properties
           let result
-            : { checked : Array String, failed : Array String, object : { _ : Dyn } }
-            =
-              # TODO: while this work, this can't report an aggregation of all errors when any of the contracts are records, including an error in the main one
-              # If this is needed, it is possible to validate the required part and the optional part of each manually and aggregate that in the final result
-              let result =
-                std.record.to_array value
-                |> std.array.fold_right
-                  (fun e acc =>
-                    std.record.to_array patternProperties
-                    |> std.array.fold_right
-                      (fun p acc =>
-                        if std.string.is_match p.field e.field then
-                          let validationResult =
-                            if std.typeof p.value == 'Record then
-                              if (e.value | p.value) == e.value then "" else "pattern doesn't match"
-                            else
-                              std.contract.check p.value label e.value
-                              |> match {
-                                'Ok val => "",
-                                'Error val =>
-                                  (
-                                    "Property %{e.field} matches %{p.field} but doesn't match its contract:\n\t"
-                                    ++ (std.record.get_or "message" "" val)
-                                  ) | String,
-                              }
-                          in
-                          # TODO: this could be written in a better way by contrcut
-                          let newResult =
-                            if validationResult == "" then
-                              acc.checked @ [e.field]
-                            else
-                              acc.checked
-                          in
+          =
+            # TODO: while this work, this can't report an aggregation of all errors when any of the contracts are records, including an error in the main one
+            # If this is needed, it is possible to validate the required part and the optional part of each manually and aggregate that in the final result
+            let result =
+              std.record.to_array value
+              |> std.array.fold_right
+                (fun e acc =>
+                  std.record.to_array patternProperties
+                  |> std.array.fold_right
+                    (fun p acc =>
+                      if std.string.is_match p.field e.field then
+                        let validationResult =
+                          if std.typeof p.value == 'Record then
+                            if (e.value | p.value) == e.value then "" else "pattern doesn't match"
+                          else
+                            std.contract.check p.value label e.value
+                            |> match {
+                              'Ok val => "",
+                              'Error val =>
+                                (
+                                  "Property %{e.field} matches %{p.field} but doesn't match its contract:\n\t"
+                                  ++ (std.record.get_or "message" "" val)
+                                ) | String,
+                            }
+                        in
+                        let newResult =
+                          if validationResult == "" then
+                            acc.checked @ [e.field]
+                          else
+                            acc.checked
+                        in
 
-                          let newFailures =
-                            if validationResult != "" then
-                              acc.failed @ [validationResult]
-                            else
-                              acc.failed
-                          in
-                          let patternProperties = p.value in # Just to make naming easier to read when looking at `nickel eval`
-                          { checked = newResult, failed = newFailures, object = { "%{e.field}" | patternProperties = e.value } }
-                        else
-                          acc
-                      )
-                      acc
-                  )
-                  { checked = [], failed = [], object = {} }
-              in
-              result
+                        let newFailures =
+                          if validationResult != "" then
+                            acc.failed @ [validationResult]
+                          else
+                            acc.failed
+                        in
+                        { checked = newResult, failed = newFailures, object = { "%{e.field}" | p.value = e.value } }
+                      else
+                        acc
+                    )
+                    acc
+                )
+                { checked = [], failed = [], object = {} }
+            in
+            result
           in
 
           # here we want to go over the defined properties and apply their IsContract
@@ -689,7 +685,10 @@ in
                         failed = acc.failed,
                         object =
                           let propertyContract = e.value.contract in
-                          let c : { _ : Dyn } = { "%{e.field}" | propertyContract = (value."%{e.field}") } in
+                          let c
+                          # : { _ : Dyn }
+                          = { "%{e.field}" | propertyContract = (value."%{e.field}") }
+                          in
                           (
                             c
                             & acc.object
@@ -699,7 +698,7 @@ in
                     'Error val =>
                       {
                         checked = acc.checked,
-                        failed = acc.failed @ ["`%{e.field}` doesn't match its specified contract\n" ++ "%{(std.record.get_or "message" "" val) | String }"],
+                        failed = acc.failed @ ["`%{e.field}` doesn't match its specified contract\n" ++ "%{(std.record.get_or "message" "" val)  }"],
                         object = acc.object
                       },
                   }
