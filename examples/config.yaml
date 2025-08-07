@@ -1,5 +1,6 @@
 exporters:
-  debug: {}
+  debug:
+    verbosity: detailed
 extensions:
   health_check:
     endpoint: ${env:MY_POD_IP}:13133
@@ -20,7 +21,6 @@ receivers:
         endpoint: ${env:MY_POD_IP}:6831
       thrift_http:
         endpoint: ${env:MY_POD_IP}:14268
-  otlp/test:
   otlp:
     protocols:
       grpc:
@@ -40,14 +40,15 @@ receivers:
 connectors:
   forward: {}
   exceptions: {}
-  count:
+  # TODO: nice, the graph checker in Otel ensures this is used as an exporter somewhere
+  # we could do something similar
+  # count:
 service:
   extensions:
   - health_check
   pipelines:
     logs:
       exporters:
-      - forward
       - debug
       processors:
       - memory_limiter
@@ -63,14 +64,7 @@ service:
       - metricstransform
       receivers:
       - otlp
-      - count
-      - prometheus
-    logs/test:
-      receivers:
-        - forward
-        - otlp
-      exporters:
-        - debug
+      # - prometheus
     traces:
       exporters:
       - debug
@@ -86,11 +80,6 @@ service:
         - otlp
       exporters:
         - debug
-    logs/res:
-      exporters:
-        - debug
-      receivers:
-        - otlp/test
   telemetry:
     metrics:
       address: ${env:MY_POD_IP}:8888

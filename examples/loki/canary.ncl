@@ -1,13 +1,23 @@
-let utils = import "./utils.ncl" in
 let t = import "../../transfomers.ncl" in
-# All of these need the target name
-# All of these need version
-# Function to load this or something else, what matters it has to overridable
-# Typed or better contracted with semver or something
-fun version =>
+fun version loki_address =>
   let
-    _selectors = utils.component_selectors "canary",
-    _labels = utils.common_labels version "canary",
+    _labels = {
+      "app.kubernetes.io/instance" = "loki",
+      "app.kubernetes.io/name" | force = "loki",
+      "app.kubernetes.io/version" = version,
+      "app.kubernetes.io/component" | force = "loki-canary"
+    },
+    labels_to_selectors = fun labels =>
+      labels
+      |> std.record.filter (fun k _ =>
+        k
+        |> match {
+          "app.kubernetes.io/component" => true,
+          "app.kubernetes.io/instance" => true,
+          "app.kubernetes.io/name" => true,
+          _ => false,
+        }
+      ),
   in
   {
     loki-canary-daemonset = {
@@ -19,17 +29,17 @@ fun version =>
       },
       spec = {
         selector = {
-          matchLabels = _selectors,
+          matchLabels = labels_to_selectors metadata.labels,
         },
         template = {
           metadata = {
-            labels = _labels
+            labels = loki-canary-daemonset.metadata.labels,
           },
           spec = {
             containers = [
               {
                 args = [
-                  "-addr=release-name-loki-gateway.default.svc.cluster.local.:80",
+                  "-addr=%{loki_address}",
                   "-labelname=pod",
                   "-labelvalue=$(POD_NAME)",
                   "-user=self-monitoring",
@@ -47,7 +57,7 @@ fun version =>
                     },
                   }
                 ],
-                image = "docker.io/grafana/loki-canary:3.3.2",
+                image = "docker.io/grafana/loki-canary:%{version}",
                 imagePullPolicy = "IfNotPresent",
                 name = "loki-canary",
                 ports = [
@@ -78,7 +88,7 @@ fun version =>
               runAsNonRoot = true,
               runAsUser = 10001,
             },
-            serviceAccountName = "loki-canary",
+            serviceAccountName = loki-canary-serviceaccount.metadata.name,
           },
         },
         updateStrategy = {

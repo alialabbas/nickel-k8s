@@ -12,7 +12,6 @@ let fromContainerPortToServicePort = fun p =>
   & (if std.record.has_field "protocol" p then { protocol = p.protocol } else {})
 in
 {
-  # PERF: these contracts are somewhat duplicated and are mainly for development
   ServiceFromDeployment
     | doc "Create a ClusterIP service from the given deployment"
     | all.apps.v1.Deployment -> all.v1.Service
@@ -37,11 +36,12 @@ in
     | all.apps.v1.Deployment -> all.v1.Service
     = fun value =>
       let svc = ServiceFromDeployment value in
+      let metadata = svc.metadata |> std.record.update "name" (svc.metadata.name ++ "-headless") in
+      # we don't want to introduce any merge priority in here to allow us to avoid recursive conflict in our merge system
       svc
       & {
-        spec = { clusterIP = "None" },
-        metadata.name | priority 1 = svc.metadata.name ++ "-headless",
-      },
+        spec = { clusterIP = "None", publishNotReadyAddresses = true },
+      } |> std.record.update "metadata" metadata,
   PodDisruptionBudgetForWorkload
     | doc "Create a disruption budget matching any k8s workload"
     | { _ | Dyn } -> [| 'maxUnavailable Number, 'minAvailable Number |] -> Dyn
@@ -49,10 +49,7 @@ in
       {
         apiVersion = "policy/v1",
         kind = "PodDisruptionBudget",
-        metadata = {
-          labels = workload.metadata.labels,
-          name = workload.metadata.name,
-        },
+        metadata = workload.metadata,
         spec =
           {
             selector = workload.spec.selector,
@@ -66,12 +63,16 @@ in
           ),
       },
 
-  # This one is somewhat useless in a world of easy self referential and strong types
   VolumeFromConfigMap
     | doc "Genarate a ConfigMap volume and VolumeMount for a ConfigMap"
     | all.v1.ConfigMap -> Dyn
     = fun value =>
+      let keys = std.record.get_or "data" {} value |> std.record.fields in
       {
-        volumes = []
+        name = value.metadata.name,
+        configMap = {
+          name = value.metadata.name,
+          items = std.array.fold_right (fun e acc => acc @ [{ key = e, path = e }]) [] keys,
+        },
       },
 }

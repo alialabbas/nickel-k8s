@@ -250,8 +250,8 @@ let HttpProbeAction = {
 in
 let Probe = {
   httpGet | { port | lib.k8s.PortOrName, path | String, .. } | optional,
-  exec | Array String | optional,
-  tcpSocket | { host | String | optional, port | lib.networking.Port } | optional,
+  exec | { command | Array String } | optional,
+  tcpSocket | { host | String | optional, port | lib.k8s.PortOrName } | optional,
   ..
 }
 in
@@ -482,8 +482,7 @@ let podSpec = {
     | optional,
 
   dnsPolicy
-    | std.enum.TagOrString
-    | [| 'ClusterFirstWithHostNet, 'ClusterFirst, 'Default, 'None |]
+    | lib.enum.StringOrEnum [| 'ClusterFirstWithHostNet, 'ClusterFirst, 'Default, 'None |]
     | optional,
 
   hostAliases | Array { hostnames | Array String, ip | String } | optional,
@@ -503,8 +502,7 @@ let podSpec = {
         | optional,
       fsGroupChangePolicy
       # | onlyLinux os
-        | std.enum.TagOrString
-        | [| '"OnRootMismatch", '"Always" |] # not windows check
+        | lib.enum.StringOrEnum [| '"OnRootMismatch", '"Always" |] # not windows check
         | optional,
 
       runAsGroup
@@ -734,6 +732,7 @@ in
               | optional,
           }
           | optional,
+        ..
       },
     ..
   },

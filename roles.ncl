@@ -1,9 +1,9 @@
 let lib = import "lib.ncl" in
 let PolicyRule = {
-  apiGroups | Array String,
+  apiGroups | Array String | optional,
   nonResourceURLs | Array String | optional,
   resourceNames | Array String | optional,
-  resources | std.array.NonEmpty | Array String,
+  resources | std.array.NonEmpty | Array String | optional,
   verbs | std.array.NonEmpty | Array String
 }
 in

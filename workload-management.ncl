@@ -16,7 +16,7 @@ in
 {
   policy.v1.PodDisruptionBudget = {
     apiVersion | String | force = "policy/v1",
-    kind | String | force  = "PodDisruptionBudget",
+    kind | String | force = "PodDisruptionBudget",
     metadata | k8s.Metadata,
     spec
       | records.MutualExclusive ["maxUnavailable", "minAvailable"]
@@ -24,12 +24,13 @@ in
         selector | k8s.LabelSelector,
         maxUnavailable | numbers.NumberOrPercentage | optional,
         minAvailable | numbers.NumberOrPercentage | optional,
+        ..
       },
     ..
   },
 
   autoscaling.v2.HorizontalPodAutoscaler = {
-    apiVersion | String | force  = "autoscaling/v2",
+    apiVersion | String | force = "autoscaling/v2",
     kind | String | force = "HorizontalPodAutoscaler",
     metadata | k8s.Metadata,
     spec
@@ -49,6 +50,6 @@ in
           }
           | optional,
       },
-      ..
+    ..
   },
 }

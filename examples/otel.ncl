@@ -6,27 +6,30 @@ let { ValidateServiceMatchPod, PortCheck, .. } = import "../release-validations.
 let t = import "../transfomers.ncl" in
 
 let otelConfig = import "./config.yaml" in
-let getReceiverPort : String -> Number
-  = fun r =>
-    let parts = std.string.split ":" r in
-    std.array.last parts |> std.string.to_number
-  in
+let getReceiverPort : String -> Number = fun r =>
+  let parts = std.string.split ":" r in
+  std.array.last parts |> std.string.to_number
+in
 
 # Defining the schema, then passing it and having to define its input again kind doesn't make sense
 let InputSchema = {
-  version | String | default = "0.0.97",
+  version | String | default = "0.124.0",
+  config
+    | (import "otelconfig.ncl")
+    # | default # To default or not to default?
+    = import "config.yaml",
 }
 in
 {
-  Inputs = InputSchema,
-  Manifests = {
+  inputs | InputSchema = {},
+  manifests = {
     serviceAccount = {
       apiVersion = "v1",
       kind = "ServiceAccount",
       metadata = {
         labels = {
           "app.kubernetes.io/name" = name,
-          "app.kubernetes.io/version" = Inputs.version,
+          "app.kubernetes.io/version" = inputs.version,
         },
         name = "opentelemetry-collector",
       },
@@ -38,9 +41,7 @@ in
         relay =
           std.serialize
             'Yaml
-            (
-              (import "config.yaml") # | (import "otelconfig.ncl")
-            ),
+            inputs.config,
       },
       metadata = {
         labels = serviceAccount.metadata.labels,
@@ -70,7 +71,7 @@ in
             containers = [
               {
                 command = [
-                  "/otelcol-contrib",
+                  "/otelcol-k8s",
                   "--config=/conf/relay.yaml"
                 ],
                 env = [
@@ -85,9 +86,10 @@ in
                   },
                   { name = "overlayed-env", value = "overridden" },
                 ],
-                image | default = "otel/opentelemetry-collector-contrib:" ++ Inputs.version,
+                image | default = "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s:" ++ inputs.version,
                 imagePullPolicy = "IfNotPresent",
                 name = "opentelemetry-collector",
+                resources = { requests = { cpu = "0.1", memory = "200Mi" } },
                 ports = [
                   {
                     containerPort = getReceiverPort otelConfig.receivers.jaeger.protocols.thrift_compact.endpoint,
@@ -163,7 +165,6 @@ in
       metadata = {
         labels = { serviceMonitorSelector = "prometheus", },
         name = "prometheus",
-        namespace = "prometheus",
       },
       spec = {
         endpoints = [{ interval = "30s", path = "/metrics", targetPort = 9090, }],
@@ -172,4 +173,4 @@ in
       },
     }
   },
-}  | Release InputSchema
+} | Release

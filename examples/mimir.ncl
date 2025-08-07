@@ -1,87 +1,88 @@
-# The question is how one would manage a complex deployment like this one where you just have so many pieces
-# I guess what is not optional is slapped inside the core mimir-distributed with what is needed to run
-# everything else is scattered around as optional pieces that are augmented by the user
+let lib = import "../lib.ncl" in
+let MimirConfig = import "./mimir/config.ncl" in
 {
-  Manifests = {
-    config = {
-      apiVersion = "v1",
-      data = {
-        "mimir.yaml" = std.serialize 'Yaml (import "./mimir/config.yaml"),
-      },
-      kind = "ConfigMap",
-      metadata = {
-        labels = {
-          "app.kubernetes.io/instance" = "mimir-distributed",
-          "app.kubernetes.io/name" = "mimir",
-          "app.kubernetes.io/version" = "2.12.0",
-        },
-        name = "mimir-distributed-config",
-        namespace = "monitoring",
-      },
-    },
-    gossip-ring-service = {
-      apiVersion = "v1",
-      kind = "Service",
-      metadata = {
-        labels = {
-          "app.kubernetes.io/component" = "gossip-ring",
-          "app.kubernetes.io/instance" = "mimir-distributed",
-          "app.kubernetes.io/name" = "mimir",
-          "app.kubernetes.io/version" = "2.12.0",
+  inputs
+    | {
+      version | doc "Mimir version to use" | lib.semver.SemanticVersion | default = "2.16.0",
+      continuous-testing | { enabled | Bool | default = true, } | default = {},
+      mode
+        | doc m%"
+        Run mode for mimir, scalable is a read-write distribution and distributed is the microservices mode
 
-        },
-        name = "mimir-distributed-gossip-ring",
-        namespace = config.metadata.namespace,
-      },
-      spec = {
-        clusterIP = "None",
-        ports = [
-          {
-            appProtocol = "tcp",
-            name = "gossip-ring",
-            port = 7946,
-            protocol = "TCP",
-            targetPort = 7946,
-          }
-        ],
-        publishNotReadyAddresses = true,
-        selector = {
-          "app.kubernetes.io/instance" = "mimir-distributed",
-          "app.kubernetes.io/name" = "mimir",
-          "app.kubernetes.io/part-of" = "memberlist",
-        },
-        type = "ClusterIP",
-      },
-    },
-    runtime-config= {
-      apiVersion = "v1",
-      data = {
-        "runtime.yaml" = std.serialize 'Yaml ({} | (import "mimir/runtime-config.ncl")),
-      },
-      kind = "ConfigMap",
-      metadata = {
-        labels = {
-          "app.kubernetes.io/instance" = "mimir-distributed",
-          "app.kubernetes.io/name" = "mimir",
-          "app.kubernetes.io/version" = "2.12.0",
-        },
-        name = "mimir-distributed-runtime",
-        namespace = config.metadata.namespace,
-      },
-    },
-    serviceaccount = {
-      apiVersion = "v1",
-      kind = "ServiceAccount",
-      metadata = {
-        annotations = {},
-        labels = {
-          "app.kubernetes.io/instance" = "mimir-distributed",
-          "app.kubernetes.io/name" = "mimir",
-          "app.kubernetes.io/version" = "2.12.0",
-        },
-        name = "mimir-distributed",
-        namespace = config.metadata.namespace,
-      },
-    },
+        'distributed => microservices mode, each target represent a single mimir component like ingester, querier, etc
+        'scalable => separate read/write path
+        'single-binary => low data volume environment
+        'playground => ephemeral environment to bootstrap mimir and test it out
+        "%
+        | std.enum.TagOrString
+        | [| 'single-binary, 'distributed, 'scalable |]
+        | default
+        = 'single-binary,
+      config
+        | doc "Standard mimir configuration. Note this data drive many parts in the configuration"
+        | MimirConfig
+        & { memberlist.join_members | force = ["dns+%{manifests.gossip-ring-service.metadata.name}:%{memberlist.bind_port}"], }
+        & (
+          if mode == 'distributed then
+            {
+              frontend.scheduler_address | force =
+                manifests.query-scheduler-headless-service.metadata.name
+                ++ ":"
+                ++ (std.string.from_number config.server.grpc_listen_port),
+              frontend_worker.scheduler_address | force =
+                manifests.query-scheduler-headless-service.metadata.name
+                ++ ":"
+                ++ (std.string.from_number config.server.grpc_listen_port),
+            }
+          else
+            {}
+        )
+        = (import "./mimir/mimir.yaml"),
+    }
+    | default
+    = {},
+
+  output = {
+    endpoints =
+      let port = ":%{std.string.from_number inputs.config.server.http_listen_port}" in
+      {
+        writer =
+          inputs.mode
+          |> match {
+            'distributed => manifests.distributor-service.metadata.name ++ port,
+            'single-binary => manifests.single-binary-service.metadata.name ++ port,
+            'scalable => manifests.write-service.metadata.name ++ port,
+          },
+        reader =
+          inputs.mode
+          |> match {
+            'distributed => manifests.query-frontend-service.metadata.name ++ port,
+            'single-binary => manifests.single-binary-service.metadata.name ++ port,
+            'scalable => manifests.read-service.metadata.name ++ port,
+          },
+      }
   },
-} | (import "../kube.ncl").Release
+
+  release_metadata = {},
+
+  manifests =
+    (
+      if inputs.continuous-testing.enabled then
+        (
+          (import "./mimir/continuous-test.ncl")
+            inputs
+            output.endpoints.reader
+            output.endpoints.writer
+        )
+      else
+        {}
+    )
+    & (
+      inputs.mode
+      |> match {
+        'distributed => (import "./mimir/distributed.ncl") inputs,
+        'scalable => (import "./mimir/scalable.ncl") inputs,
+        'single-binary => (import "./mimir/single-binary.ncl") inputs,
+      }
+    ),
+}

@@ -3,7 +3,6 @@ let validLabel
   = fun str =>
     std.string.is_match
       "^[a-zA-Z0-9]([-_/\\.a-zA-Z0-9]*[a-zA-Z0-9]\\/?[a-zA-Z0-9]*[a-zA-Z0-9]?)?$"
-    # "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
       str
 in
 let OnlyWhenInOrNotIn
@@ -29,27 +28,64 @@ in
       Name
         | doc m%"
             Kubernetes Metadata.Name based on RFC1123, lowercase alphanumeric and '-'
-            ```nickel
+
+            # Examples
+
+            ```nickel multiline
             "this-is-valid" | Name
+            # "this-is-valid"
+
+            "NOTVALID" | Name
+            # => error: contract broken by a value
+
+            (std.array.replicate 70 "a" |> std.string.join "") | Name
+            # => error: contract broken by a value
             ```
           "%
-        = std.contract.from_predicate (fun name => std.string.is_match "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" name),
+        =
+          std.contract.from_validator (fun name =>
+            if std.string.length name > 63 then
+              'Error { message = "Kube resources should be less than 63 characters" }
+            else if !std.string.is_match "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" name then
+              'Error { message = "Kube resource should be a valid DNS name" }
+            else
+              'Ok
+          ),
 
       Resource
-        | doc m%" Kubernetes compute resource, cpu and memory
-          ```nickel
+        | doc m%"
+          Kubernetes compute resource, cpu and memory
+
+          # Examples
+
+          ```nickel multiline
           1000  | Resource
-          ```
-          Or
-          ```nickel
+          # 1000
+
           "100Mi"  | Resource
+          # "100Mi"
+
+          "1000U" | Resource
+          # => error: contract broken by a value
           ```
         "%
         =
           std.contract.from_predicate (fun val => std.is_number val || std.string.is_match "^[0-9]+(\\.[0-9]+)?(mi?|k|Ki|Mi?|Gi?|Ti?|Pi?|Ei?)?$" val),
 
       PortOrName
-        | doc "Define a port either by standard port range a port name like http, grpc, etc."
+        | doc m%"
+            Define a port either by standard port range a port name like http, grpc, etc.
+
+            Examlpes
+
+            ```nickel multiline
+            27707 | PortOrName
+            # 27707
+
+            "http" | PortOrName
+            # "http"
+            ```
+        "%
         =
           std.contract.custom (fun label port =>
             let
@@ -65,12 +101,24 @@ in
           ),
 
       Manifest
-        | doc m%"KubeResrouce requires apiVersion, kind and metadata.name"%
+        | doc m%"
+        KubeResrouce requires apiVersion, kind and metadata.name
+
+        Examples
+
+        ```nickel multiline
+        { apiVersion = "myApiVersion", kind = "myApiKind", metadata.name = "my-resource-name" } | Manifest
+
+        {} | Manifest
+        # => error: missing definition for `apiVersion`
+        ```
+        "%
         = { apiVersion | String, kind | String, metadata | { name | String, .. }, .. },
 
       List
         | doc m%"KubeList is a list of resources of various types"%
         = { apiVersion = "v1", kind = "List", items | Array Manifest },
+
       Metadata
         | doc "ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create."
         = {
@@ -81,7 +129,7 @@ in
           ..
         },
       ResourceMetadata
-        | doc "Extension of Metadata, includes metadata.name, the other one is used in embedded resources"
+        | doc "Similar to `Metadata` but name is now a required field"
         = { name | Name } & Metadata,
 
       ValidLabel = std.contract.from_predicate (fun val => validLabel val),
@@ -130,11 +178,16 @@ in
           ),
 
       to_bytes
-        | doc "Convert Request/Limits to total bytes"
+        | doc m%"
+        Convert Request/Limits to total bytes
+
+        # Examples
+        to_bytes 100K
+        100000
+        "%
         | Resource -> Number
         = fun resource =>
           let allUnits = [| 'm, 'mi, 'k, 'Ki, 'M, 'Mi, 'G, 'Gi, 'T, 'Ti, 'P, 'Pi, 'E, 'Ei |] in
-          let powerOf2 = std.number.pow 2 in
           let unit =
             resource
             |> std.string.characters
@@ -158,12 +211,12 @@ in
             'E => value * 1e18,
             'm => value / 1000,
             'mi => value / 1024,
-            'Ki => value * powerOf2 10,
-            'Mi => value * powerOf2 20,
-            'Gi => value * powerOf2 30,
-            'Ti => value * powerOf2 40,
-            'Pi => value * powerOf2 50,
-            'Ei => value * powerOf2 60,
+            'Ki => value * std.number.pow 2 10,
+            'Mi => value * std.number.pow 2 20,
+            'Gi => value * std.number.pow 2 30,
+            'Ti => value * std.number.pow 2 40,
+            'Pi => value * std.number.pow 2 50,
+            'Ei => value * std.number.pow 2 60,
           },
 
       from_map_to_list
@@ -210,49 +263,151 @@ in
         },
     },
 
-  contracts = {
+  semver = {
+    Constraint
+      | doc m%"
+  Contract Ensuring a semantic version is meeting a specifc requirement
+  "%
+      = fun constraint => std.contract.from_validator (fun e => 'Ok),
 
+    SemanticVersion
+      | doc m%"
+        Contract to ensure a semantic version matches a major/minor/patch
+
+        # Example
+
+        ```nickel multiline
+        "1.1.1-alpha" | SemanticVersion
+
+        "1.1.1-alpha." | SemanticVersion
+        # => error: `1.1.1-alpha.` is not a valid semver
+
+        "v1" | SemanticVersion
+
+        "1" | SemanticVersion
+
+        "1.1" | SemanticVersion
+
+        "1.1.1" | SemanticVersion
+
+        "1." | SemanticVersion
+        # => error: `1.` is not a valid semver
+
+        "1.1.1-" | SemanticVersion
+        # => error: `1.1.1-` is not a valid semver
+        ```
+    "%
+      =
+        let is_valid_pre : String -> Bool = fun pre =>
+          std.string.is_match "^[0-9a-zA-Z.-]*$" pre
+          && (std.string.length pre == 0 || (std.string.characters pre |> std.array.last |> std.string.is_match "[.-]" |> (!)))
+        in
+        # TODO: technically not a semver?!
+        let is_valid_major : String -> Bool = fun v => std.string.is_match "v?[0-9]+$" v in
+        let is_valid_minor_or_patch : String -> Bool = fun v => std.string.is_match "v?[0-9]*$" v in
+
+        std.contract.from_validator (fun ver =>
+          let err = 'Error { message = "`%{ver}` is not a valid semver" } in
+          if std.typeof ver != 'String then
+            err
+          else if std.string.is_match ".*[.-]$" ver then
+            err
+          else
+            let is_valid_semver = fun major minor patch pre =>
+              if is_valid_major major
+              && is_valid_minor_or_patch minor
+              && is_valid_minor_or_patch patch
+              && is_valid_pre pre then
+                'Ok
+              else
+                'Error { message = "`%{ver}` is not a valid semver" }
+            in
+            strings.splitN ver "." 2
+            |> match {
+              [major, minor, patch] =>
+                let [patch, ..pre] = std.string.split "-" patch in
+                let pre = std.string.join "" pre in
+                is_valid_semver major minor patch pre,
+              [major, maybe_minor_or_pre] =>
+                let [minor, ..pre] =
+                  let subStr = strings.splitN maybe_minor_or_pre "-" 1 in
+                  if std.array.length subStr == 1 then
+                    subStr @ [""]
+                  else
+                    subStr
+                in
+                let pre = std.string.join "" pre in
+                is_valid_semver major minor "" pre,
+              [major] => std.trace "%{major}" is_valid_semver major "" "" "",
+              _ => 'Error { message = "`%{ver}` is not a valid semver" }
+            }
+        ),
+  },
+
+  contracts = {
+    IfThenElse
+      | doc m%"
+    Conditonal contract evaluated against then else when the if part fails. Otherwise, check it against the then part.
+
+    ```nickel multiline
+    12 | IfThenElse Number (numbers.MultipleOf 2) String
+
+    "test" | IfThenElse Number (numbers.MultipleOf 2) String
+
+    3 | IfThenElse Number (numbers.MultipleOf 2) String
+    # => error: `3` should be a multiple of `2`
+    ```
+    "%
+      = fun ef zen els =>
+        std.contract.custom (fun label value =>
+          std.contract.check ef label value
+          |> match {
+            'Ok _ => std.contract.check zen label value,
+            'Error _ => std.contract.check els label value,
+          }
+        ),
     ArrayOf
       | doc m%"
-          Non-Lazy implementation of `Array` Contract. Useful in cases when a result is expected to be immediately available like in std.contract.any and such.
-          ```nickel
-          [1,2,3,4] | ArrayOf Number
-          ```
+        Non-Lazy implementation of `Array` Contract. Useful in cases when a result is expected to be immediately available like in std.contract.any and such.
+
+        # Examples
+
+        ```nickel multiline
+        [1,2,3,4] | ArrayOf Number
+
+        [1,2,3] | ArrayOf String
+        # => error: contract broken by a value
+
+        [1,2,3, true ] | std.contract.any_of [ArrayOf String, ArrayOf Number]
+        # => error: contract broken by a value
+        ```
       "%
       = fun element =>
-        std.contract.custom (fun label value =>
-          # TODO: restructure this to allow us to extract error messages more than just than the offending values
-          # maybe since it is an array we should just do, value at i with error E
-          let failedContracts =
+        std.contract.custom (fun lbl value =>
+          if std.typeof value != 'Array then
+            'Error {
+              message = "Expected an array, got %{std.to_string (std.typeof value)}",
+              blame_location = lbl
+            }
+          else
             value
-            |> std.array.fold_right
-              (fun e acc =>
+            |> std.array.fold_left
+              (fun acc e =>
                 std.contract.check
                   element
-                  label
+                  lbl
                   e
                 |> match {
                   'Ok _ => acc,
-                  'Error v => [e] @ acc
+                  'Error e => 'Error e
                 }
               )
-              []
-          in
-          std.typeof value
-          |> match {
-            'Array =>
-              if std.array.length failedContracts == 0 then
-                'Ok value
-              else
-                'Error {
-                  message = "Some array elements don't match their contract\noffending values:\n%{std.serialize 'Json failedContracts}",
-                  notes = []
-                },
-            t =>
-              'Error {
-                message = "Expected an array, got %{std.to_string t}"
-              },
-          }
+              'Ok
+            |> match {
+              'Ok =>
+                'Ok value,
+              'Error e => 'Error e,
+            }
         ),
 
     IsContract
@@ -372,57 +527,75 @@ in
             'Ok value
         ),
 
-    UUID =
-      let IsNGuid = fun v =>
-        std.string.is_match
-          "^[0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}$"
-          v
-      in
-      let IsDGuid = fun v =>
-        std.string.is_match
-          "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-          v
-      in
-      let IsBGuid = fun v =>
-        std.string.is_match
-          "^\\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$"
-          v
-      in
-      let IsPGuid = fun v =>
-        std.string.is_match
-          "^\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\)$"
-          v
-      in
-      std.contract.from_validator (match {
-        t if std.typeof t != 'String =>
-          'Error {
-            message = "Expected a String, got %{std.to_string (std.typeof t)}"
-          },
-        s if std.string.length s < 32 =>
-          'Error {
-            message = "Got an invalid UUID length, need least 32 characters"
-          },
-        v if IsNGuid v
-          || IsDGuid v
-          || IsPGuid v
-          || IsBGuid v => 'Ok,
-        _ =>
-          'Error {
-            message = "Invalid Guid",
-            notes = [
-              "Guid have one of the following representations",
-              "00000000000000000000000000000000",
-              "00000000-0000-0000-0000-000000000000",
-              "{00000000-0000-0000-0000-000000000000}",
-              "(00000000-0000-0000-0000-000000000000)",
-            ]
-          },
-      }
-      ),
+    UUID
+      | doc m%"
+    Check if a string value represent a guid
+
+    # Examples
+
+    ```nickel multiline
+    "be39fd8b-6c60-43d6-83d9-bd01b5ce4b06" | UUID
+
+    "be39fd8b6c6043d683d9bd01b5ce4b06" | UUID
+
+    "{be39fd8b-6c60-43d6-83d9-bd01b5ce4b06}" | UUID
+
+    "invalid-guid" | UUID
+    # => error: contract broken by a value
+    ```
+    "%
+      =
+        let IsNGuid = fun v =>
+          std.string.is_match
+            "^[0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}$"
+            v
+        in
+        let IsDGuid = fun v =>
+          std.string.is_match
+            "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            v
+        in
+        let IsBGuid = fun v =>
+          std.string.is_match
+            "^\\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$"
+            v
+        in
+        let IsPGuid = fun v =>
+          std.string.is_match
+            "^\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\)$"
+            v
+        in
+        std.contract.from_validator (match {
+          t if std.typeof t != 'String =>
+            'Error {
+              message = "Expected a String, got %{std.to_string (std.typeof t)}"
+            },
+          s if std.string.length s < 32 =>
+            'Error {
+              message = "Got an invalid UUID length, need least 32 characters"
+            },
+          v if IsNGuid v
+            || IsDGuid v
+            || IsPGuid v
+            || IsBGuid v => 'Ok,
+          _ =>
+            'Error {
+              message = "Invalid Guid",
+              notes = [
+                "Guid have one of the following representations",
+                "00000000000000000000000000000000",
+                "00000000-0000-0000-0000-000000000000",
+                "{00000000-0000-0000-0000-000000000000}",
+                "(00000000-0000-0000-0000-000000000000)",
+              ]
+            },
+        }
+        ),
 
     DateTime = {
       Date =
         std.contract.from_validator (
+          let is_number = fun n => std.string.is_match "^[0-9]+$" n in
           let isDateTime = fun v =>
             let segments = std.string.split "-" v in
             let year = std.array.at 0 segments in
@@ -430,12 +603,13 @@ in
             let day = std.array.at 2 segments in
 
             let isValidMonth = fun v =>
-              std.string.length v == 2
+              is_number v
+              && std.string.length v == 2
               && (std.string.to_number v > 0 && std.string.to_number v <= 12)
             in
 
             let isValidDay = fun year month day =>
-              let isDayValid = std.string.length day == 2 in
+              let isDayValid = is_number day && std.string.length day == 2 in
               let year = std.string.to_number year in
               let month = std.string.to_number month in
               let day = std.string.to_number day in
@@ -496,6 +670,97 @@ in
   },
 
   records = {
+    MaxFields
+      | doc m%"
+      A contract to check if a record only have a specific set of fields. This doesn't check the length of an inner record.
+
+      # Example
+
+      ```nickel multiline
+      {foo = 1, bar = 1, baz = 1} | MaxFields 3
+
+      {foo = 1, bar = 1, baz = 1} | MaxFields 2
+      # => error: Record can't have more than `2` fields
+      ```
+      "%
+      | std.number.Nat -> Dyn
+      = fun propsCount =>
+        std.contract.from_validator (fun value =>
+          if std.typeof value != 'Record then
+            'Error { message = "Expected a record, got %{std.to_string (std.typeof value)}" }
+          else if std.record.length value > propsCount then
+            'Error { message = "Record can't have more than `%{std.to_string propsCount}` fields" }
+          else
+            'Ok
+        ),
+
+    MinFields
+      | doc m%"
+      A contract to check if a record length is equal or greater than a specific legnth
+
+      # Example
+
+      ```nickel multiline
+      {foo = 1, bar = 1, baz = 1} | MinFields 2
+
+      {foo = 1, } | MinFields 2
+      # => error: Record need at least `2` fields to be defined
+      ```
+        "%
+      | std.number.Nat -> Dyn
+      = fun propsCount =>
+        std.contract.from_validator (fun value =>
+          if std.typeof value != 'Record then
+            'Error { message = "Expected a record, got %{std.to_string (std.typeof value)}" }
+          else if std.record.length value < propsCount then
+            'Error { message = "Record need at least `%{std.to_string propsCount}` fields to be defined" }
+          else
+            'Ok
+        ),
+
+    DependentFields
+      | doc m%"
+      A contract to assert the existence of fields when they are depdenent is defined in a value
+
+      ```nickel multiline
+      {first = 1, second = 2 } | DependentFields {first = ["second"]}
+
+      {first = 1, } | DependentFields {first = ["second"]}
+      # => error: Expected field `second`
+      ```
+    "%
+      | { _ | Array String } -> Dyn
+      = fun dependencies =>
+        std.contract.from_validator (fun value =>
+          if std.typeof value != 'Record then
+            'Error { message = "Expected a record" }
+          else
+            let check_fields = fun fields record =>
+              fields
+              |> std.array.fold_right
+                (fun e acc =>
+                  if !std.record.has_field e record then
+                    'Error { message = "Expected field `%{e}`" }
+                  else
+                    acc
+                )
+                'Ok
+            in
+            dependencies
+            |> std.record.to_array
+            |> std.array.fold_right
+              (fun e acc =>
+                if std.record.has_field e.field value then
+                  check_fields e.value value
+                  |> match {
+                    'Ok => acc,
+                    'Error err => 'Error (err & { notes = ["because field %{e.field} was present"] }),
+                  }
+                else
+                  acc
+              )
+              'Ok
+        ),
     NonEmpty =
       std.contract.from_validator (match {
         r if std.record.length r == 0 => 'Error { message = "Record can't be empty" },
@@ -549,55 +814,56 @@ in
           The benefit of this contract is to allow us to have know if the record at this instance matches the model
           and returns back 'Ok and 'Error values. This allow us to consume records validation inside of any_of and all_of
           since those expect those values to be propagated back. The lazy version would always err which sometimes is not ideal
-
-          ```nickel
-          { test = 1 } | { test = { type = Number, optional = false } }
-          ```
         "%
       = fun contract =>
-        # TODO: there is no way to do additional properties without passing a flag or something
-        # this flag always represent the root level schema, so if we had a sub schema that would need to also be somehow called recusively with the flag
-        # The root doesn't decidate what is open and what is not open
-        # yeah no way around this other than additional properties.
-        # the issue is the ugly code that would be generated
-        # there is gonna be a parent contract. Modeled by itself, but then as we have yet another record it would need to be a JsonObject yet again to test what we want to test
-        # neseted contracts, basically each time we generate, the included sub contract should be able to grok what's going on
-        # will work but it means every generated code need to use this and not the basic contracts
-        # i guess the issue stems from complex schemas that has multiple parts
         std.contract.custom (fun label value =>
           if std.typeof value != 'Record then
             'Error { message = "expected a record, got %{std.to_string (std.typeof value)}" }
           else
-            let errors =
-              std.typeof value
-              |> match {
-                'Record =>
-                  std.record.to_array value
-                  |> std.array.try_fold_left
-                    (fun acc e =>
-                      if std.typeof e.value == 'Record then
-                        std.contract.check (IsRecord contract."%{e.field}") label e.value
-                        |> match {
-                          'Ok v => ('Ok v),
-                          'Error val => ('Error val),
-                        }
-                      else
-                        std.contract.check contract."%{e.field}" label e.value
-                        |> match {
-                          'Ok v => ('Ok v),
-                          'Error val => ('Error val),
-                        }
-                    )
-                    'None,
-              }
-            in
-            errors
+            std.record.to_array value
+            |> std.array.try_fold_left
+              (fun acc e =>
+                std.contract.check contract."%{e.field}" label e.value
+                |> match {
+                  'Ok v => 'Ok { "%{e.field}" | contract."%{e.field}" = e.value } & acc,
+                  'Error val => ('Error val),
+                }
+              )
+              ('Ok {})
             |> match {
-              'None =>
-                'Error { message = "empty case" },
-              'Error _ =>
-                errors,
               'Ok _ => 'Ok value,
+              'Error err => 'Error err,
+            }
+        ),
+
+    RecordKeys
+      | doc m%"
+      Contract to strict record fields to a specific type
+
+      # Example
+
+      ```nickel multiline
+      {"1" = 1, "2" = 2, "11" = 11 } | RecordKeys (std.string.Matches "^[0-9].*")
+
+      {"1" = 1, "2" = 2, first = 1 } | RecordKeys (std.string.Matches "[0-9]")
+      # => error: expected a string matching `[0-9]`
+      ```
+      "%
+      | Dyn -> Dyn
+      = fun contract =>
+        std.contract.custom (fun label value =>
+          if std.typeof value != 'Record then
+            'Error { message = "Expected a record, got %{std.to_string (std.typeof value)}" }
+          else
+            std.record.to_array value
+            |> std.array.try_fold_left
+              (fun acc e =>
+                std.contract.check contract label e.field
+              )
+              ('Ok value)
+            |> match {
+              'Ok _ => 'Ok value,
+              'Error e => 'Error e,
             }
         ),
 
@@ -605,196 +871,136 @@ in
       | doc m%"
           Represent a json record using standard json schema model for objects.
           Only use this when you want to code generation json schemas since most likely the code would look cleaner if you write your contract by hand.
-        "%
-      = fun properties patternProperties additionalProperties =>
-        let contract = fun label value =>
-          # Edge Case: When no properties and patterns are set but additional is true, we will need to pass values as is
-          # we first check pattern properties
-          let result
-          =
-            # TODO: while this work, this can't report an aggregation of all errors when any of the contracts are records, including an error in the main one
-            # If this is needed, it is possible to validate the required part and the optional part of each manually and aggregate that in the final result
-            let result =
-              std.record.to_array value
-              |> std.array.fold_right
-                (fun e acc =>
-                  std.record.to_array patternProperties
-                  |> std.array.fold_right
-                    (fun p acc =>
-                      if std.string.is_match p.field e.field then
-                        let validationResult =
-                          if std.typeof p.value == 'Record then
-                            if (e.value | p.value) == e.value then "" else "pattern doesn't match"
-                          else
-                            std.contract.check p.value label e.value
-                            |> match {
-                              'Ok val => "",
-                              'Error val =>
-                                (
-                                  "Property %{e.field} matches %{p.field} but doesn't match its contract:\n\t"
-                                  ++ (std.record.get_or "message" "" val)
-                                ) | String,
-                            }
-                        in
-                        let newResult =
-                          if validationResult == "" then
-                            acc.checked @ [e.field]
-                          else
-                            acc.checked
-                        in
 
-                        let newFailures =
-                          if validationResult != "" then
-                            acc.failed @ [validationResult]
-                          else
-                            acc.failed
-                        in
-                        { checked = newResult, failed = newFailures, object = { "%{e.field}" | p.value = e.value } }
-                      else
-                        acc
-                    )
-                    acc
-                )
-                { checked = [], failed = [], object = {} }
-            in
-            result
+          **NOTE**: Prefer using eager contracts over lazy ones.
+        "%
+      | { _ | { optional | Bool, contract | Dyn } } -> { _ | Dyn } -> Dyn -> Dyn
+      = fun properties patternProperties additionalProperties =>
+        std.contract.custom (fun label value =>
+          let checked_pattern_properties =
+            std.record.to_array value
+            |> std.array.try_fold_left
+              (fun acc e =>
+                std.record.to_array patternProperties
+                |> std.array.try_fold_left
+                  (fun acc p =>
+                    if std.string.is_match p.field e.field then
+                      std.contract.check p.value label e.value
+                      |> match {
+                        'Ok val => 'Ok ({ "%{e.field}" | p.value = e.value } & acc),
+                        'Error val => 'Error val
+                      }
+                    else
+                      'Ok acc
+                  )
+                  acc
+              )
+              {}
           in
 
-          # here we want to go over the defined properties and apply their IsContract
-          # NOTE: while this look like a root level check only, each field contract could be yet another invocation to JsonObject
-          let result #: { checked : Array String, failed : Array String, object : { _ : Dyn} }
-          =
+          let checked_properties =
             std.record.to_array properties
-            |> std.array.fold_right
-              (fun e acc =>
+            |> std.array.try_fold_left
+              (fun acc e =>
                 if !std.record.has_field e.field value && !e.value.optional then
-                  {
-                    checked = acc.checked,
-                    failed = acc.failed @ ["Missing required field `%{e.field}`"],
-                    object = acc.object
-                  }
+                  'Error { message = "Missing required field `%{e.field}`" }
                 else if !std.record.has_field e.field value && e.value.optional then
                   # missing an optional propertie, nothing to do here
-                  acc
+                  'Ok acc
                 else
                   std.contract.check e.value.contract label value."%{e.field}"
                   |> match {
                     'Ok _ =>
-                      {
-                        checked = acc.checked @ [e.field],
-                        failed = acc.failed,
-                        object =
-                          let propertyContract = e.value.contract in
-                          let c
-                          # : { _ : Dyn }
-                          = { "%{e.field}" | propertyContract = (value."%{e.field}") }
-                          in
-                          (
-                            c
-                            & acc.object
-                          ) | { _ | Dyn }
-                      },
-                    # TODO: better error messaging
-                    'Error val =>
-                      {
-                        checked = acc.checked,
-                        failed = acc.failed @ ["`%{e.field}` doesn't match its specified contract\n" ++ "%{(std.record.get_or "message" "" val)  }"],
-                        object = acc.object
-                      },
+                      let propertyContract = e.value.contract in
+                      'Ok ({ "%{e.field}" | propertyContract = (value."%{e.field}") } & acc),
+                    'Error e => 'Error e
                   }
               )
-              result
+              {}
           in
 
-          # get the remaining properties and inject them
-          let result =
+          let partial_check =
+            checked_pattern_properties
+            & checked_properties
+            |> std.enum.to_tag_and_arg
+            |> std.record.get "arg"
+          in
+          let checked_additional_properties =
             std.record.to_array value
-            # TODO: most likely a lot of this contract validation logic could be in a helper method referenced in many places
-            |> std.array.fold_right
-              (fun e acc =>
-                # Skip what was already checked
-                if std.array.elem (e.field | Dyn) (result.checked | Array Dyn) then
-                  acc
-                  # NOTE: not obvious, but record contracts are lazying evaluated, meanging we need to apply them or
-                  # the user wraps then in std.contract.custom and apply what we do here themselves
-                  # TODO: remove me, this shouldn't happen
-                else if std.typeof additionalProperties == 'Record then
-                  if (e.value | additionalProperties) == e.value then
-                    {
-                      checked = acc.checked,
-                      failed = acc.failed,
-                      object = acc.object,
-                    }
-                  else
-                    {
-                      checked = acc.checked,
-                      failed = acc.failed @ ["additional properties doesn't conform to its record contract"],
-                      object = acc.object
-                    }
-                else if std.typeof additionalProperties == 'Bool then
-                  {
-                    checked = acc.checked @ [e.field],
-                    failed = acc.failed,
-                    object = (acc.object & { "%{e.field}" = e.value }) | { _ | Dyn },
-                  }
-                else
+            |> std.array.try_fold_left
+              (fun acc e =>
+                if !std.record.has_field e.field partial_check then
                   std.contract.check additionalProperties label e.value
                   |> match {
                     'Ok _ =>
-                      {
-                        checked = acc.checked @ [e.field],
-                        failed = acc.failed,
-                        object = (acc.object & { "%{e.field}" | additionalProperties = e.value }) | { _ | Dyn }
-                      },
-                    'Error _ =>
-                      {
-                        checked = acc.checked,
-                        failed = acc.failed @ ["`%{e.field}` fails to match additional properties contract"],
-                        object = acc.object
-                      }
+                      let additionalProperty = additionalProperties in
+                      'Ok ({ "%{e.field}" | additionalProperty = e.value } & acc),
+                    'Error e => 'Error e,
                   }
+                else
+                  'Ok acc
               )
-              result
-          in
-          let remainingProperties =
-            std.record.fields value
-            |> std.array.fold_right (fun e acc => if !std.array.elem (e | Dyn) (result.checked | Array Dyn) then acc @ [e] else acc) []
+              {}
           in
 
           let type = std.typeof (value | Dyn) in
 
           if type != 'Record then
             'Error { message = "expected a record, got `%{std.string.from_enum type}`", notes = [] }
-          else if std.array.length result.failed != 0 then
-            'Error { message = (result.failed |> std.array.fold_right (fun e acc => "%{e}\n%{acc}") ""), notes = result.failed }
-          else if (std.typeof additionalProperties == '"Bool")
-          && additionalProperties == false
-          && std.array.length remainingProperties > 0 then
-            'Error { message = "record doesn't allow unchecked fields" ++ (std.serialize 'Json remainingProperties) | String, notes = remainingProperties }
           else
-            # NOTE: this approach is not great and doesn't work well with merging contracts
-            'Ok result.object
-        in
-        std.contract.custom contract | Dyn,
+            [checked_properties, checked_pattern_properties, checked_additional_properties]
+            |> match {
+              ['Error e, _, _] => 'Error e,
+              [_, 'Error e, _] => 'Error e,
+              [_, _, 'Error e] => 'Error e,
+              _ => checked_properties & checked_pattern_properties & checked_additional_properties,
+            }
+        ),
 
     get_value_at_path
-    # : Array String -> { _ : Dyn } -> [| 'NotFound, 'Found |]
-    = fun path value =>
-      let leftOverPath = std.array.slice 1 (std.array.length path) path in
-      let head = std.array.first path in
-      # if we have anything left, recruse
-      if head == "*" then
-        let fields = std.record.fields value in
-        if std.array.length fields > 1 then
-          std.fail_with "When using a path with `*`, it is expected to only have a single field found more than 1"
-        else
-          get_value_at_path leftOverPath value
-      else if !std.record.has_field head value then
-        'NotFound
-      else if std.array.length leftOverPath > 0 then
-        get_value_at_path leftOverPath value."%{head}"
-      else
-        'Found value."%{head}",
+      | doc m%"
+    Retrieve a value from a record using an array of field names.
+
+    # Example
+
+    ```nickel multiline
+    get_value_at_path ["first", "second", "third" ] { first = { second = { third = 3 } } }
+    # => 'Found 3
+
+    get_value_at_path ["magic"] { first = { second = { third = 3 } } }
+    # => 'NotFound
+    ```
+    "%
+      # : Array String -> { _ : Dyn } -> [| 'NotFound, 'Found |]
+      = fun path value =>
+        let leftOverPath = std.array.slice 1 (std.array.length path) path in
+        let head = std.array.first path in
+
+        std.typeof value
+        |> match {
+          'Array =>
+            let is_number = std.string.is_match "^[0-9]+" head
+            in
+            if !is_number then
+              std.fail_with "Value is an array but current path value is not an array index"
+            else if is_number && std.array.length leftOverPath > 0 then
+              get_value_at_path leftOverPath (std.array.at (std.string.to_number head) value)
+            else
+              'Found (std.array.at (std.string.to_number head) value),
+          'Record =>
+            if head == "*" then
+              let fields = std.record.fields value in
+              if std.array.length fields > 1 then
+                std.fail_with "When using a path with `*`, it is expected to only have a single field found more than 1"
+              else
+                get_value_at_path leftOverPath value
+            else if !std.record.has_field head value then
+              'NotFound
+            else if std.array.length leftOverPath > 0 then
+              get_value_at_path leftOverPath value."%{head}"
+            else
+              'Found value."%{head}",
+        },
 
     get_value_at_path_or_default = fun path default_val value =>
       let val = get_value_at_path path value in
@@ -896,6 +1102,57 @@ in
 
   strings = {
 
+    splitN
+      | doc m%"
+      Split a characeter N times and return the result as an array
+
+      # Example
+
+      ```nickel multiline
+      splitN "this.will.split.twice" "." 2
+      # => ["this", "will", "split.twice"]
+
+      splitN "this.will.split.twice" "." 1
+      # => ["this", "will.split.twice"]
+
+      splitN "" "." 2
+      # => [""]
+
+      splitN "test" "." 1
+      # => ["test"]
+
+      splitN "v1.0" "." 1
+      # => ["v1", "0" ]
+      ```
+     "%
+      : String -> String -> Number -> Array String
+      = fun s sep c =>
+        let chars = std.string.characters s in
+        let len = std.array.length chars in
+        chars
+        |> std.array.try_fold_left
+          (fun acc e =>
+            if acc.count == c then
+              'Error acc
+            else if e == sep then
+              'Ok { result = acc.result @ [acc.intermediate], count = acc.count + 1, intermediate = "", index = acc.index + 1 }
+            else
+              'Ok { result = acc.result, count = acc.count, intermediate = acc.intermediate ++ e, index = acc.index + 1 }
+          )
+          { result = [], count = 0, intermediate = "", index = 0 }
+        |> match {
+          'Error r =>
+            if r.result == [] then
+              [s]
+            else
+              r.result @ [std.array.slice r.index len chars |> std.string.join ""],
+          'Ok r =>
+            if r.result == [] then
+              [s]
+            else
+              r.result @ [std.array.slice r.index len chars |> std.string.join ""],
+        },
+
     MinLength
       | doc "Ensure a string is of a minimum range"
       | Number -> Dyn
@@ -974,7 +1231,22 @@ in
 
   arrays = {
     Length
-      | doc "Contract for checking if an array has a specific length, min, max or both"
+      | doc m%"
+        Contract for checking if an array has a specific length, min, max or both
+
+        # Example
+
+        ```nickel multiline
+        [1, 2, 3, 4] | Length { max = 3 }
+        # => error: Array doesn't satisfy the given constraints Min: 0, Max: 3
+
+        [1] | Length { min = 2 }
+        # => error: Array doesn't satisfy the given constraints Min: 2, Max: +inf
+
+        [1,2,3] | Length { min = 2, max = 2 }
+        # => error: Array doesn't satisfy the given constraints Min: 2, Max: 2
+        ```
+      "%
       | { min | std.number.PosNat | optional, max | std.number.PosNat | optional } -> Dyn
       = fun MinAndMax =>
         std.contract.custom (fun label value =>
@@ -1024,7 +1296,21 @@ in
         ),
 
     Contains
-      | doc "ensure an array contains a specifc type with the specified minimum occurrance"
+      | doc m%"
+        A contract ensureing an array contains a specifc type with the specified minimum occurrance
+
+        # Example
+
+        ```nickel multiline
+        [1, "first", "second"] | Contains { min = 2, } String
+
+        [1, "first", "second"] | Contains { min = 3, } String
+        # => error: Expecting at least 3 of the passed contract
+
+        [1,2,3] | Contains { min =1, max = 2 } Number
+        # => error: Expected at least 1 and at most 2 of the passed contract
+        ```
+      "%
       | { min | Number, max | Number | optional, } -> Dyn -> Dyn
       = fun constraints contract =>
         std.contract.custom (fun label value =>
@@ -1082,8 +1368,12 @@ in
         | doc m%"
             Valid port number between 0 to 65535
 
-            ```nickel
+            ```nickel multiline
             1234 | Port
+            # => 1234
+
+            500000 | Port
+            # => error: contract broken by a value
             ```
         "%
         = numbers.InRange 0 true 65535 true,
@@ -1108,14 +1398,64 @@ in
                 'Error { message = "%{value} is not a valid ipv6" }
           ),
       IPv4
-        | doc "IPv4 address"
+        | doc m%"
+        IPv4 address
+
+        # Example
+
+        ```nickel multiline
+        123 | IPv4
+        # => error: contract broken by a value
+
+        "192.168.1.1" | IPv4
+
+        "255.0.0.0.1" | IPv4
+        # => error: contract broken by a value
+
+        "256.0.0.0" | IPv4
+        # => error: contract broken by a value
+        ```
+        "%
         =
-          std.contract.from_predicate (fun ip =>
-            let parts = std.string.split "." ip in
-            if std.array.length parts == 4 then
-              parts |> std.array.all (fun val => let n = std.string.to_number val in n >= 0 && n <= 255)
+          std.contract.from_validator (fun ip =>
+            if std.typeof ip != 'String then
+              'Error { message = "Expected string, got `%{std.typeof ip}`" }
             else
-              false
+              let errMsg = 'Error { message = "Not a valid IPv4 address `%{ip}`" } in
+              let parts = std.string.split "." ip in
+              if std.array.length parts == 4 then
+                parts
+                |> std.array.try_fold_left
+                  (fun acc val =>
+                    let n = std.string.to_number val in
+                    let starts_with_zero = fun n =>
+                      let digits = std.string.characters n in
+                      std.array.length digits > 1 && (digits |> std.array.at 0) == "0"
+                    in
+                    if std.string.is_match "^[0-9]+$" val && !starts_with_zero val && n >= 0 && n <= 255 then
+                      'Ok ip
+                    else
+                      errMsg
+                  )
+                  null
+                |> match {
+                  'Ok _ => 'Ok,
+                  'Error _ => errMsg,
+                }
+              else
+                errMsg
           ),
+
+      Hostname =
+        std.contract.from_validator (fun name =>
+          if std.typeof name != 'String then
+            'Error { message = "Expected a string" }
+          else if std.string.split "." name |> std.array.any (fun l => std.string.length l > 63) then
+            'Error { message = "Hostname label can't be longer than 63 characters" }
+          else if !std.string.is_match "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" name then
+            'Error { message = "Hostname include invalid characters" }
+          else
+            'Ok
+        ),
     },
 }

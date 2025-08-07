@@ -1,0 +1,6 @@
+server:
+  http_listen_port: 4040
+  grpc_listen_port: 9095
+memberlist:
+  advertise_port: 7946
+  bind_port: 7946

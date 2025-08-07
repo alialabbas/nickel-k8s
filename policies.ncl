@@ -287,11 +287,15 @@ let lib = import "lib.ncl" in
         kind = "Deployment",
         spec.template.spec.containers
           | Array {
-            resources.requests
+            resources
               | {
-                # the module system will enforce the correct format, here we just want to remove the optionality
-                cpu | Dyn,
-                memory | Dyn,
+                requests
+                  | {
+                    # the module system will enforce the correct format, here we just want to remove the optionality
+                    cpu | Dyn,
+                    memory | Dyn,
+                    ..
+                  },
                 ..
               },
             ..
