@@ -306,7 +306,7 @@ in
       ```nickel multiline
       {
         inputs | { version | String | default = "v1.0.0" } = {},
-        manifests = { deployment = { apiVersion = "apps/v1/", kind = "Deployment", metadata.name = "test", spec.template.spec.containers = [{ image = "my-image:" ++ Inputs.version, name = "my-image" }] } },
+        manifests = { deployment = { apiVersion = "apps/v1/", kind = "Deployment", metadata.name = "test", spec.template.spec.containers = [{ image = "my-image:" ++ inputs.version, name = "my-image" }] } },
       } | Release
     "%
     = {
@@ -680,13 +680,6 @@ in
  Utility function to merge metadata sources in an environment.
 
  The goal is to merge in a single place to ensure all references are frozen correctly and applied to where their value needs to be propagated. If a resource is using metadata.name, it needs to see what is going to be injected in the name in its manifest, ref manifests, inputs, outputs, and so on.
-
- # Example
-
- ```nickel multiline
- merge_metadata { prefix = "my-instance-", } { myapp = {apiVersion = "v1", kind = "SomeAPI", metadata.name = "myapp"} }
- # => { myapp = {apiVersion = "v1", kind = "SomeAPI", metadata.name = "my-instance-myapp",  metadata.labels = {}, metadata.annotations = {} }, }
- ```
  "%
     # NOTE: it is necessary to use map or map_values, this shouldn't be changed unless something fundementally changes in Nickel lang itself and this property is no longer true
     # The goal is to generate a record to use with (&) operator so nickel can do its job and recursively update all props correctly
