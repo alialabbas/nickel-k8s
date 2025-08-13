@@ -8,17 +8,20 @@ let p = import "../policies.ncl" in
       }
     },
     inputs = {
-      mode = 'distributed,
-      config.blocks_storage = {
-        backend | force = "s3",
-        s3 = {
-          access_key_id = "grafana-mimir",
-          bucket_name = "mimir-tsdb",
-          endpoint = "minio:9000",
-          insecure = true,
-          secret_access_key = "supersecret",
+      mode = 'single-binary,
+      config = {
+        limits.max_global_exemplars_per_user = 1000000,
+        blocks_storage = {
+          backend | force = "s3",
+          s3 = {
+            access_key_id = "grafana-mimir",
+            bucket_name = "mimir-tsdb",
+            endpoint = "minio:9000",
+            insecure = true,
+            secret_access_key = "supersecret",
+          },
         },
-      }
+      },
     },
     output = { endpoints, },
   },
@@ -63,7 +66,7 @@ let p = import "../policies.ncl" in
       }
     },
     inputs = {
-      mode = 'distributed,
+      mode = 'single-binary,
       config = {
         storage.trace = {
           backend | force = "s3",
@@ -90,7 +93,7 @@ let p = import "../policies.ncl" in
     },
     output = { endpoints, },
     inputs = {
-      mode = 'distributed,
+      mode = 'single-binary,
       config = {
         storage = {
           backend = "s3",
@@ -163,18 +166,65 @@ let p = import "../policies.ncl" in
         {
           name = "Loki",
           type = "loki",
+          uid = "loki",
           access = "proxy",
-          url = "http://" ++ loki.output.endpoints.reader
+          url = "http://" ++ loki.output.endpoints.reader,
+          jsonData.derivedFields = [
+            {
+              datasourceUid = "tempo",
+              matcherRegex = "service_name",
+              matcherType = "label",
+              name = "service_name",
+              url = "{.service.name = \"$${__value.raw}\"}",
+            },
+            {
+              datasourceUid = "tempo",
+              matcherRegex = "trace_id",
+              matcherType = "label",
+              name = "traceId",
+              url = "$${__value.raw}",
+            },
+          ],
         },
         {
           name = "Mimir",
           type = "prometheus",
-          url = "http://" ++ mimir.output.endpoints.reader ++ "/prometheus"
+          uid = "mimir",
+          url = "http://" ++ mimir.output.endpoints.reader ++ "/prometheus",
+          jsonData = {
+            exemplarTraceIdDestinations = [{ datasourceUid = "tempo", name = "trace_id", }],
+            httpMethod = "POST",
+          },
         },
         {
           name = "Tempo",
           type = "tempo",
+          uid = "tempo",
           url = "http://" ++ tempo.output.endpoints.reader,
+          # trace_id="${__trace.traceId}"
+          jsonData = {
+            tracesToLogsV2 = {
+              customQuery = true,
+              datasourceUid = "loki",
+              filterBySpanID = false,
+              filterByTraceID = true,
+              query = "{$${__tags}} |trace_id=\"$${__trace.traceId}\"",
+              spanEndTimeShift = "10m",
+              spanStartTimeShift = "-10m",
+              tags = [],
+            },
+            tracesToMetrics = {
+              datasourceUid = "mimir",
+              queries = [
+                {
+                  name = "Rate",
+                  query = "sum(rate(counter_int{$$__tags}[5m]))",
+                },
+                { name = "Sum", query = "sum(counter_int{$$__tags})", }
+              ],
+              tags = [],
+            },
+          },
         },
         {
           name = "Pyroscope",

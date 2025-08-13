@@ -10,7 +10,7 @@ let gen_label = fun version =>
   }
 in
 let schema = {
-  version | String | default = "v12.0",
+  version | String | default = "12.1.0",
   # DataSources? How do we augment them?
   # Each object has its own schema, having a unified schema will be impossible without grafana-sdks stuff
   # Gosh even the sdk sucks in this regard, for now feed the list of datasources as an option
@@ -148,7 +148,7 @@ in
                     value = "/etc/grafana/provisioning",
                   }
                 ],
-                image = "docker.io/grafana/grafana:10.4.1",
+                image = "docker.io/grafana/grafana:%{inputs.version}",
                 imagePullPolicy = "IfNotPresent",
                 livenessProbe = {
                   failureThreshold = 10,

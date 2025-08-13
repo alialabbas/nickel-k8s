@@ -16,6 +16,7 @@ fun inputs =>
           "app.kubernetes.io/component" => true,
           "app.kubernetes.io/instance" => true,
           "app.kubernetes.io/name" => true,
+          "app.kubernetes.io/part-of" => true,
           _ => false,
         }
       ),
@@ -87,14 +88,11 @@ fun inputs =>
         replicas = 1,
         revisionHistoryLimit = 10,
         selector = {
-          matchLabels = labels_to_selectors metadata.labesl,
-        },
-        strategy = {
-          rollingUpdate = { maxSurge = 0, maxUnavailable = 1, },
+          matchLabels = labels_to_selectors metadata.labels,
         },
         template = {
           metadata = {
-            labels = _labels,
+            labels = single-binary-statefulset.metadata.labels,
           },
           spec = {
             containers = [
